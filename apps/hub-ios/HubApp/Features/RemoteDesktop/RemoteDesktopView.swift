@@ -28,31 +28,60 @@ struct RemoteDesktopView: View {
     @State private var webViewReference: WKWebView?
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Connection Header
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(remoteServer.name)
-                        .font(.headline)
+        ZStack {
+            // Remote Cursor Chat Interface - Full Screen Native View
+            if isConnected, let url = connectionURL {
+                // Full screen native view when connected
+                ZStack {
+                    // WebView fills entire space
+                    WebViewWrapper(
+                        url: url,
+                        username: remoteServer.username,
+                        password: remoteServer.password,
+                        isLoading: $webViewIsLoading,
+                        errorMessage: $webViewError,
+                        onScreenshot: { webView in
+                            webViewReference = webView
+                        }
+                    )
+                    .opacity(webViewIsLoading ? 0.5 : 1.0)
                     
-                    Text(remoteServer.host)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                
-                Spacer()
-                
-                // Connection Status with Quality Indicator
-                HStack(spacing: 8) {
-                    if isConnecting {
+                    if webViewIsLoading {
                         ProgressView()
-                            .scaleEffect(0.7)
-                    } else if isConnected {
+                            .scaleEffect(1.5)
+                            .tint(.white)
+                    }
+                    
+                    if let error = webViewError {
+                        VStack(spacing: 12) {
+                            Image(systemName: "exclamationmark.triangle")
+                                .font(.title)
+                                .foregroundColor(.red)
+                            
+                            Text("Connection Error")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                            
+                            Text(error)
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.8))
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal)
+                        }
+                        .padding()
+                        .background(Color.black.opacity(0.8))
+                        .cornerRadius(12)
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .overlay(alignment: .topTrailing) {
+                    // Minimal connection indicator overlay
+                    HStack(spacing: 6) {
                         // Connection Quality Indicator
                         HStack(spacing: 4) {
                             Image(systemName: qualityMonitor.quality.icon)
                                 .foregroundColor(qualityMonitor.quality.color)
-                                .font(.caption)
+                                .font(.caption2)
                             
                             if let latency = qualityMonitor.latency {
                                 Text("\(Int(latency))ms")
@@ -69,212 +98,174 @@ struct RemoteDesktopView: View {
                                 )
                             }
                         }
-                    } else {
-                        Circle()
-                            .fill(Color.red)
-                            .frame(width: 8, height: 8)
                     }
-                    
-                    Text(statusText)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                
-                if !isConnected && !isConnecting {
-                    Button("Connect") {
-                        connectToServer()
-                    }
-                    .buttonStyle(.borderedProminent)
-                } else if isConnected {
-                    Button("Disconnect") {
+                    .padding(8)
+                    .background(.ultraThinMaterial)
+                    .cornerRadius(8)
+                    .padding(8)
+                    .opacity(0.7)
+                    .onLongPressGesture {
+                        // Show disconnect option on long press
                         disconnectFromServer()
                     }
-                    .buttonStyle(.bordered)
                 }
-            }
-            .padding()
-            .background(.ultraThinMaterial)
-            
-            Divider()
-            
-            // Toolbar (when connected)
-            if isConnected {
-                RemoteDesktopToolbar(
-                    isConnected: $isConnected,
-                    onRefresh: {
-                        refreshConnection()
-                    },
-                    onFullscreen: {
-                        isFullscreen.toggle()
-                    },
-                    onScreenshot: {
-                        takeScreenshot()
-                    },
-                    onKeyboard: {
-                        showKeyboard.toggle()
-                    },
-                    onDisconnect: {
-                        disconnectFromServer()
-                    }
-                )
-                .padding(.horizontal)
-                .padding(.vertical, 4)
-                
-                Divider()
-            }
-            
-            // Remote Cursor Chat Interface
-            ZStack {
-                Color.black
-                
-                if isConnecting {
-                    VStack(spacing: 16) {
-                        ProgressView()
-                            .scaleEffect(1.5)
-                            .tint(.white)
-                        
-                        Text("Connecting...")
-                            .font(.title3)
-                            .foregroundColor(.white)
-                        
-                        Text("Establishing connection to \(remoteServer.name)")
-                            .font(.caption)
-                            .foregroundColor(.white.opacity(0.7))
-                            .multilineTextAlignment(.center)
-                    }
-                    .padding()
-                } else if isConnected, let url = connectionURL {
-                    // Remote desktop WebView
-                    ZStack {
-                        WebViewWrapper(
-                            url: url,
-                            username: remoteServer.username,
-                            password: remoteServer.password,
-                            isLoading: $webViewIsLoading,
-                            errorMessage: $webViewError,
-                            onScreenshot: { webView in
-                                webViewReference = webView
+                .overlay(alignment: .bottom) {
+                    // Virtual Keyboard Overlay
+                    VirtualKeyboardView(
+                        isVisible: $showKeyboard,
+                        textInput: $keyboardText,
+                        onSend: { input in
+                            // Check if it's a key command or text
+                            if input.hasPrefix("Ctrl+") || input == "Esc" || input == "Tab" || input == "Enter" {
+                                sendKeyToRemote(input)
+                            } else {
+                                sendTextToRemote(input)
                             }
-                        )
-                            .opacity(webViewIsLoading ? 0.5 : 1.0)
-                        
-                        if webViewIsLoading {
-                            ProgressView()
-                                .scaleEffect(1.5)
-                                .tint(.white)
                         }
-                        
-                        if let error = webViewError {
-                            VStack(spacing: 12) {
-                                Image(systemName: "exclamationmark.triangle")
-                                    .font(.title)
-                                    .foregroundColor(.red)
-                                
-                                Text("Connection Error")
-                                    .font(.headline)
-                                    .foregroundColor(.white)
-                                
-                                Text(error)
-                                    .font(.caption)
-                                    .foregroundColor(.white.opacity(0.8))
-                                    .multilineTextAlignment(.center)
-                                    .padding(.horizontal)
-                            }
-                            .padding()
-                            .background(Color.black.opacity(0.8))
-                            .cornerRadius(12)
-                        }
-                    }
-                } else {
-                    VStack(spacing: 16) {
-                        Image(systemName: "display.trianglebadge.exclamationmark")
-                            .font(.system(size: 60))
-                            .foregroundColor(.white.opacity(0.5))
-                        
-                        Text("Not Connected")
-                            .font(.title2)
-                            .foregroundColor(.white)
-                        
-                        VStack(spacing: 8) {
-                            Text("Connect to view Cursor chat interface")
-                                .font(.subheadline)
-                                .foregroundColor(.white.opacity(0.7))
-                                .multilineTextAlignment(.center)
+                    )
+                }
+            } else {
+                // Connection UI (only shown when not connected)
+                VStack(spacing: 0) {
+                    // Connection Header
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(remoteServer.name)
+                                .font(.headline)
                             
-                            if connectionError != nil {
-                                Text("💡 Tip: Use 'Test Connection' to diagnose issues")
-                                    .font(.caption2)
-                                    .foregroundColor(.white.opacity(0.6))
-                                    .padding(.top, 4)
-                            }
+                            Text(remoteServer.host)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
                         }
                         
-                        if let error = connectionError {
-                            VStack(spacing: 12) {
-                                Divider()
-                                    .background(.white.opacity(0.3))
-                                
-                                HStack {
-                                    Image(systemName: "exclamationmark.triangle.fill")
-                                        .foregroundColor(.red)
-                                    Text("Connection Error")
-                                        .font(.headline)
-                                        .foregroundColor(.red)
-                                }
-                                
-                                ScrollView {
-                                    Text(error)
-                                        .font(.caption)
-                                        .foregroundColor(.white.opacity(0.9))
-                                        .multilineTextAlignment(.leading)
-                                        .padding(.horizontal)
-                                }
-                                .frame(maxHeight: 150)
-                                
-                                Button("Retry Connection") {
-                                    connectToServer()
-                                }
-                                .buttonStyle(.borderedProminent)
-                                .padding(.top, 4)
+                        Spacer()
+                        
+                        // Connection Status
+                        HStack(spacing: 8) {
+                            if isConnecting {
+                                ProgressView()
+                                    .scaleEffect(0.7)
+                            } else {
+                                Circle()
+                                    .fill(Color.red)
+                                    .frame(width: 8, height: 8)
                             }
-                            .padding(.top, 8)
+                            
+                            Text(statusText)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
                         }
                         
-                        VStack(spacing: 12) {
-                            Button("Connect to \(remoteServer.name)") {
+                        if !isConnected && !isConnecting {
+                            Button("Connect") {
                                 connectToServer()
                             }
                             .buttonStyle(.borderedProminent)
-                            .disabled(isConnecting)
-                            
-                            Button("Test Connection") {
-                                testConnection()
-                            }
-                            .buttonStyle(.bordered)
-                            .disabled(isConnecting)
                         }
                     }
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-        }
-        .background(.ultraThinMaterial)
-        .cornerRadius(12)
-        .overlay(alignment: .bottom) {
-            // Virtual Keyboard Overlay
-            VirtualKeyboardView(
-                isVisible: $showKeyboard,
-                textInput: $keyboardText,
-                onSend: { input in
-                    // Check if it's a key command or text
-                    if input.hasPrefix("Ctrl+") || input == "Esc" || input == "Tab" || input == "Enter" {
-                        sendKeyToRemote(input)
-                    } else {
-                        sendTextToRemote(input)
+                    .padding()
+                    .background(.ultraThinMaterial)
+                    
+                    Divider()
+                    
+                    // Remote Cursor Chat Interface
+                    ZStack {
+                        Color.black
+                
+                        if isConnecting {
+                            VStack(spacing: 16) {
+                                ProgressView()
+                                    .scaleEffect(1.5)
+                                    .tint(.white)
+                                
+                                Text("Connecting...")
+                                    .font(.title3)
+                                    .foregroundColor(.white)
+                                
+                                Text("Establishing connection to \(remoteServer.name)")
+                                    .font(.caption)
+                                    .foregroundColor(.white.opacity(0.7))
+                                    .multilineTextAlignment(.center)
+                            }
+                            .padding()
+                        } else {
+                            VStack(spacing: 16) {
+                                Image(systemName: "display.trianglebadge.exclamationmark")
+                                    .font(.system(size: 60))
+                                    .foregroundColor(.white.opacity(0.5))
+                                
+                                Text("Not Connected")
+                                    .font(.title2)
+                                    .foregroundColor(.white)
+                                
+                                VStack(spacing: 8) {
+                                    Text("Connect to view Cursor chat interface")
+                                        .font(.subheadline)
+                                        .foregroundColor(.white.opacity(0.7))
+                                        .multilineTextAlignment(.center)
+                                    
+                                    if connectionError != nil {
+                                        Text("💡 Tip: Use 'Test Connection' to diagnose issues")
+                                            .font(.caption2)
+                                            .foregroundColor(.white.opacity(0.6))
+                                            .padding(.top, 4)
+                                    }
+                                }
+                                
+                                if let error = connectionError {
+                                    VStack(spacing: 12) {
+                                        Divider()
+                                            .background(.white.opacity(0.3))
+                                        
+                                        HStack {
+                                            Image(systemName: "exclamationmark.triangle.fill")
+                                                .foregroundColor(.red)
+                                            Text("Connection Error")
+                                                .font(.headline)
+                                                .foregroundColor(.red)
+                                        }
+                                        
+                                        ScrollView {
+                                            Text(error)
+                                                .font(.caption)
+                                                .foregroundColor(.white.opacity(0.9))
+                                                .multilineTextAlignment(.leading)
+                                                .padding(.horizontal)
+                                        }
+                                        .frame(maxHeight: 150)
+                                        
+                                        Button("Retry Connection") {
+                                            connectToServer()
+                                        }
+                                        .buttonStyle(.borderedProminent)
+                                        .padding(.top, 4)
+                                    }
+                                    .padding(.top, 8)
+                                }
+                                
+                                VStack(spacing: 12) {
+                                    Button("Connect to \(remoteServer.name)") {
+                                        connectToServer()
+                                    }
+                                    .buttonStyle(.borderedProminent)
+                                    .disabled(isConnecting)
+                                    
+                                    Button("Test Connection") {
+                                        testConnection()
+                                    }
+                                    .buttonStyle(.bordered)
+                                    .disabled(isConnecting)
+                                }
+                            }
+                        }
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-            )
+                .background(.ultraThinMaterial)
+                .cornerRadius(12)
+            }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear {
             // Auto-connect on appear if configured
             if remoteServer.autoConnect {

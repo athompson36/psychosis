@@ -206,7 +206,7 @@ class ConnectionManager: ObservableObject {
             let (_, response) = try await URLSession.shared.data(for: request)
             
             // If we get any response (even error codes), the port is open
-            if let httpResponse = response as? HTTPURLResponse {
+            if response is HTTPURLResponse {
                 return true // Port is reachable (even if service returns error)
             }
             return true

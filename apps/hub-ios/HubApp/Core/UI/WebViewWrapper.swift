@@ -74,6 +74,15 @@ struct WebViewWrapper: UIViewRepresentable {
         webView.scrollView.delaysContentTouches = false
         webView.scrollView.canCancelContentTouches = true
         
+        // Hide scroll indicators for native look
+        webView.scrollView.showsHorizontalScrollIndicator = false
+        webView.scrollView.showsVerticalScrollIndicator = false
+        
+        // Remove background color for seamless native appearance
+        webView.isOpaque = false
+        webView.backgroundColor = .clear
+        webView.scrollView.backgroundColor = .clear
+        
         // Add gesture recognizers for better interaction
         let pinchGesture = UIPinchGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handlePinch(_:)))
         webView.addGestureRecognizer(pinchGesture)
