@@ -26,6 +26,16 @@ struct MainTabView: View {
                     Label("Tasks", systemImage: "checklist")
                 }
             
+            CalendarView()
+                .tabItem {
+                    Label("Calendar", systemImage: "calendar")
+                }
+            
+            NotesView()
+                .tabItem {
+                    Label("Notes", systemImage: "note.text")
+                }
+            
             FavoritesView()
                 .tabItem {
                     Label("Favorites", systemImage: "heart.fill")

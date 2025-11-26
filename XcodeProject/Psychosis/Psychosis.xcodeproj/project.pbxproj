@@ -37,6 +37,9 @@
 		4958E8772ED6B66F00A11277 /* NotificationsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E8432ED6B66F00A11277 /* NotificationsViewModel.swift */; };
 		4958E8782ED6B66F00A11277 /* DetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E8242ED6B66F00A11277 /* DetailViewModel.swift */; };
 		4958E8792ED6B66F00A11277 /* .gitkeep in Resources */ = {isa = PBXBuildFile; fileRef = 4958E85D2ED6B66F00A11277 /* .gitkeep */; };
+		4958E8CB2ED6B7F500A11277 /* TasksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E8C82ED6B7F500A11277 /* TasksView.swift */; };
+		4958E8CC2ED6B7F500A11277 /* TasksViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E8C62ED6B7F500A11277 /* TasksViewModel.swift */; };
+		4958E8CD2ED6B7F500A11277 /* TaskItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E8C42ED6B7F500A11277 /* TaskItem.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -92,6 +95,9 @@
 		4958E85A2ED6B66F00A11277 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		4958E85D2ED6B66F00A11277 /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
 		4958E85E2ED6B66F00A11277 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		4958E8C42ED6B7F500A11277 /* TaskItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskItem.swift; sourceTree = "<group>"; };
+		4958E8C62ED6B7F500A11277 /* TasksViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksViewModel.swift; sourceTree = "<group>"; };
+		4958E8C82ED6B7F500A11277 /* TasksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -447,6 +453,7 @@
 		4958E85F2ED6B66F00A11277 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				4958E8CA2ED6B7F500A11277 /* Tasks */,
 				4958E8282ED6B66F00A11277 /* Detail */,
 				4958E82F2ED6B66F00A11277 /* Favorites */,
 				4958E8362ED6B66F00A11277 /* History */,
@@ -459,6 +466,40 @@
 				4958E85E2ED6B66F00A11277 /* README.md */,
 			);
 			path = Features;
+			sourceTree = "<group>";
+		};
+		4958E8C52ED6B7F500A11277 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				4958E8C42ED6B7F500A11277 /* TaskItem.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		4958E8C72ED6B7F500A11277 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				4958E8C62ED6B7F500A11277 /* TasksViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		4958E8C92ED6B7F500A11277 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				4958E8C82ED6B7F500A11277 /* TasksView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		4958E8CA2ED6B7F500A11277 /* Tasks */ = {
+			isa = PBXGroup;
+			children = (
+				4958E8C52ED6B7F500A11277 /* Models */,
+				4958E8C72ED6B7F500A11277 /* ViewModels */,
+				4958E8C92ED6B7F500A11277 /* Views */,
+			);
+			path = Tasks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -629,6 +670,9 @@
 				4958E8722ED6B66F00A11277 /* MainTabView.swift in Sources */,
 				4958E8732ED6B66F00A11277 /* ProfileViewModel.swift in Sources */,
 				4958E8742ED6B66F00A11277 /* DetailItem.swift in Sources */,
+				4958E8CB2ED6B7F500A11277 /* TasksView.swift in Sources */,
+				4958E8CC2ED6B7F500A11277 /* TasksViewModel.swift in Sources */,
+				4958E8CD2ED6B7F500A11277 /* TaskItem.swift in Sources */,
 				4958E8752ED6B66F00A11277 /* HistoryView.swift in Sources */,
 				4958E8762ED6B66F00A11277 /* NotificationItem.swift in Sources */,
 				4958E8772ED6B66F00A11277 /* NotificationsViewModel.swift in Sources */,
