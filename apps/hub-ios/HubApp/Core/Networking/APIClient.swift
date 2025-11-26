@@ -19,19 +19,19 @@ class APIClient {
     // MARK: - Tools API
     
     func getTools() async throws -> [Tool] {
-        try await request<[Tool]>(endpoint: "/tools", method: "GET")
+        try await request(endpoint: "/tools", method: "GET")
     }
     
     // MARK: - Files API
     
     func getFileTree(path: String = "/") async throws -> [FileItem] {
         let encodedPath = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
-        return try await request<[FileItem]>(endpoint: "/files/tree?path=\(encodedPath)", method: "GET")
+        return try await request(endpoint: "/files/tree?path=\(encodedPath)", method: "GET")
     }
     
     func getFileContent(path: String) async throws -> FileItem {
         let encodedPath = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
-        return try await request<FileItem>(endpoint: "/files/content?path=\(encodedPath)", method: "GET")
+        return try await request(endpoint: "/files/content?path=\(encodedPath)", method: "GET")
     }
     
     func saveFile(path: String, content: String) async throws {
@@ -45,7 +45,7 @@ class APIClient {
         }
         
         let body = SaveRequest(path: path, content: content)
-        _ = try await request<SaveResponse, SaveRequest>(endpoint: "/files/save", method: "POST", body: body)
+        let _: SaveResponse = try await request(endpoint: "/files/save", method: "POST", body: body)
     }
     
     // MARK: - Chat API
@@ -57,7 +57,7 @@ class APIClient {
         }
         
         let body = ChatRequest(message: message, context: context)
-        return try await request<ChatResponse>(endpoint: "/chat", method: "POST", body: body)
+        return try await request(endpoint: "/chat", method: "POST", body: body)
     }
     
     // MARK: - Generic Request
