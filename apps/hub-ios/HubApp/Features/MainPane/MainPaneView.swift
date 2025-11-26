@@ -341,10 +341,7 @@ struct MainPaneView: View {
         .sheet(isPresented: $showSettings) {
             SettingsView()
         }
-        .sheet(isPresented: $showAddServerSheet, onDismiss: {
-            // Only reset form when sheet is dismissed (after save or cancel)
-            // This ensures values persist while editing
-        }) {
+        .sheet(isPresented: $showAddServerSheet) {
             // Simple add server view (can be replaced with AddRemoteServerView when added to Xcode)
             NavigationView {
                 Form {
