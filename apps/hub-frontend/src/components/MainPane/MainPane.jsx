@@ -16,7 +16,7 @@ const MainPane = ({ children }) => {
   }, []);
 
   const tabs = [
-    { id: 'chat', label: 'Chat', icon: '💬' },
+    { id: 'chat', label: 'Chat', icon: '💬' }, // Cursor chat
     { id: 'editor', label: 'Editor', icon: '📝' },
     { id: 'files', label: 'Files', icon: '📁' },
   ];

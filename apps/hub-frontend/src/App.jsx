@@ -7,8 +7,6 @@ import FileBrowser from './components/FileBrowser/FileBrowser';
 import './App.css';
 
 function App() {
-  const [selectedTool, setSelectedTool] = useState('dev-remote');
-  const [connectionStatus, setConnectionStatus] = useState('connected');
   const [currentFile, setCurrentFile] = useState(null);
 
   const handleFileSelect = (file) => {
@@ -21,12 +19,6 @@ function App() {
 
   return (
     <div className="app">
-      <EditorBar
-        selectedTool={selectedTool}
-        onToolChange={setSelectedTool}
-        connectionStatus={connectionStatus}
-      />
-      
       <MainPane>
         {{
           chat: <Chat context={{ file: currentFile }} />,

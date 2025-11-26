@@ -7,7 +7,7 @@ const Chat = ({ context = {} }) => {
     {
       id: 1,
       role: 'assistant',
-      content: 'Hello! I\'m your AI coding assistant. How can I help you with your code today?',
+      content: 'Connect to Cursor to start chatting about your code.',
       timestamp: new Date(),
     },
   ]);
@@ -39,12 +39,13 @@ const Chat = ({ context = {} }) => {
     setIsLoading(true);
 
     try {
+      // TODO: Connect to Cursor chat API instead of generic AI
       const response = await api.sendChatMessage(input, context);
       
       const assistantMessage = {
         id: Date.now() + 1,
         role: 'assistant',
-        content: response.response || response.message || 'I apologize, but I couldn\'t process that request.',
+        content: response.response || response.message || 'Cursor chat response would appear here.',
         timestamp: new Date(),
       };
 
@@ -94,10 +95,10 @@ const Chat = ({ context = {} }) => {
       </div>
 
       <form className="chat-input-form" onSubmit={handleSend}>
-        <input
+          <input
           type="text"
           className="chat-input input"
-          placeholder="Ask about your code..."
+          placeholder="Ask Cursor about your code..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
           disabled={isLoading}
