@@ -6,6 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		4958E72E2ED6AD4100A11277 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E72D2ED6AD4000A11277 /* APIClient.swift */; };
+		4958E7302ED6AD5900A11277 /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E72F2ED6AD5900A11277 /* StorageManager.swift */; };
+		4958E7322ED6AD7B00A11277 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E7312ED6AD7B00A11277 /* Constants.swift */; };
+		4958E7342ED6AD9500A11277 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E7332ED6AD9500A11277 /* AppTheme.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		4958E7112ED6AA4200A11277 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +34,10 @@
 		4958E7032ED6AA3F00A11277 /* Psychosis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Psychosis.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4958E7102ED6AA4200A11277 /* PsychosisTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PsychosisTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4958E71A2ED6AA4200A11277 /* PsychosisUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PsychosisUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4958E72D2ED6AD4000A11277 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = APIClient.swift; path = Core/Networking/APIClient.swift; sourceTree = "<group>"; };
+		4958E72F2ED6AD5900A11277 /* StorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StorageManager.swift; path = Core/Storage/StorageManager.swift; sourceTree = "<group>"; };
+		4958E7312ED6AD7B00A11277 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Constants.swift; path = Core/Utilities/Constants.swift; sourceTree = "<group>"; };
+		4958E7332ED6AD9500A11277 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppTheme.swift; path = Core/UI/Themes/AppTheme.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +86,10 @@
 		4958E6FA2ED6AA3F00A11277 = {
 			isa = PBXGroup;
 			children = (
+				4958E7332ED6AD9500A11277 /* AppTheme.swift */,
+				4958E7312ED6AD7B00A11277 /* Constants.swift */,
+				4958E72F2ED6AD5900A11277 /* StorageManager.swift */,
+				4958E72D2ED6AD4000A11277 /* APIClient.swift */,
 				4958E7052ED6AA3F00A11277 /* Psychosis */,
 				4958E7132ED6AA4200A11277 /* PsychosisTests */,
 				4958E71D2ED6AA4200A11277 /* PsychosisUITests */,
@@ -236,6 +251,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4958E7322ED6AD7B00A11277 /* Constants.swift in Sources */,
+				4958E7342ED6AD9500A11277 /* AppTheme.swift in Sources */,
+				4958E72E2ED6AD4100A11277 /* APIClient.swift in Sources */,
+				4958E7302ED6AD5900A11277 /* StorageManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

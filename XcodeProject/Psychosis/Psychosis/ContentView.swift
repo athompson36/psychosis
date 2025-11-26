@@ -9,19 +9,22 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: AppTheme.Spacing.large) {
             Image(systemName: "globe")
                 .imageScale(.large)
-                .foregroundStyle(.tint)
+                .foregroundStyle(AppTheme.Colors.primary)
             
-            Text("Welcome to Psychosis")
-                .font(.title)
+            Text("Welcome to \(Constants.appName)")
+                .font(AppTheme.Typography.title)
+                .foregroundColor(AppTheme.Colors.foreground)
             
-            Text("Version 0.1.0")
-                .font(.caption)
-                .foregroundColor(.secondary)
+            Text("Version \(Constants.appVersion)")
+                .font(AppTheme.Typography.caption)
+                .foregroundColor(AppTheme.Colors.secondary)
         }
-        .padding(32)
+        .padding(AppTheme.Spacing.extraLarge)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(AppTheme.Colors.background)
     }
 }
 
