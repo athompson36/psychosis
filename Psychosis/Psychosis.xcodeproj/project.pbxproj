@@ -16,7 +16,7 @@
 		4958E9352ED6C07800A11277 /* EditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9222ED6C07800A11277 /* EditorView.swift */; };
 		4958E9362ED6C07800A11277 /* PsychosisApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9172ED6C07800A11277 /* PsychosisApp.swift */; };
 		4958E9372ED6C07800A11277 /* EditorBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9242ED6C07800A11277 /* EditorBarView.swift */; };
-		4958E9382ED6C07800A11277 /* CursorChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9382ED6C07800A11277 /* CursorChatView.swift */; };
+		4958E9392ED6C07800A11277 /* CursorChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9382ED6C07800A11277 /* CursorChatView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -367,7 +367,7 @@
 			files = (
 				4958E92D2ED6C07800A11277 /* Color+Hex.swift in Sources */,
 				4958E92E2ED6C07800A11277 /* MainPaneView.swift in Sources */,
-				4958E9382ED6C07800A11277 /* CursorChatView.swift in Sources */,
+				4958E9392ED6C07800A11277 /* CursorChatView.swift in Sources */,
 				4958E9302ED6C07800A11277 /* ContentView.swift in Sources */,
 				4958E9312ED6C07800A11277 /* FileBrowserView.swift in Sources */,
 				4958E9322ED6C07800A11277 /* APIClient.swift in Sources */,
