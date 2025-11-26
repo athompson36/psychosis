@@ -150,8 +150,18 @@ class ConnectionManager: ObservableObject {
                 
                 // Check for specific error codes
                 if nsError.code == -1005 {
-                    // Connection lost/reset by peer
-                    return .failure("Connection reset by server. The server accepted the connection but immediately closed it. This may indicate:\n• Server doesn't support the requested path\n• Authentication required\n• Server is rejecting the connection format\n• Try accessing http://\(server.host):\(url.port ?? 0)/vnc.html in a browser first")
+                    // Connection lost/reset by peer - often DNS resolution failure
+                    var errorMsg = "Connection lost. This often indicates:\n"
+                    // Check if hostname might be the issue (not an IP address)
+                    let isIPAddress = server.host.range(of: "^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$", options: .regularExpression) != nil
+                    if server.host.contains(".local") || (!isIPAddress && !server.host.contains(".")) {
+                        errorMsg += "• Hostname '\(server.host)' may not resolve on this device\n"
+                        errorMsg += "• Try using IP address instead (e.g., 192.168.4.100)\n"
+                    }
+                    errorMsg += "• Server doesn't support the requested path\n"
+                    errorMsg += "• Authentication required\n"
+                    errorMsg += "• Try accessing http://\(server.host):\(url.port ?? 0)/vnc.html in a browser first"
+                    return .failure(errorMsg)
                 } else if nsError.code == -1004 {
                     // Could not connect
                     if errorMsg.contains("refused") {

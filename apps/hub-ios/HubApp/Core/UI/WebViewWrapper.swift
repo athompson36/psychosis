@@ -87,35 +87,48 @@ struct WebViewWrapper: UIViewRepresentable {
     }
     
     func updateUIView(_ webView: WKWebView, context: Context) {
-        if let url = url {
-            var request = URLRequest(url: url)
-            
-            // Handle basic authentication if credentials are in URL
-            if let user = url.user, let password = url.password {
-                let loginString = "\(user):\(password)"
-                let loginData = loginString.data(using: .utf8)!
-                let base64LoginString = loginData.base64EncodedString()
-                request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
-            }
-            
-            // Set additional headers for better compatibility with noVNC
-            request.setValue("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1", forHTTPHeaderField: "User-Agent")
-            request.setValue("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", forHTTPHeaderField: "Accept")
-            request.setValue("gzip, deflate", forHTTPHeaderField: "Accept-Encoding")
-            request.setValue("en-US,en;q=0.9", forHTTPHeaderField: "Accept-Language")
-            request.setValue("keep-alive", forHTTPHeaderField: "Connection")
-            
-            // Don't set Content-Type for GET requests
-            // request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-            
-            // Increase timeout for remote desktop connections
-            request.timeoutInterval = 30.0
-            
-            // Allow redirects
-            request.httpShouldHandleCookies = true
-            
-            webView.load(request)
+        // Reset tracking if URL is nil (disconnected)
+        if url == nil {
+            context.coordinator.lastLoadedURL = nil
+            context.coordinator.isCurrentlyLoading = false
+            return
         }
+        
+        // Only load if URL has changed and we're not currently loading
+        guard let url = url,
+              url != context.coordinator.lastLoadedURL,
+              !context.coordinator.isCurrentlyLoading else {
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        
+        // Handle basic authentication if credentials are in URL
+        if let user = url.user, let password = url.password {
+            let loginString = "\(user):\(password)"
+            let loginData = loginString.data(using: .utf8)!
+            let base64LoginString = loginData.base64EncodedString()
+            request.setValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
+        }
+        
+        // Set additional headers for better compatibility with noVNC
+        request.setValue("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1", forHTTPHeaderField: "User-Agent")
+        request.setValue("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", forHTTPHeaderField: "Accept")
+        request.setValue("gzip, deflate", forHTTPHeaderField: "Accept-Encoding")
+        request.setValue("en-US,en;q=0.9", forHTTPHeaderField: "Accept-Language")
+        request.setValue("keep-alive", forHTTPHeaderField: "Connection")
+        
+        // Increase timeout for remote desktop connections
+        request.timeoutInterval = 30.0
+        
+        // Allow redirects
+        request.httpShouldHandleCookies = true
+        
+        // Mark as loading and store URL
+        context.coordinator.isCurrentlyLoading = true
+        context.coordinator.lastLoadedURL = url
+        
+        webView.load(request)
     }
     
     func makeCoordinator() -> Coordinator {
@@ -125,6 +138,8 @@ struct WebViewWrapper: UIViewRepresentable {
     class Coordinator: NSObject, WKNavigationDelegate, WKUIDelegate {
         let parent: WebViewWrapper
         var webView: WKWebView?
+        var lastLoadedURL: URL?
+        var isCurrentlyLoading: Bool = false
         
         init(_ parent: WebViewWrapper) {
             self.parent = parent
@@ -282,18 +297,38 @@ struct WebViewWrapper: UIViewRepresentable {
         func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
             parent.isLoading = true
             parent.errorMessage = nil
+            isCurrentlyLoading = true
         }
         
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             parent.isLoading = false
+            isCurrentlyLoading = false
         }
         
         func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+            isCurrentlyLoading = false
+            
+            // Ignore -999 errors (NSURLErrorCancelled) - these are harmless navigation cancellations
+            let nsError = error as NSError
+            if nsError.code == -999 { // NSURLErrorCancelled
+                // This is a cancelled navigation, usually harmless (e.g., new navigation started)
+                return
+            }
+            
             parent.isLoading = false
             parent.errorMessage = error.localizedDescription
         }
         
         func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+            isCurrentlyLoading = false
+            
+            // Ignore -999 errors (NSURLErrorCancelled) - these are harmless navigation cancellations
+            let nsError = error as NSError
+            if nsError.code == -999 { // NSURLErrorCancelled
+                // This is a cancelled navigation, usually harmless (e.g., new navigation started)
+                return
+            }
+            
             parent.isLoading = false
             parent.errorMessage = error.localizedDescription
         }

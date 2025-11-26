@@ -8,10 +8,7 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @State private var remoteServers: [RemoteServer] = [
-        RemoteServer(name: "fs-dev Ubuntu", host: "fs-dev.local", port: 5900, type: .ubuntu),
-        RemoteServer(name: "Mac Studio", host: "mac-studio.local", port: 5900, type: .mac)
-    ]
+    @StateObject private var serverManager = RemoteServerManager.shared
     @State private var showAddServerSheet: Bool = false
     @State private var serverToEdit: RemoteServer?
     
@@ -19,7 +16,7 @@ struct SettingsView: View {
         NavigationView {
             List {
                 Section(header: Text("Remote Servers")) {
-                    ForEach(remoteServers) { server in
+                    ForEach(serverManager.servers) { server in
                         HStack {
                             Text(server.type.icon)
                             VStack(alignment: .leading, spacing: 4) {
@@ -40,12 +37,15 @@ struct SettingsView: View {
                         }
                         .contentShape(Rectangle())
                         .onTapGesture {
-                            serverToEdit = server
-                            showAddServerSheet = true
+                            // Get the latest server from manager to ensure we have the most up-to-date data
+                            if let latestServer = serverManager.servers.first(where: { $0.id == server.id }) {
+                                serverToEdit = latestServer
+                                showAddServerSheet = true
+                            }
                         }
                     }
                     .onDelete { indexSet in
-                        remoteServers.remove(atOffsets: indexSet)
+                        serverManager.deleteServer(at: indexSet)
                     }
                     
                     Button(action: {
@@ -105,29 +105,21 @@ struct SettingsView: View {
             }
             .navigationTitle("Settings")
             .sheet(isPresented: $showAddServerSheet) {
-                // Simple add server view
-                NavigationView {
-                    Form {
-                        Section(header: Text("Server Information")) {
-                            TextField("Server Name", text: .constant(serverToEdit?.name ?? ""))
-                            TextField("Host", text: .constant(serverToEdit?.host ?? ""))
-                            TextField("Port", text: .constant(serverToEdit != nil ? String(serverToEdit!.port) : "5900"))
-                        }
-                        Section {
-                            Button("Save") {
-                                showAddServerSheet = false
-                            }
-                        }
+                ServerFormView(serverToEdit: serverToEdit) { server in
+                    if serverToEdit != nil {
+                        serverManager.updateServer(server)
+                    } else {
+                        serverManager.addServer(server)
                     }
-                    .navigationTitle(serverToEdit == nil ? "Add Server" : "Edit Server")
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarLeading) {
-                            Button("Cancel") {
-                                showAddServerSheet = false
-                            }
-                        }
-                    }
+                    // Clear serverToEdit after saving
+                    serverToEdit = nil
+                }
+                .id(serverToEdit?.id ?? UUID()) // Force recreation when serverToEdit changes
+            }
+            .onChange(of: showAddServerSheet) { isPresented in
+                // Clear serverToEdit when sheet is dismissed
+                if !isPresented {
+                    serverToEdit = nil
                 }
             }
         }

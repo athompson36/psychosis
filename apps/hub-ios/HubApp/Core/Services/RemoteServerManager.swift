@@ -23,7 +23,7 @@ class RemoteServerManager: ObservableObject {
         // Add default servers if none exist
         if servers.isEmpty {
             servers = [
-                RemoteServer(name: "fs-dev Ubuntu", host: "fs-dev.local", port: 5900, type: .ubuntu),
+                RemoteServer(name: "fs-dev Ubuntu", host: "192.168.4.100", port: 6080, type: .ubuntu, connectionPath: "/vnc.html"),
                 RemoteServer(name: "Mac Studio", host: "mac-studio.local", port: 5900, type: .mac)
             ]
             saveServers()

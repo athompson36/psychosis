@@ -88,6 +88,9 @@ struct ServerFormView: View {
             .onAppear {
                 loadServerData()
             }
+            .onChange(of: serverToEdit?.id) { _ in
+                loadServerData()
+            }
         }
     }
     
