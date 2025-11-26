@@ -23,6 +23,9 @@ enum Constants {
         static let notificationsEnabled = "notificationsEnabled"
         static let hapticFeedbackEnabled = "hapticFeedbackEnabled"
         static let userProfile = "userProfile"
+        static let notifications = "notifications"
+        static let favorites = "favorites"
+        static let history = "history"
     }
 }
 

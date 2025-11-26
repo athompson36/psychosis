@@ -21,6 +21,22 @@ struct MainTabView: View {
                     Label("Search", systemImage: "magnifyingglass")
                 }
             
+            FavoritesView()
+                .tabItem {
+                    Label("Favorites", systemImage: "heart.fill")
+                }
+            
+            NotificationsView()
+                .tabItem {
+                    Label("Notifications", systemImage: "bell.fill")
+                }
+                .badge(NotificationsViewModel().unreadCount)
+            
+            HistoryView()
+                .tabItem {
+                    Label("History", systemImage: "clock.fill")
+                }
+            
             ProfileView()
                 .tabItem {
                     Label("Profile", systemImage: "person.fill")
