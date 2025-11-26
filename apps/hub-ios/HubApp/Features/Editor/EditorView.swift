@@ -52,9 +52,9 @@ struct EditorView: View {
                     .background(Color(.systemBackground))
                     .onChange(of: content) { _, _ in
                         isDirty = true
-                        if var file = file {
-                            file.content = content
-                            self.file = file
+                        if var currentFile = self.file {
+                            currentFile.content = content
+                            self.file = currentFile
                         }
                     }
             } else {
