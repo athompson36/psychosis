@@ -2,26 +2,29 @@
 //  ContentView.swift
 //  Psychosis
 //
-//  Created on [Current Date]
+//  Created by Andrew Thompson on 11/25/25.
 //
 
 import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        VStack {
+        VStack(spacing: 24) {
             Image(systemName: "globe")
                 .imageScale(.large)
                 .foregroundStyle(.tint)
+            
             Text("Welcome to Psychosis")
                 .font(.title)
-                .padding()
+            
+            Text("Version 0.1.0")
+                .font(.caption)
+                .foregroundColor(.secondary)
         }
-        .padding()
+        .padding(32)
     }
 }
 
 #Preview {
     ContentView()
 }
-

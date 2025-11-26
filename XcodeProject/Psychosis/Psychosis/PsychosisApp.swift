@@ -2,7 +2,7 @@
 //  PsychosisApp.swift
 //  Psychosis
 //
-//  Created on [Current Date]
+//  Created by Andrew Thompson on 11/25/25.
 //
 
 import SwiftUI
@@ -15,4 +15,3 @@ struct PsychosisApp: App {
         }
     }
 }
-
