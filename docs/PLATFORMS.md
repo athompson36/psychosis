@@ -1,8 +1,8 @@
-# Platform Support: FS-Remote Hub
+# Platform Support: Psychosis
 
 ## Overview
 
-FS-Remote Hub is available on **two platforms**:
+Psychosis is available on **two platforms**:
 
 1. **Web App** (PWA) - Browser-based, works everywhere
 2. **Native iOS/iPadOS App** - Native performance, better mobile experience

@@ -1,17 +1,17 @@
-# Project Summary: FS-Remote Hub (FS-Tech Liquid Glass)
+# Project Summary: Psychosis (FS-Tech Liquid Glass)
 
 ## Current Project State
 
 **Status**: 🟢 Phase 0 - Initialization (In Progress)  
 **Last Updated**: [Current Date]  
 **Repository**: ✅ Initialized and pushed to GitHub  
-**Project Type**: Web Application (React + Node.js)
+**Project Type**: Dual-Platform (Web App + iOS App)
 
 ---
 
 ## Project Overview
 
-**FS-Remote Hub** (code name: Psychosis) is a mobile-first, Liquid Glass–themed control cockpit for remote development. It provides a phone-optimized UI to browse/edit code, chat with AI about repositories, and view desktop-only tools (Xcode) via remote-screen sessions.
+**Psychosis** is a mobile-first, Liquid Glass–themed control cockpit for remote development. It provides a phone-optimized UI to browse/edit code, chat with AI about repositories, and view desktop-only tools (Xcode) via remote-screen sessions.
 
 ### Key Goals
 

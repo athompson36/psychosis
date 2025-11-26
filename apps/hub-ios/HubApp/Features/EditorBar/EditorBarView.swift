@@ -35,7 +35,7 @@ struct EditorBarView: View {
             Spacer()
             
             // Title
-            Text("FS-Remote Hub")
+            Text("Psychosis")
                 .font(.title2)
                 .fontWeight(.semibold)
                 .foregroundStyle(

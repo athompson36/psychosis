@@ -1,6 +1,6 @@
-# Hub Backend
+# Psychosis Backend
 
-Node.js + Express server for FS-Remote Hub.
+Node.js + Express server for Psychosis.
 
 ## API Endpoints
 

@@ -1,6 +1,6 @@
 //
 //  ChatView.swift
-//  HubApp
+//  Psychosis
 //
 //  Created on [Current Date]
 //

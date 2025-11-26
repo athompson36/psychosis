@@ -1,6 +1,6 @@
 {
-  "name": "FS-Remote Hub",
-  "short_name": "FS Hub",
+  "name": "Psychosis",
+  "short_name": "Psychosis",
   "description": "Mobile-first remote development control cockpit",
   "start_url": "/",
   "display": "standalone",

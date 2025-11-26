@@ -1,6 +1,6 @@
-# Hub iOS App
+# Psychosis iOS App
 
-Native iOS/iPadOS app for FS-Remote Hub.
+Native iOS/iPadOS app for Psychosis.
 
 ## Overview
 
@@ -22,7 +22,7 @@ This is the native iOS companion to the web app, providing the same functionalit
 ## Project Structure
 
 ```
-HubApp/
+Psychosis/
 ├── App/              # App entry point
 ├── Features/         # Feature modules
 │   ├── EditorBar/   # Tool selector
@@ -46,7 +46,7 @@ HubApp/
 
 ## Setup
 
-1. Open `HubApp.xcodeproj` in Xcode
+1. Open `Psychosis.xcodeproj` in Xcode
 2. Select your development team
 3. Build and run
 

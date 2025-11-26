@@ -1,4 +1,4 @@
-# FS-Remote Hub (FS-Tech Liquid Glass)
+# Psychosis (FS-Tech Liquid Glass)
 
 A mobile-first, Liquid Glass–themed control cockpit for fs-dev.
 

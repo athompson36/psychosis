@@ -1,4 +1,4 @@
-# Architecture: FS-Remote Hub (FS-Tech Liquid Glass)
+# Architecture: Psychosis (FS-Tech Liquid Glass)
 
 ## Architecture Decision Record (ADR)
 
@@ -10,7 +10,7 @@
 
 ## Overview
 
-This document describes the architecture decisions, patterns, and structure for the FS-Remote Hub - a mobile-first, Liquid Glass–themed control cockpit for remote development.
+This document describes the architecture decisions, patterns, and structure for Psychosis - a mobile-first, Liquid Glass–themed control cockpit for remote development.
 
 ---
 

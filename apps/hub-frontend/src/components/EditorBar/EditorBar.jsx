@@ -24,9 +24,9 @@ const EditorBar = ({ selectedTool, onToolChange, connectionStatus }) => {
         </select>
       </div>
 
-      <div className="editor-bar-center">
-        <h1 className="editor-bar-title">FS-Remote Hub</h1>
-      </div>
+            <div className="editor-bar-center">
+                <h1 className="editor-bar-title">Psychosis</h1>
+            </div>
 
       <div className="editor-bar-right">
         <div className={`connection-status ${connectionStatus}`}>

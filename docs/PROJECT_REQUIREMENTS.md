@@ -1,8 +1,8 @@
-# Project Requirements: FS-Remote Hub (FS-Tech Liquid Glass)
+# Project Requirements: Psychosis (FS-Tech Liquid Glass)
 
 ## Project Overview
 
-**Project Name**: FS-Remote Hub (Psychosis)  
+**Project Name**: Psychosis  
 **Status**: In Development  
 **Version**: 0.1.0  
 **Last Updated**: [Current Date]
@@ -11,7 +11,7 @@
 
 ## Purpose & Vision
 
-**FS-Remote Hub** is a mobile-first, Liquid Glass–themed control cockpit for fs-dev that enables remote development workflows from an iPhone.
+**Psychosis** is a mobile-first, Liquid Glass–themed control cockpit for fs-dev that enables remote development workflows from an iPhone.
 
 ### Core Goals
 

@@ -1,6 +1,6 @@
-# Hub Frontend
+# Psychosis Frontend
 
-React + Vite PWA for FS-Remote Hub.
+React + Vite PWA for Psychosis.
 
 ## Features
 

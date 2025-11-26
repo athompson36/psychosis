@@ -6,7 +6,7 @@
 2. **File → New → Project...**
 3. Select **iOS → App**
 4. Configure:
-   - **Product Name**: `HubApp`
+   - **Product Name**: `Psychosis`
    - **Team**: Your development team
    - **Organization Identifier**: `com.fstech` (or your choice)
    - **Interface**: SwiftUI
@@ -20,7 +20,7 @@
 After creating the project, add the files we've created:
 
 1. **Right-click** on the project in Navigator
-2. **Add Files to "HubApp"...**
+2. **Add Files to "Psychosis"...**
 3. Navigate to `apps/hub-ios/HubApp/`
 4. Select all folders:
    - `App/`
@@ -30,7 +30,7 @@ After creating the project, add the files we've created:
 5. **IMPORTANT**:
    - ✅ **"Create groups"** (not folder references)
    - ❌ **"Copy items if needed"** - UNCHECKED
-   - ✅ **"Add to targets: HubApp"** - CHECKED
+   - ✅ **"Add to targets: Psychosis"** - CHECKED
 6. Click **Add**
 
 ## Project Structure in Xcode
@@ -38,9 +38,9 @@ After creating the project, add the files we've created:
 After adding files, your project should look like:
 
 ```
-HubApp
+Psychosis
 ├── App
-│   ├── HubApp.swift
+│   ├── PsychosisApp.swift
 │   └── ContentView.swift
 ├── Features
 │   ├── EditorBar

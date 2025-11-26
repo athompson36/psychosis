@@ -1,6 +1,6 @@
 //
-//  HubApp.swift
-//  HubApp
+//  PsychosisApp.swift
+//  Psychosis
 //
 //  Created on [Current Date]
 //
@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct HubApp: App {
+struct PsychosisApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
