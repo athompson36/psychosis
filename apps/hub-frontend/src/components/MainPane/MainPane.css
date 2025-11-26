@@ -1,0 +1,139 @@
+.main-pane {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 100px);
+  margin: var(--spacing-md);
+  gap: var(--spacing-md);
+}
+
+.main-pane-tabs {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-md);
+}
+
+.tab-button {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+}
+
+.tab-button:hover {
+  background: var(--glass-bg);
+  color: var(--text);
+}
+
+.tab-button.active {
+  background: var(--glass-bg);
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.tab-icon {
+  font-size: 1rem;
+}
+
+.tab-label {
+  font-weight: 500;
+}
+
+.split-toggle {
+  margin-left: auto;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg-dark);
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 1.25rem;
+  transition: all 0.2s ease;
+}
+
+.split-toggle:hover {
+  background: var(--glass-bg);
+  color: var(--text);
+}
+
+.split-toggle.active {
+  background: var(--primary);
+  color: var(--bg-dark);
+  border-color: var(--primary);
+}
+
+.main-pane-content {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Portrait Layouts */
+.main-pane-portrait-single {
+  height: 100%;
+  overflow: auto;
+}
+
+.main-pane-portrait-split {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: var(--spacing-sm);
+}
+
+.pane-top,
+.pane-bottom {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+}
+
+.pane-divider {
+  height: 2px;
+  background: var(--glass-border);
+  margin: var(--spacing-sm) 0;
+}
+
+/* Landscape Layouts */
+.main-pane-landscape-single {
+  height: 100%;
+  overflow: auto;
+}
+
+.main-pane-landscape-split {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  gap: var(--spacing-sm);
+}
+
+.pane-left,
+.pane-right {
+  flex: 1;
+  overflow: auto;
+  min-width: 0;
+}
+
+.pane-divider-vertical {
+  width: 2px;
+  background: var(--glass-border);
+  margin: 0 var(--spacing-sm);
+}
+
+@media (max-width: 768px) {
+  .tab-label {
+    display: none;
+  }
+
+  .tab-button {
+    padding: var(--spacing-sm);
+  }
+}
+
