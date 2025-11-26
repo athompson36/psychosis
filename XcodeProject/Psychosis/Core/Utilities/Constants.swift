@@ -18,6 +18,7 @@ enum Constants {
     // Storage Keys
     enum StorageKeys {
         static let userPreferences = "userPreferences"
+        static let homeItems = "homeItems"
     }
 }
 
