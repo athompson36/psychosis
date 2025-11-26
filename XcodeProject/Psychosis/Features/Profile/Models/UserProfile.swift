@@ -38,12 +38,12 @@ struct UserProfile: Identifiable, Codable, Equatable {
 
 /// User preferences
 struct UserPreferences: Codable, Equatable {
-    var theme: AppTheme
+    var theme: UserThemePreference
     var notificationsEnabled: Bool
     var hapticFeedbackEnabled: Bool
     
     init(
-        theme: AppTheme = .system,
+        theme: UserThemePreference = .system,
         notificationsEnabled: Bool = true,
         hapticFeedbackEnabled: Bool = true
     ) {
@@ -53,7 +53,7 @@ struct UserPreferences: Codable, Equatable {
     }
 }
 
-enum AppTheme: String, Codable, CaseIterable {
+enum UserThemePreference: String, Codable, CaseIterable {
     case light = "Light"
     case dark = "Dark"
     case system = "System"
