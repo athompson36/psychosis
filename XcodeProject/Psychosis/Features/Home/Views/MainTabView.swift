@@ -30,7 +30,6 @@ struct MainTabView: View {
                 .tabItem {
                     Label("Notifications", systemImage: "bell.fill")
                 }
-                .badge(NotificationsViewModel().unreadCount)
             
             HistoryView()
                 .tabItem {
