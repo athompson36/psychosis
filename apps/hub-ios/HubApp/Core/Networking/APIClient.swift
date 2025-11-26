@@ -48,17 +48,6 @@ class APIClient {
         let _: SaveResponse = try await request(endpoint: "/files/save", method: "POST", body: body)
     }
     
-    // MARK: - Chat API
-    
-    func sendChatMessage(message: String, context: ChatContext? = nil) async throws -> ChatResponse {
-        struct ChatRequest: Codable {
-            let message: String
-            let context: ChatContext?
-        }
-        
-        let body = ChatRequest(message: message, context: context)
-        return try await request(endpoint: "/chat", method: "POST", body: body)
-    }
     
     // MARK: - Generic Request
     
@@ -124,15 +113,6 @@ struct Tool: Identifiable, Codable {
     let url: String
 }
 
-struct ChatContext: Codable {
-    let file: String?
-    let code: String?
-}
-
-struct ChatResponse: Codable {
-    let response: String
-    let suggestions: [String]?
-}
 
 // MARK: - Errors
 

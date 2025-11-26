@@ -1,5 +1,5 @@
 //
-//  ChatView.swift
+//  CursorChatView.swift
 //  Psychosis
 //
 //  Created on [Current Date]
@@ -7,29 +7,68 @@
 
 import SwiftUI
 
-struct ChatView: View {
+struct CursorChatView: View {
     let file: FileItem?
     
-    @State private var messages: [ChatMessage] = [
-        ChatMessage(
-            id: UUID(),
-            role: .assistant,
-            content: "Hello! I'm your AI coding assistant. How can I help you with your code today?",
-            timestamp: Date()
-        )
-    ]
+    @State private var messages: [ChatMessage] = []
     @State private var inputText: String = ""
     @State private var isLoading: Bool = false
+    @State private var isConnected: Bool = false
     
     var body: some View {
         VStack(spacing: 0) {
+            // Connection Status
+            HStack {
+                HStack(spacing: 6) {
+                    Circle()
+                        .fill(isConnected ? Color.green : Color.red)
+                        .frame(width: 8, height: 8)
+                    
+                    Text(isConnected ? "Cursor Connected" : "Not Connected")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                
+                Spacer()
+                
+                Button("Connect") {
+                    // TODO: Connect to Cursor chat
+                    isConnected = true
+                }
+                .buttonStyle(.bordered)
+                .disabled(isConnected)
+            }
+            .padding()
+            .background(.ultraThinMaterial)
+            
+            Divider()
+            
             // Messages
             ScrollViewReader { proxy in
                 ScrollView {
                     LazyVStack(spacing: 12) {
-                        ForEach(messages) { message in
-                            ChatBubble(message: message)
-                                .id(message.id)
+                        if messages.isEmpty {
+                            VStack(spacing: 16) {
+                                Image(systemName: "message.fill")
+                                    .font(.system(size: 60))
+                                    .foregroundColor(.secondary)
+                                
+                                Text("Cursor Chat")
+                                    .font(.title2)
+                                    .fontWeight(.semibold)
+                                
+                                Text("Connect to Cursor to start chatting about your code")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                    .multilineTextAlignment(.center)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                        } else {
+                            ForEach(messages) { message in
+                                ChatBubble(message: message)
+                                    .id(message.id)
+                            }
                         }
                         
                         if isLoading {
@@ -58,16 +97,17 @@ struct ChatView: View {
             
             // Input
             HStack(spacing: 12) {
-                TextField("Ask about your code...", text: $inputText, axis: .vertical)
+                TextField("Ask Cursor about your code...", text: $inputText, axis: .vertical)
                     .textFieldStyle(.roundedBorder)
                     .lineLimit(1...4)
+                    .disabled(!isConnected)
                 
                 Button(action: sendMessage) {
                     Image(systemName: "arrow.up.circle.fill")
                         .font(.title2)
-                        .foregroundColor(inputText.isEmpty ? .gray : .blue)
+                        .foregroundColor(inputText.isEmpty || !isConnected ? .gray : .blue)
                 }
-                .disabled(inputText.isEmpty || isLoading)
+                .disabled(inputText.isEmpty || isLoading || !isConnected)
             }
             .padding()
         }
@@ -76,7 +116,7 @@ struct ChatView: View {
     }
     
     private func sendMessage() {
-        guard !inputText.isEmpty else { return }
+        guard !inputText.isEmpty && isConnected else { return }
         
         let userMessage = ChatMessage(
             id: UUID(),
@@ -91,39 +131,20 @@ struct ChatView: View {
         isLoading = true
         
         Task {
-            do {
-                let context = ChatContext(
-                    file: file?.path,
-                    code: file?.content
-                )
-                
-                let response = try await APIClient.shared.sendChatMessage(
-                    message: messageToSend,
-                    context: context
-                )
-                
-                let assistantMessage = ChatMessage(
-                    id: UUID(),
-                    role: .assistant,
-                    content: response.response,
-                    timestamp: Date()
-                )
-                
-                await MainActor.run {
-                    messages.append(assistantMessage)
-                    isLoading = false
-                }
-            } catch {
-                await MainActor.run {
-                    let errorMessage = ChatMessage(
-                        id: UUID(),
-                        role: .assistant,
-                        content: "Error: \(error.localizedDescription). Please check your connection.",
-                        timestamp: Date()
-                    )
-                    messages.append(errorMessage)
-                    isLoading = false
-                }
+            // TODO: Send message to Cursor chat API
+            // This would connect to the Cursor chat endpoint
+            try? await Task.sleep(nanoseconds: 1_000_000_000) // Simulate delay
+            
+            let response = ChatMessage(
+                id: UUID(),
+                role: .assistant,
+                content: "Cursor chat response would appear here. Connect to Cursor API to enable.",
+                timestamp: Date()
+            )
+            
+            await MainActor.run {
+                messages.append(response)
+                isLoading = false
             }
         }
     }
@@ -179,7 +200,7 @@ struct ChatBubble: View {
 }
 
 #Preview {
-    ChatView(file: nil)
+    CursorChatView(file: nil)
         .background(Color.black)
 }
 

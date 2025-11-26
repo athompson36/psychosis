@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct MainPaneView: View {
-    let selectedTool: String
     @Binding var currentFile: FileItem?
     
     @State private var selectedTab: Tab = .chat
@@ -97,6 +96,7 @@ struct MainPaneView: View {
                 } else {
                     // Single View
                     tabContent(selectedTab)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
         }
@@ -117,7 +117,7 @@ struct MainPaneView: View {
     private func tabContent(_ tab: Tab) -> some View {
         switch tab {
         case .chat:
-            ChatView(file: currentFile)
+            CursorChatView(file: currentFile)
         case .editor:
             EditorView(file: $currentFile)
         case .files:
@@ -147,7 +147,7 @@ struct RoundedCorner: Shape {
 }
 
 #Preview {
-    MainPaneView(selectedTool: "dev-remote", currentFile: .constant(nil))
+    MainPaneView(currentFile: .constant(nil))
         .background(Color.black)
 }
 
