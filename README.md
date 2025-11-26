@@ -28,10 +28,16 @@ psychosis/
 │   │   ├── /api/files/*     # File tree & content for configured repo
 │   │   └── /api/chat        # Coding assistant endpoint (OpenAI)
 │   │
-│   └── hub-frontend/        # React + Vite PWA
-│       ├── Top editor bar   # Xcode / VS Code / Dev Remote
-│       ├── MainPane         # Portrait top/bottom, landscape side-by-side
-│       └── Tabs             # Chat / Editor / Files + Split toggle
+│   ├── hub-frontend/        # React + Vite PWA (Web App)
+│   │   ├── Top editor bar   # Xcode / VS Code / Dev Remote
+│   │   ├── MainPane         # Portrait top/bottom, landscape side-by-side
+│   │   └── Tabs             # Chat / Editor / Files + Split toggle
+│   │
+│   └── hub-ios/             # Native iOS/iPadOS App
+│       ├── App/             # App entry point
+│       ├── Features/        # Feature modules (same as web)
+│       ├── Core/            # Shared infrastructure
+│       └── Resources/       # Assets
 │
 ├── docs/                    # Documentation
 └── README.md                # This file
@@ -43,11 +49,19 @@ psychosis/
 - **Node.js** + **Express**
 - **API endpoints** for tools, files, and chat
 
-### Frontend
+### Web Frontend
 - **React** + **Vite**
 - **PWA** (Progressive Web App)
 - **Liquid Glass** theme
 - **Responsive design** (portrait/landscape)
+
+### iOS App
+- **SwiftUI** for UI
+- **Swift** 5.9+
+- **MVVM** architecture
+- **async/await** for networking
+- **iOS 17.0+** / **iPadOS 17.0+**
+- **Liquid Glass** theme (matching web)
 
 ## Usage
 
@@ -69,17 +83,27 @@ psychosis/
 - WireGuard VPN (for local development)
 
 ### Setup
+
+#### Backend
 ```bash
-# Install dependencies
-cd apps/hub-backend && npm install
-cd ../hub-frontend && npm install
-
-# Start backend
-cd apps/hub-backend && npm start
-
-# Start frontend
-cd apps/hub-frontend && npm run dev
+cd apps/hub-backend
+npm install
+npm start
 ```
+
+#### Web Frontend
+```bash
+cd apps/hub-frontend
+npm install
+npm run dev
+```
+
+#### iOS App
+1. Open Xcode
+2. Create new iOS App project in `apps/hub-ios/`
+3. Add files from `apps/hub-ios/HubApp/` to Xcode project
+4. See `apps/hub-ios/PROJECT_SETUP.md` for detailed instructions
+5. Build and run (⌘R)
 
 ## Architecture
 
