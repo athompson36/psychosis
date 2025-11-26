@@ -196,7 +196,7 @@
 		4958E92A2ED6C07800A11277 /* Features */ = {
 			isa = PBXGroup;
 			children = (
-				4958E9212ED6C07800A11277 /* Chat */,
+				4958E9212ED6C07800A11277 /* CursorChat */,
 				4958E9232ED6C07800A11277 /* Editor */,
 				4958E9252ED6C07800A11277 /* EditorBar */,
 				4958E9272ED6C07800A11277 /* FileBrowser */,
