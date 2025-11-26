@@ -50,9 +50,12 @@ struct EditorView: View {
                     .font(.system(.body, design: .monospaced))
                     .padding()
                     .background(Color(.systemBackground))
-                    .onChange(of: content) { _ in
+                    .onChange(of: content) { _, _ in
                         isDirty = true
-                        file?.content = content
+                        if var file = file {
+                            file.content = content
+                            self.file = file
+                        }
                     }
             } else {
                 VStack(spacing: 16) {
@@ -74,7 +77,7 @@ struct EditorView: View {
         }
         .background(.ultraThinMaterial)
         .cornerRadius(12)
-        .onChange(of: file?.content) { newContent in
+        .onChange(of: file?.content) { oldContent, newContent in
             if let newContent = newContent {
                 content = newContent
                 isDirty = false
