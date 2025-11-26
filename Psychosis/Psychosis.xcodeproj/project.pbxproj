@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4933F7272ED6C8A4007F04FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4933F7242ED6C8A4007F04FA /* Assets.xcassets */; };
+		2BEFA7A73414E8D5CAEBC701 /* ScreenshotManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE12DE940128F3A5BBB102C /* ScreenshotManager.swift */; };
+		40252F9F20894B5D301D497F /* ServerPresets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22AB8D515E960E09873ADB4A /* ServerPresets.swift */; };
 		4933F7282ED6C8A4007F04FA /* PsychosisApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F70C2ED6C8A4007F04FA /* PsychosisApp.swift */; };
 		4933F7292ED6C8A4007F04FA /* EditorBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F71B2ED6C8A4007F04FA /* EditorBarView.swift */; };
 		4933F72A2ED6C8A4007F04FA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F70A2ED6C8A4007F04FA /* ContentView.swift */; };
@@ -18,12 +19,20 @@
 		4933F72F2ED6C8A4007F04FA /* FileItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F7102ED6C8A4007F04FA /* FileItem.swift */; };
 		4933F7302ED6C8A4007F04FA /* FileBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F71D2ED6C8A4007F04FA /* FileBrowserView.swift */; };
 		4933F7312ED6C8A4007F04FA /* CursorChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F7172ED6C8A4007F04FA /* CursorChatView.swift */; };
-		4933F7332ED6C8A4007F04FA /* RemoteDesktopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F7212ED6C8A4007F04FA /* RemoteDesktopView.swift */; };
 		4933F7342ED6C8A4007F04FA /* EditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F7192ED6C8A4007F04FA /* EditorView.swift */; };
-		4933F7382ED6C933007F04FA /* RemoteServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F7362ED6C933007F04FA /* RemoteServer.swift */; };
-		4933F7392ED6C933007F04FA /* FileItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F7352ED6C933007F04FA /* FileItem.swift */; };
 		4933F73C2ED6C948007F04FA /* RemoteDesktopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F73A2ED6C948007F04FA /* RemoteDesktopView.swift */; };
 		4933F73F2ED6C965007F04FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4933F73D2ED6C965007F04FA /* Assets.xcassets */; };
+		4933F7462ED6CCD9007F04FA /* RemoteServerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F7442ED6CCD9007F04FA /* RemoteServerManager.swift */; };
+		4933F7472ED6CCD9007F04FA /* ConnectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F7432ED6CCD9007F04FA /* ConnectionManager.swift */; };
+		4933F74B2ED6CCF7007F04FA /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F7492ED6CCF7007F04FA /* SettingsView.swift */; };
+		4933F74C2ED6CCF7007F04FA /* AddRemoteServerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F7482ED6CCF7007F04FA /* AddRemoteServerView.swift */; };
+		81217341D2A8CCA9C5EB4AEF /* RecentConnectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D0C8F19E0D48507A80E7A9B /* RecentConnectionsView.swift */; };
+		85E25C14382DC943192CC3BE /* ConnectionHistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC68D1A0AACB8DDE86F418EB /* ConnectionHistoryManager.swift */; };
+		A30C2B8860AC056FC7DC3E31 /* RemoteDesktopToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B2E7261A58F3D8DFBEA5AE /* RemoteDesktopToolbar.swift */; };
+		B55F73A16219120ECAE38821 /* WebViewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B9F906FAED75996234BDFBB /* WebViewWrapper.swift */; };
+		C8C8F1F223602EB87068878F /* VirtualKeyboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E9C726FCE66A6CD826FCB58 /* VirtualKeyboardView.swift */; };
+		D4296546287FEF6C253E8BA8 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CBEF52D51F9904DF46C1DE /* NotificationManager.swift */; };
+		F248FAB9E39DD9194CEEEBE3 /* ConnectionQualityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8616B3B530B92CC5E042C30D /* ConnectionQualityMonitor.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +53,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		22AB8D515E960E09873ADB4A /* ServerPresets.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ServerPresets.swift; path = "../apps/hub-ios/HubApp/Core/Services/ServerPresets.swift"; sourceTree = "<group>"; };
+		41CBEF52D51F9904DF46C1DE /* NotificationManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NotificationManager.swift; path = "../apps/hub-ios/HubApp/Core/Services/NotificationManager.swift"; sourceTree = "<group>"; };
 		4933F70A2ED6C8A4007F04FA /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		4933F70B2ED6C8A4007F04FA /* HubApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HubApp.swift; sourceTree = "<group>"; };
 		4933F70C2ED6C8A4007F04FA /* PsychosisApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsychosisApp.swift; sourceTree = "<group>"; };
@@ -62,19 +73,34 @@
 		4933F7362ED6C933007F04FA /* RemoteServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteServer.swift; sourceTree = "<group>"; };
 		4933F73A2ED6C948007F04FA /* RemoteDesktopView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteDesktopView.swift; sourceTree = "<group>"; };
 		4933F73D2ED6C965007F04FA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		4933F7432ED6CCD9007F04FA /* ConnectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionManager.swift; sourceTree = "<group>"; };
+		4933F7442ED6CCD9007F04FA /* RemoteServerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteServerManager.swift; sourceTree = "<group>"; };
+		4933F7482ED6CCF7007F04FA /* AddRemoteServerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddRemoteServerView.swift; sourceTree = "<group>"; };
+		4933F7492ED6CCF7007F04FA /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		4958E8EB2ED6C03E00A11277 /* Psychosis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Psychosis.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4958E8F82ED6C04000A11277 /* PsychosisTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PsychosisTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4958E9022ED6C04100A11277 /* PsychosisUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PsychosisUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5D0C8F19E0D48507A80E7A9B /* RecentConnectionsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RecentConnectionsView.swift; path = "../apps/hub-ios/HubApp/Features/Settings/RecentConnectionsView.swift"; sourceTree = "<group>"; };
+		7B9F906FAED75996234BDFBB /* WebViewWrapper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WebViewWrapper.swift; path = "../apps/hub-ios/HubApp/Core/UI/WebViewWrapper.swift"; sourceTree = "<group>"; };
+		82B2E7261A58F3D8DFBEA5AE /* RemoteDesktopToolbar.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RemoteDesktopToolbar.swift; path = "../apps/hub-ios/HubApp/Features/RemoteDesktop/RemoteDesktopToolbar.swift"; sourceTree = "<group>"; };
+		8616B3B530B92CC5E042C30D /* ConnectionQualityMonitor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ConnectionQualityMonitor.swift; path = "../apps/hub-ios/HubApp/Core/Services/ConnectionQualityMonitor.swift"; sourceTree = "<group>"; };
+		8E9C726FCE66A6CD826FCB58 /* VirtualKeyboardView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = VirtualKeyboardView.swift; path = "../apps/hub-ios/HubApp/Features/RemoteDesktop/VirtualKeyboardView.swift"; sourceTree = "<group>"; };
+		BC68D1A0AACB8DDE86F418EB /* ConnectionHistoryManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ConnectionHistoryManager.swift; path = "../apps/hub-ios/HubApp/Core/Services/ConnectionHistoryManager.swift"; sourceTree = "<group>"; };
+		DBE12DE940128F3A5BBB102C /* ScreenshotManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ScreenshotManager.swift; path = "../apps/hub-ios/HubApp/Core/Utilities/ScreenshotManager.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		4958E8FB2ED6C04000A11277 /* PsychosisTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = PsychosisTests;
 			sourceTree = "<group>";
 		};
 		4958E9052ED6C04100A11277 /* PsychosisUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = PsychosisUITests;
 			sourceTree = "<group>";
 		};
@@ -105,6 +131,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3F939937A12A0DA1E200A46E /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				8F76C7EA0AA31BDECE1B6F41 /* RemoteDesktop */,
+				4C6C2184B1E7BC6D6744D708 /* Settings */,
+			);
+			name = Features;
+			sourceTree = "<group>";
+		};
 		4933F70D2ED6C8A4007F04FA /* App */ = {
 			isa = PBXGroup;
 			children = (
@@ -143,6 +178,9 @@
 		4933F7152ED6C8A4007F04FA /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				4933F7522ED6D10F007F04FA /* Utilities */,
+				4933F7452ED6CCD9007F04FA /* Services */,
+				4933F7412ED6CCBE007F04FA /* UI */,
 				4933F70F2ED6C8A4007F04FA /* Extensions */,
 				4933F7122ED6C8A4007F04FA /* Models */,
 				4933F7142ED6C8A4007F04FA /* Networking */,
@@ -208,6 +246,7 @@
 		4933F7232ED6C8A4007F04FA /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				4933F74A2ED6CCF7007F04FA /* Settings */,
 				4933F7162ED6C8A4007F04FA /* Chat */,
 				4933F7182ED6C8A4007F04FA /* CursorChat */,
 				4933F71A2ED6C8A4007F04FA /* Editor */,
@@ -269,6 +308,38 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		4933F7412ED6CCBE007F04FA /* UI */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		4933F7452ED6CCD9007F04FA /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				4933F7432ED6CCD9007F04FA /* ConnectionManager.swift */,
+				4933F7442ED6CCD9007F04FA /* RemoteServerManager.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		4933F74A2ED6CCF7007F04FA /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				4933F7482ED6CCF7007F04FA /* AddRemoteServerView.swift */,
+				4933F7492ED6CCF7007F04FA /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		4933F7522ED6D10F007F04FA /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
 		4958E8E22ED6C03E00A11277 = {
 			isa = PBXGroup;
 			children = (
@@ -276,6 +347,8 @@
 				4958E8FB2ED6C04000A11277 /* PsychosisTests */,
 				4958E9052ED6C04100A11277 /* PsychosisUITests */,
 				4958E8EC2ED6C03E00A11277 /* Products */,
+				BEFB14FBA2ECE7B9422F7A2A /* Core */,
+				3F939937A12A0DA1E200A46E /* Features */,
 			);
 			sourceTree = "<group>";
 		};
@@ -287,6 +360,60 @@
 				4958E9022ED6C04100A11277 /* PsychosisUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		4C6C2184B1E7BC6D6744D708 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				5D0C8F19E0D48507A80E7A9B /* RecentConnectionsView.swift */,
+			);
+			name = Settings;
+			sourceTree = "<group>";
+		};
+		4F4E02DCB5B9B26E6ABF7D52 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				DBE12DE940128F3A5BBB102C /* ScreenshotManager.swift */,
+			);
+			name = Utilities;
+			sourceTree = "<group>";
+		};
+		5CAE7B56E9EF7AF1F947927C /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				7B9F906FAED75996234BDFBB /* WebViewWrapper.swift */,
+			);
+			name = UI;
+			sourceTree = "<group>";
+		};
+		652941E1A8654DBD98AD767B /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				BC68D1A0AACB8DDE86F418EB /* ConnectionHistoryManager.swift */,
+				8616B3B530B92CC5E042C30D /* ConnectionQualityMonitor.swift */,
+				22AB8D515E960E09873ADB4A /* ServerPresets.swift */,
+				41CBEF52D51F9904DF46C1DE /* NotificationManager.swift */,
+			);
+			name = Services;
+			sourceTree = "<group>";
+		};
+		8F76C7EA0AA31BDECE1B6F41 /* RemoteDesktop */ = {
+			isa = PBXGroup;
+			children = (
+				82B2E7261A58F3D8DFBEA5AE /* RemoteDesktopToolbar.swift */,
+				8E9C726FCE66A6CD826FCB58 /* VirtualKeyboardView.swift */,
+			);
+			name = RemoteDesktop;
+			sourceTree = "<group>";
+		};
+		BEFB14FBA2ECE7B9422F7A2A /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				652941E1A8654DBD98AD767B /* Services */,
+				5CAE7B56E9EF7AF1F947927C /* UI */,
+				4F4E02DCB5B9B26E6ABF7D52 /* Utilities */,
+			);
+			name = Core;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -305,8 +432,6 @@
 			dependencies = (
 			);
 			name = Psychosis;
-			packageProductDependencies = (
-			);
 			productName = Psychosis;
 			productReference = 4958E8EB2ED6C03E00A11277 /* Psychosis.app */;
 			productType = "com.apple.product-type.application";
@@ -328,8 +453,6 @@
 				4958E8FB2ED6C04000A11277 /* PsychosisTests */,
 			);
 			name = PsychosisTests;
-			packageProductDependencies = (
-			);
 			productName = PsychosisTests;
 			productReference = 4958E8F82ED6C04000A11277 /* PsychosisTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -351,8 +474,6 @@
 				4958E9052ED6C04100A11277 /* PsychosisUITests */,
 			);
 			name = PsychosisUITests;
-			packageProductDependencies = (
-			);
 			productName = PsychosisUITests;
 			productReference = 4958E9022ED6C04100A11277 /* PsychosisUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
@@ -365,7 +486,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1640;
-				LastUpgradeCheck = 1640;
+				LastUpgradeCheck = 2610;
 				TargetAttributes = {
 					4958E8EA2ED6C03E00A11277 = {
 						CreatedOnToolsVersion = 16.4;
@@ -407,7 +528,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4933F73F2ED6C965007F04FA /* Assets.xcassets in Resources */,
-				4933F7272ED6C8A4007F04FA /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -433,6 +553,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				4933F7282ED6C8A4007F04FA /* PsychosisApp.swift in Sources */,
+				4933F7462ED6CCD9007F04FA /* RemoteServerManager.swift in Sources */,
+				4933F7472ED6CCD9007F04FA /* ConnectionManager.swift in Sources */,
+				4933F74B2ED6CCF7007F04FA /* SettingsView.swift in Sources */,
+				4933F74C2ED6CCF7007F04FA /* AddRemoteServerView.swift in Sources */,
 				4933F7292ED6C8A4007F04FA /* EditorBarView.swift in Sources */,
 				4933F72A2ED6C8A4007F04FA /* ContentView.swift in Sources */,
 				4933F73C2ED6C948007F04FA /* RemoteDesktopView.swift in Sources */,
@@ -441,12 +565,18 @@
 				4933F72D2ED6C8A4007F04FA /* APIClient.swift in Sources */,
 				4933F72E2ED6C8A4007F04FA /* RemoteServer.swift in Sources */,
 				4933F72F2ED6C8A4007F04FA /* FileItem.swift in Sources */,
-				4933F7382ED6C933007F04FA /* RemoteServer.swift in Sources */,
-				4933F7392ED6C933007F04FA /* FileItem.swift in Sources */,
 				4933F7302ED6C8A4007F04FA /* FileBrowserView.swift in Sources */,
 				4933F7312ED6C8A4007F04FA /* CursorChatView.swift in Sources */,
-				4933F7332ED6C8A4007F04FA /* RemoteDesktopView.swift in Sources */,
 				4933F7342ED6C8A4007F04FA /* EditorView.swift in Sources */,
+				85E25C14382DC943192CC3BE /* ConnectionHistoryManager.swift in Sources */,
+				F248FAB9E39DD9194CEEEBE3 /* ConnectionQualityMonitor.swift in Sources */,
+				B55F73A16219120ECAE38821 /* WebViewWrapper.swift in Sources */,
+				2BEFA7A73414E8D5CAEBC701 /* ScreenshotManager.swift in Sources */,
+				A30C2B8860AC056FC7DC3E31 /* RemoteDesktopToolbar.swift in Sources */,
+				C8C8F1F223602EB87068878F /* VirtualKeyboardView.swift in Sources */,
+				81217341D2A8CCA9C5EB4AEF /* RecentConnectionsView.swift in Sources */,
+				40252F9F20894B5D301D497F /* ServerPresets.swift in Sources */,
+				D4296546287FEF6C253E8BA8 /* NotificationManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -539,6 +669,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -596,6 +727,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};

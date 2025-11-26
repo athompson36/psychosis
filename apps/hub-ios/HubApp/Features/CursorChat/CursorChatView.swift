@@ -126,13 +126,14 @@ struct CursorChatView: View {
         )
         
         messages.append(userMessage)
-        let messageToSend = inputText
+        let _ = inputText // Store for future API call
         inputText = ""
         isLoading = true
         
         Task {
             // TODO: Send message to Cursor chat API
             // This would connect to the Cursor chat endpoint
+            // Use messageToSend variable here when implementing API call
             try? await Task.sleep(nanoseconds: 1_000_000_000) // Simulate delay
             
             let response = ChatMessage(

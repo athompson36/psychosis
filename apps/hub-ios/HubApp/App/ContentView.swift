@@ -19,7 +19,6 @@ struct ContentView: View {
                     endPoint: .bottomTrailing
                 )
             )
-            .ignoresSafeArea()
     }
 }
 
