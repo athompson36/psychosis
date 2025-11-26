@@ -53,11 +53,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		4958E8ED2ED6C03E00A11277 /* Psychosis */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Psychosis;
-			sourceTree = "<group>";
-		};
 		4958E8FB2ED6C04000A11277 /* PsychosisTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = PsychosisTests;
@@ -99,7 +94,6 @@
 			isa = PBXGroup;
 			children = (
 				4958E92C2ED6C07800A11277 /* HubApp */,
-				4958E8ED2ED6C03E00A11277 /* Psychosis */,
 				4958E8FB2ED6C04000A11277 /* PsychosisTests */,
 				4958E9052ED6C04100A11277 /* PsychosisUITests */,
 				4958E8EC2ED6C03E00A11277 /* Products */,
@@ -244,9 +238,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				4958E8ED2ED6C03E00A11277 /* Psychosis */,
 			);
 			name = Psychosis;
 			packageProductDependencies = (

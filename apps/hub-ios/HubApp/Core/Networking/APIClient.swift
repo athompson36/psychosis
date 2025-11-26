@@ -19,19 +19,19 @@ class APIClient {
     // MARK: - Tools API
     
     func getTools() async throws -> [Tool] {
-        try await request(endpoint: "/tools", method: "GET")
+        try await request<[Tool]>(endpoint: "/tools", method: "GET")
     }
     
     // MARK: - Files API
     
     func getFileTree(path: String = "/") async throws -> [FileItem] {
         let encodedPath = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
-        return try await request(endpoint: "/files/tree?path=\(encodedPath)", method: "GET")
+        return try await request<[FileItem]>(endpoint: "/files/tree?path=\(encodedPath)", method: "GET")
     }
     
     func getFileContent(path: String) async throws -> FileItem {
         let encodedPath = path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
-        return try await request(endpoint: "/files/content?path=\(encodedPath)", method: "GET")
+        return try await request<FileItem>(endpoint: "/files/content?path=\(encodedPath)", method: "GET")
     }
     
     func saveFile(path: String, content: String) async throws {
@@ -40,8 +40,12 @@ class APIClient {
             let content: String
         }
         
+        struct SaveResponse: Codable {
+            let success: Bool?
+        }
+        
         let body = SaveRequest(path: path, content: content)
-        try await request(endpoint: "/files/save", method: "POST", body: body)
+        _ = try await request<SaveResponse, SaveRequest>(endpoint: "/files/save", method: "POST", body: body)
     }
     
     // MARK: - Chat API
@@ -53,15 +57,14 @@ class APIClient {
         }
         
         let body = ChatRequest(message: message, context: context)
-        return try await request(endpoint: "/chat", method: "POST", body: body)
+        return try await request<ChatResponse>(endpoint: "/chat", method: "POST", body: body)
     }
     
     // MARK: - Generic Request
     
-    private func request<T: Decodable, B: Encodable>(
+    private func request<T: Decodable>(
         endpoint: String,
-        method: String,
-        body: B? = nil
+        method: String
     ) async throws -> T {
         guard let url = URL(string: baseURL + endpoint) else {
             throw APIError.invalidURL
@@ -71,9 +74,32 @@ class APIClient {
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        if let body = body {
-            request.httpBody = try JSONEncoder().encode(body)
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.invalidResponse
         }
+        
+        guard (200...299).contains(httpResponse.statusCode) else {
+            throw APIError.httpError(httpResponse.statusCode)
+        }
+        
+        return try JSONDecoder().decode(T.self, from: data)
+    }
+    
+    private func request<T: Decodable, B: Encodable>(
+        endpoint: String,
+        method: String,
+        body: B
+    ) async throws -> T {
+        guard let url = URL(string: baseURL + endpoint) else {
+            throw APIError.invalidURL
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = method
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(body)
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
