@@ -11,9 +11,7 @@ import SwiftUI
 struct PsychosisApp: App {
     var body: some Scene {
         WindowGroup {
-            // HomeView will be used once feature files are added to Xcode project
-            // See ADD_FEATURE_FILES.md for instructions
-            ContentView()
+            MainTabView()
         }
     }
 }
