@@ -342,106 +342,18 @@ struct MainPaneView: View {
             SettingsView()
         }
         .sheet(isPresented: $showAddServerSheet) {
-            // Simple add server view (can be replaced with AddRemoteServerView when added to Xcode)
-            NavigationView {
-                Form {
-                    Section(header: Text("Server Information")) {
-                        TextField("Server Name", text: $newServerName)
-                            .textContentType(.none)
-                            .autocapitalization(.words)
-                            .submitLabel(.next)
-                        
-                        TextField("Host or IP Address", text: $newServerHost)
-                            .keyboardType(.URL)
-                            .autocapitalization(.none)
-                            .textContentType(.URL)
-                            .submitLabel(.next)
-                        
-                        TextField("Port", text: $newServerPort)
-                            .keyboardType(.numberPad)
-                            .textContentType(.none)
-                            .submitLabel(.done)
-                        
-                        Picker("Server Type", selection: $newServerType) {
-                            ForEach(ServerType.allCases, id: \.self) { type in
-                                HStack {
-                                    Text(type.icon)
-                                    Text(type.rawValue)
-                                }
-                                .tag(type)
-                            }
-                        }
+            ServerFormView(serverToEdit: serverToEdit) { server in
+                if let existing = serverToEdit {
+                    serverManager.updateServer(server)
+                    if selectedEditorTab?.id == existing.id {
+                        selectedEditorTab = server
                     }
-                    
-                    Section(header: Text("Connection Settings")) {
-                        Toggle("Use SSL/HTTPS", isOn: $newServerUseSSL)
-                        
-                        TextField("Connection Path (e.g., /vnc.html)", text: $newServerPath)
-                            .keyboardType(.default)
-                            .autocapitalization(.none)
-                            .textContentType(.none)
-                            .submitLabel(.next)
-                    }
-                    
-                    Section(header: Text("Authentication (Optional)")) {
-                        TextField("Username", text: $newServerUsername)
-                            .keyboardType(.default)
-                            .autocapitalization(.none)
-                            .textContentType(.username)
-                            .submitLabel(.next)
-                        
-                        SecureField("Password", text: $newServerPassword)
-                            .textContentType(.password)
-                            .submitLabel(.done)
-                    }
-                    
-                    Section {
-                        Button("Save") {
-                            saveServer()
-                        }
-                        .disabled(newServerName.isEmpty || newServerHost.isEmpty || Int(newServerPort) == nil)
-                    }
+                } else {
+                    serverManager.addServer(server)
+                    selectedEditorTab = server
                 }
-                .navigationTitle(serverToEdit == nil ? "Add Server" : "Edit Server")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        Button("Cancel") {
-                            resetForm()
-                            showAddServerSheet = false
-                        }
-                    }
-                }
-                .onAppear {
-                    // Load existing server data when editing
-                    if let existing = serverToEdit {
-                        // Always load from the server being edited
-                        newServerName = existing.name
-                        newServerHost = existing.host
-                        newServerPort = String(existing.port)
-                        newServerUsername = existing.username ?? ""
-                        newServerPassword = existing.password ?? ""
-                        newServerUseSSL = existing.useSSL
-                        newServerPath = existing.connectionPath ?? "/vnc.html"
-                        newServerType = existing.type
-                    } else {
-                        // For new server, only set defaults if fields are truly empty
-                        // This prevents overwriting user input if sheet re-appears
-                        if newServerName.isEmpty {
-                            newServerName = ""
-                        }
-                        if newServerHost.isEmpty {
-                            newServerHost = ""
-                        }
-                        if newServerPort.isEmpty {
-                            newServerPort = "6080"
-                        }
-                        if newServerPath.isEmpty {
-                            newServerPath = "/vnc.html"
-                        }
-                    }
-                }
-                .interactiveDismissDisabled() // Prevent swipe to dismiss - user must use Cancel or Save
+                // Reset for next use
+                serverToEdit = nil
             }
         }
         .onAppear {

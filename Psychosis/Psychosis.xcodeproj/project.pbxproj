@@ -32,6 +32,7 @@
 		B55F73A16219120ECAE38821 /* WebViewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B9F906FAED75996234BDFBB /* WebViewWrapper.swift */; };
 		C8C8F1F223602EB87068878F /* VirtualKeyboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E9C726FCE66A6CD826FCB58 /* VirtualKeyboardView.swift */; };
 		D4296546287FEF6C253E8BA8 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CBEF52D51F9904DF46C1DE /* NotificationManager.swift */; };
+		F10CA4A7D7AF96970EC493D7 /* ServerFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44E82250F81F99306DA57F1F /* ServerFormView.swift */; };
 		F248FAB9E39DD9194CEEEBE3 /* ConnectionQualityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8616B3B530B92CC5E042C30D /* ConnectionQualityMonitor.swift */; };
 /* End PBXBuildFile section */
 
@@ -55,6 +56,7 @@
 /* Begin PBXFileReference section */
 		22AB8D515E960E09873ADB4A /* ServerPresets.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ServerPresets.swift; path = "../apps/hub-ios/HubApp/Core/Services/ServerPresets.swift"; sourceTree = "<group>"; };
 		41CBEF52D51F9904DF46C1DE /* NotificationManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NotificationManager.swift; path = "../apps/hub-ios/HubApp/Core/Services/NotificationManager.swift"; sourceTree = "<group>"; };
+		44E82250F81F99306DA57F1F /* ServerFormView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ServerFormView.swift; path = "../apps/hub-ios/HubApp/Features/MainPane/ServerFormView.swift"; sourceTree = "<group>"; };
 		4933F70A2ED6C8A4007F04FA /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		4933F70B2ED6C8A4007F04FA /* HubApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HubApp.swift; sourceTree = "<group>"; };
 		4933F70C2ED6C8A4007F04FA /* PsychosisApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsychosisApp.swift; sourceTree = "<group>"; };
@@ -131,11 +133,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		397FB4B9149347DEE87C82CD /* MainPane */ = {
+			isa = PBXGroup;
+			children = (
+				44E82250F81F99306DA57F1F /* ServerFormView.swift */,
+			);
+			name = MainPane;
+			sourceTree = "<group>";
+		};
 		3F939937A12A0DA1E200A46E /* Features */ = {
 			isa = PBXGroup;
 			children = (
 				8F76C7EA0AA31BDECE1B6F41 /* RemoteDesktop */,
 				4C6C2184B1E7BC6D6744D708 /* Settings */,
+				397FB4B9149347DEE87C82CD /* MainPane */,
 			);
 			name = Features;
 			sourceTree = "<group>";
@@ -577,6 +588,7 @@
 				81217341D2A8CCA9C5EB4AEF /* RecentConnectionsView.swift in Sources */,
 				40252F9F20894B5D301D497F /* ServerPresets.swift in Sources */,
 				D4296546287FEF6C253E8BA8 /* NotificationManager.swift in Sources */,
+				F10CA4A7D7AF96970EC493D7 /* ServerFormView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
