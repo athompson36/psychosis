@@ -1,22 +1,25 @@
-# Project Summary: Psychosis
+# Project Summary: FS-Remote Hub (FS-Tech Liquid Glass)
 
 ## Current Project State
 
 **Status**: 🟢 Phase 0 - Initialization (In Progress)  
-**Last Scanned**: [Current Date]  
+**Last Updated**: [Current Date]  
 **Repository**: ✅ Initialized and pushed to GitHub  
-**Xcode Project**: 📁 Structure created, ready for Xcode project file
+**Project Type**: Web Application (React + Node.js)
 
 ---
 
 ## Project Overview
 
-This is a **starter template** for an Xcode project that will be developed using:
-- **Xcode** for building and running
-- **Cursor** for AI-assisted coding
-- **Git + GitHub** for version control
+**FS-Remote Hub** (code name: Psychosis) is a mobile-first, Liquid Glass–themed control cockpit for remote development. It provides a phone-optimized UI to browse/edit code, chat with AI about repositories, and view desktop-only tools (Xcode) via remote-screen sessions.
 
-The project is named **"Psychosis"** - an iOS application built with SwiftUI and MVVM architecture. Initial project structure and architecture decisions have been made.
+### Key Goals
+
+- **Remote Code Access**: Browse and edit code via Dev Remote and VS Code/code-server
+- **AI Coding Assistant**: Chat with AI about the current repository
+- **Remote Desktop Tools**: View Xcode and other desktop tools via remote-screen sessions
+- **Mobile-Optimized**: Portrait (top/bottom split) and landscape (side-by-side split) layouts
+- **Secure Access**: WireGuard VPN integration with optional Cloudflare exposure
 
 ---
 
@@ -24,196 +27,193 @@ The project is named **"Psychosis"** - an iOS application built with SwiftUI and
 
 ```
 psychosis/
-├── .cursor/
-│   └── rules.md                    # Cursor AI behavior rules
-├── .gitignore                      # Git ignore patterns for Xcode
-├── README.md                       # Main project README
-├── docs/
-│   ├── CURSOR_CONTEXT.md          # Context for Cursor AI
-│   ├── WORKFLOW.md                # Development workflow guide
-│   ├── PRODUCTION_ROADMAP.md      # Complete production roadmap
-│   ├── TODO.md                    # Detailed to-do lists
-│   └── PROJECT_SUMMARY.md         # This file
-└── XcodeProject/
-    └── README.md                  # Instructions for Xcode project
+├── apps/
+│   ├── hub-backend/          # Node.js + Express server
+│   │   ├── /api/tools        # List registered tools
+│   │   ├── /api/files/*      # File tree & content
+│   │   └── /api/chat         # AI coding assistant
+│   │
+│   └── hub-frontend/         # React + Vite PWA
+│       ├── EditorBar         # Tool selector
+│       ├── MainPane          # Split view container
+│       └── Tabs              # Chat / Editor / Files
+│
+├── docs/                     # Documentation
+│   ├── ARCHITECTURE.md       # System architecture
+│   ├── PROJECT_REQUIREMENTS.md
+│   └── ...
+└── README.md                 # Main README
 ```
 
 ---
 
-## Key Documents
+## Technology Stack
 
-### For Planning
-- **`PRODUCTION_ROADMAP.md`**: Complete 8-phase roadmap from initialization to post-launch maintenance
-- **`TODO.md`**: Detailed, actionable to-do lists organized by phase and priority
+### Backend
+- **Node.js** 18+
+- **Express.js** - RESTful API
+- **OpenAI API** - AI coding assistant
 
-### For Development
-- **`WORKFLOW.md`**: Day-to-day workflow for Xcode + Cursor + GitHub
-- **`CURSOR_CONTEXT.md`**: Context and guidelines for AI-assisted development
+### Frontend
+- **React** 18+
+- **Vite** - Build tool
+- **PWA** - Progressive Web App
+- **Liquid Glass Theme** - Modern glassmorphism design
 
-### For Reference
-- **`README.md`**: Project setup and getting started guide
-- **`.cursor/rules.md`**: Cursor-specific behavior rules
-
----
-
-## Immediate Next Steps
-
-### 🔴 Critical (Do First)
-1. **Define Project Requirements**
-   - What is the "Psychosis" application?
-   - What problem does it solve?
-   - Who is the target audience?
-   - What are the core features?
-
-2. **Initialize Git Repository**
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit: Project template"
-   ```
-
-3. **Create GitHub Repository**
-   - Create repo on GitHub
-   - Add remote and push
-
-4. **Create Xcode Project**
-   - Open Xcode
-   - Create new project
-   - Save in `XcodeProject/` folder
-
-### 🟠 High Priority (Week 1)
-- Determine target platform (iOS/macOS/etc.)
-- Choose architecture pattern
-- Choose UI framework (SwiftUI/UIKit/etc.)
-- Set up project structure
-- Create architecture documentation
+### Infrastructure
+- **WireGuard VPN** - Primary access method
+- **Cloudflare** (optional) - External access with auth
+- **nginx** (optional) - Reverse proxy
 
 ---
 
 ## Development Phases
 
 ### Phase 0: Project Initialization ⏳ (Current)
-- Define requirements
-- Initialize Git
-- Create Xcode project
-- Set up development environment
+- [x] Define project requirements
+- [x] Initialize Git repository
+- [x] Create documentation structure
+- [ ] Set up backend project structure
+- [ ] Set up frontend project structure
 
-### Phase 1: Foundation & Architecture 📋 (Weeks 1-2)
-- Architecture decisions
-- Project structure
-- Coding standards
-- Documentation
+### Phase 1: Backend Foundation 📋 (Weeks 1-2)
+- [ ] Express server setup
+- [ ] `/api/tools` endpoint
+- [ ] `/api/files/*` endpoints
+- [ ] File system integration
+- [ ] Basic authentication
 
-### Phase 2: Core Infrastructure 🔧 (Weeks 3-4)
-- Networking layer
-- Data persistence
-- Error handling
-- Testing infrastructure
+### Phase 2: Frontend Foundation 🎨 (Weeks 2-3)
+- [ ] React + Vite setup
+- [ ] Liquid Glass theme implementation
+- [ ] EditorBar component
+- [ ] MainPane with split views
+- [ ] Tab system
 
-### Phase 3: Core Features 🎨 (Weeks 5-8)
-- Feature implementation
-- UI development
-- Business logic
-- Integration
+### Phase 3: Core Features 🔧 (Weeks 3-6)
+- [ ] File browser component
+- [ ] Code editor integration
+- [ ] AI chat interface
+- [ ] Tool selector
+- [ ] Responsive layouts (portrait/landscape)
 
-### Phase 4: Polish & Optimization ✨ (Weeks 9-10)
-- Performance optimization
-- Accessibility
-- UI/UX polish
-- Localization
+### Phase 4: AI Integration 🤖 (Weeks 6-7)
+- [ ] OpenAI API integration
+- [ ] Context-aware chat
+- [ ] Repository context collection
+- [ ] Code suggestions
 
-### Phase 5: Testing & QA 🧪 (Weeks 11-12)
-- Unit tests
-- Integration tests
-- UI tests
-- Beta testing
+### Phase 5: PWA & Polish ✨ (Weeks 7-8)
+- [ ] Service worker
+- [ ] PWA manifest
+- [ ] Offline support
+- [ ] Performance optimization
+- [ ] UI/UX polish
 
-### Phase 6: Pre-Production 📦 (Weeks 13-14)
-- App Store preparation
-- Legal documents
-- Documentation
-- CI/CD setup
+### Phase 6: Integration & Testing 🧪 (Weeks 8-9)
+- [ ] WireGuard integration
+- [ ] Tool integrations (Dev Remote, VS Code, Xcode)
+- [ ] End-to-end testing
+- [ ] Security audit
 
-### Phase 7: Production Release 🚀 (Week 15)
-- App Store submission
-- Launch activities
-- Monitoring setup
-
-### Phase 8: Post-Launch & Maintenance 🔄 (Ongoing)
-- Monitoring
-- Bug fixes
-- Feature updates
-- Maintenance
+### Phase 7: Deployment 🚀 (Week 10)
+- [ ] Production setup
+- [ ] Cloudflare configuration (if needed)
+- [ ] Documentation
+- [ ] Launch
 
 ---
 
-## Technical Decisions Needed
+## Key Documents
 
-### Platform
-- [x] iOS ✅
-- [ ] macOS
-- [ ] watchOS
-- [ ] tvOS
-- [ ] Multi-platform
+### For Planning
+- **`PROJECT_REQUIREMENTS.md`**: Complete feature requirements
+- **`ARCHITECTURE.md`**: System architecture and design decisions
+- **`PRODUCTION_ROADMAP.md`**: Detailed development roadmap
 
-### UI Framework
-- [x] SwiftUI ✅
-- [ ] UIKit
-- [ ] AppKit
-- [ ] Hybrid
+### For Development
+- **`WORKFLOW.md`**: Day-to-day development workflow
+- **`CURSOR_CONTEXT.md`**: AI-assisted development guidelines
 
-### Architecture
-- [x] MVVM ✅
-- [ ] MVC
-- [ ] VIPER
-- [ ] Clean Architecture
-- [ ] Other
+---
 
-### Dependencies
-- [x] Swift Package Manager ✅
-- [ ] CocoaPods
-- [ ] Carthage
-- [ ] Manual
+## Immediate Next Steps
 
-### Minimum OS Version
-- [ ] iOS 15.0+
-- [ ] iOS 16.0+
-- [x] iOS 17.0+ ✅
-- [ ] macOS 12.0+
-- [ ] macOS 13.0+
+### 🔴 Critical (Do First)
+1. **Set up backend project**
+   ```bash
+   mkdir -p apps/hub-backend
+   cd apps/hub-backend
+   npm init -y
+   npm install express
+   ```
+
+2. **Set up frontend project**
+   ```bash
+   mkdir -p apps/hub-frontend
+   cd apps/hub-frontend
+   npm create vite@latest . -- --template react
+   ```
+
+3. **Create basic server structure**
+   - Express server with routes
+   - API endpoints skeleton
+   - File service setup
+
+4. **Create basic frontend structure**
+   - React app setup
+   - Liquid Glass theme CSS
+   - Component structure
+
+### 🟠 High Priority (Week 1)
+- Implement `/api/tools` endpoint
+- Create EditorBar component
+- Set up MainPane with split views
+- Basic file browser
 
 ---
 
 ## Project Health
 
 ### ✅ Completed
-- Template structure created
-- Documentation framework established
-- Git ignore configured
-- Cursor rules defined
-- Production roadmap created
-- To-do lists created
-- **Git repository initialized and pushed to GitHub**
-- **Architecture decisions made (MVVM, SwiftUI, iOS 17.0+)**
-- **Project structure created**
-- **Initial Swift files created (App, Core infrastructure)**
-- **Project requirements document created**
-- **Architecture documentation created**
+- Project requirements defined
+- Architecture documented
+- Git repository initialized
+- Documentation structure created
 
 ### 🟡 In Progress
-- Xcode project file creation (structure ready, needs Xcode project file)
-- Feature requirements definition (placeholders created)
+- Project structure setup
+- Backend initialization
+- Frontend initialization
 
 ### ❌ Not Started
-- Feature implementation
-- UI development
-- Testing implementation
-- App Store preparation
+- Backend API implementation
+- Frontend components
+- AI integration
+- PWA setup
+- Tool integrations
 
-### ⚠️ Next Steps
-- **Create Xcode project file** - Follow instructions in `XcodeProject/PROJECT_SETUP.md`
-- **Define specific features** - Update `docs/PROJECT_REQUIREMENTS.md` with actual features
-- **Begin Phase 1 development** - Start implementing core features
+---
+
+## Technical Decisions
+
+### Backend
+- [x] Node.js + Express ✅
+- [x] RESTful API ✅
+- [ ] Authentication method (TBD)
+- [ ] Database (if needed)
+
+### Frontend
+- [x] React + Vite ✅
+- [x] PWA ✅
+- [x] Liquid Glass theme ✅
+- [ ] State management (Context/Redux)
+- [ ] Code editor library (Monaco/CodeMirror)
+
+### Infrastructure
+- [x] WireGuard VPN ✅
+- [ ] Cloudflare (optional)
+- [ ] nginx (optional)
 
 ---
 
@@ -221,30 +221,30 @@ psychosis/
 
 ### Documentation
 - See `docs/` folder for all documentation
-- `PRODUCTION_ROADMAP.md` for complete roadmap
-- `TODO.md` for detailed task lists
+- `ARCHITECTURE.md` for system design
+- `PROJECT_REQUIREMENTS.md` for features
 
 ### External Resources
-- [Apple Developer Documentation](https://developer.apple.com/documentation/)
-- [Swift.org](https://swift.org/)
-- [App Store Review Guidelines](https://developer.apple.com/app-store/review/guidelines/)
+- [Express.js Documentation](https://expressjs.com/)
+- [React Documentation](https://react.dev/)
+- [Vite Documentation](https://vitejs.dev/)
+- [PWA Guide](https://web.dev/progressive-web-apps/)
 
 ---
 
 ## Notes
 
-- This is a **starter template** - customize as needed for your specific project
-- Timeline estimates assume single developer, full-time work
-- Adjust phases and timelines based on actual requirements
-- Regular reviews and updates to roadmap recommended
-- All decisions should be documented in `docs/ARCHITECTURE.md` once created
+- This is a **mobile-first** web application, not a native iOS app
+- Primary access via **WireGuard VPN** for security
+- **PWA** provides native-like experience without App Store
+- **Liquid Glass** theme for modern, elegant UI
 
 ---
 
 ## Quick Links
 
-- [Production Roadmap](./PRODUCTION_ROADMAP.md)
-- [To-Do Lists](./TODO.md)
+- [Architecture](./ARCHITECTURE.md)
+- [Project Requirements](./PROJECT_REQUIREMENTS.md)
 - [Workflow Guide](./WORKFLOW.md)
 - [Cursor Context](./CURSOR_CONTEXT.md)
 
@@ -252,4 +252,3 @@ psychosis/
 
 *Last Updated: [Current Date]*  
 *Version: 1.0*
-

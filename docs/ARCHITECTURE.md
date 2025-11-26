@@ -1,4 +1,4 @@
-# Architecture: Psychosis
+# Architecture: FS-Remote Hub (FS-Tech Liquid Glass)
 
 ## Architecture Decision Record (ADR)
 
@@ -10,400 +10,385 @@
 
 ## Overview
 
-This document describes the architecture decisions, patterns, and structure for the Psychosis iOS application.
+This document describes the architecture decisions, patterns, and structure for the FS-Remote Hub - a mobile-first, Liquid Glass–themed control cockpit for remote development.
 
 ---
 
-## Architecture Pattern
+## System Architecture
 
-**Pattern**: MVVM (Model-View-ViewModel)
+### High-Level Structure
 
-### Rationale
-- Clean separation of concerns
-- Testable business logic
-- SwiftUI-friendly pattern
-- Industry standard for iOS development
-- Maintainable and scalable
-
-### Structure
 ```
-View (SwiftUI)
-  ↓ observes
-ViewModel
-  ↓ uses
-Model / Service Layer
+┌─────────────────────────────────────────┐
+│         iPhone (Safari + PWA)          │
+│  ┌───────────────────────────────────┐  │
+│  │   React + Vite Frontend (PWA)    │  │
+│  │   - Liquid Glass Theme            │  │
+│  │   - Portrait/Landscape Layouts   │  │
+│  │   - Chat / Editor / Files Tabs    │  │
+│  └───────────────────────────────────┘  │
+└─────────────────────────────────────────┘
+              │ HTTPS
+              ▼
+┌─────────────────────────────────────────┐
+│      WireGuard VPN / Cloudflare         │
+└─────────────────────────────────────────┘
+              │
+              ▼
+┌─────────────────────────────────────────┐
+│    Node.js + Express Backend            │
+│  ┌───────────────────────────────────┐  │
+│  │   /api/tools   - Tool registry    │  │
+│  │   /api/files/* - File operations  │  │
+│  │   /api/chat    - OpenAI integration│  │
+│  └───────────────────────────────────┘  │
+└─────────────────────────────────────────┘
+              │
+              ▼
+┌─────────────────────────────────────────┐
+│   Development Tools & Repositories      │
+│   - Dev Remote                          │
+│   - VS Code / code-server               │
+│   - Xcode (remote screen)               │
+│   - Git repositories                    │
+└─────────────────────────────────────────┘
 ```
-
----
-
-## Platform & Technology Stack
-
-### Platform
-- **Primary**: iOS
-- **Minimum Version**: iOS 17.0+
-- **Language**: Swift 5.9+
-
-### UI Framework
-- **Primary**: SwiftUI
-- **Rationale**: 
-  - Modern, declarative UI framework
-  - Native performance
-  - Built-in state management
-  - Cross-platform potential (iOS, macOS, watchOS)
-
-### Dependency Management
-- **Tool**: Swift Package Manager (SPM)
-- **Rationale**:
-  - Native to Xcode
-  - No external tools required
-  - Fast and reliable
-  - Easy to manage
 
 ---
 
 ## Project Structure
 
 ```
-Psychosis/
-├── App/
-│   ├── PsychosisApp.swift          # App entry point
-│   └── AppDelegate.swift           # App delegate (if needed)
-│
-├── Features/
-│   ├── Feature1/
-│   │   ├── Views/
-│   │   ├── ViewModels/
-│   │   ├── Models/
-│   │   └── Services/
-│   └── Feature2/
-│       └── ...
-│
-├── Core/
-│   ├── Networking/
-│   │   ├── APIClient.swift
-│   │   ├── Endpoints.swift
-│   │   └── Models/
+psychosis/
+├── apps/
+│   ├── hub-backend/              # Node.js + Express backend
+│   │   ├── src/
+│   │   │   ├── routes/
+│   │   │   │   ├── tools.js       # /api/tools
+│   │   │   │   ├── files.js       # /api/files/*
+│   │   │   │   └── chat.js        # /api/chat
+│   │   │   ├── services/
+│   │   │   │   ├── fileService.js
+│   │   │   │   ├── chatService.js # OpenAI integration
+│   │   │   │   └── toolService.js
+│   │   │   ├── middleware/
+│   │   │   │   └── auth.js
+│   │   │   └── server.js
+│   │   ├── package.json
+│   │   └── .env
 │   │
-│   ├── Storage/
-│   │   ├── StorageManager.swift
-│   │   └── KeychainManager.swift
-│   │
-│   ├── Utilities/
-│   │   ├── Extensions/
-│   │   ├── Helpers/
-│   │   └── Constants.swift
-│   │
-│   └── UI/
-│       ├── Components/
-│       ├── Themes/
-│       └── Styles/
+│   └── hub-frontend/              # React + Vite PWA
+│       ├── src/
+│       │   ├── components/
+│       │   │   ├── EditorBar/     # Top editor bar
+│       │   │   ├── MainPane/      # Split view container
+│       │   │   ├── Chat/          # AI chat interface
+│       │   │   ├── Editor/        # Code editor
+│       │   │   ├── FileBrowser/   # File tree
+│       │   │   └── ToolSelector/  # Tool picker
+│       │   ├── hooks/
+│       │   ├── services/
+│       │   │   └── api.js          # API client
+│       │   ├── styles/
+│       │   │   └── liquid-glass.css
+│       │   ├── App.jsx
+│       │   └── main.jsx
+│       ├── public/
+│       │   ├── manifest.json       # PWA manifest
+│       │   └── service-worker.js
+│       ├── vite.config.js
+│       └── package.json
 │
-├── Resources/
-│   ├── Assets.xcassets/
-│   ├── Localizable.strings
-│   └── Fonts/
-│
-└── Tests/
-    ├── UnitTests/
-    ├── IntegrationTests/
-    └── UITests/
+├── docs/                           # Documentation
+└── README.md
 ```
 
 ---
 
-## Layer Responsibilities
+## Backend Architecture
 
-### View Layer (SwiftUI)
-- **Responsibility**: UI presentation and user interaction
-- **Dependencies**: ViewModels only
-- **Characteristics**:
-  - Declarative UI
-  - State-driven updates
-  - No business logic
-  - Minimal conditional logic
+### Technology Stack
 
-### ViewModel Layer
-- **Responsibility**: Business logic, state management, data transformation
-- **Dependencies**: Models, Services
-- **Characteristics**:
-  - Observable objects (@Observable or @Published)
-  - Input validation
-  - Data formatting
-  - Error handling
-  - Testable (no UI dependencies)
+- **Runtime**: Node.js 18+
+- **Framework**: Express.js
+- **API Style**: RESTful
+- **File System**: Node.js fs module
+- **AI**: OpenAI API
 
-### Model Layer
-- **Responsibility**: Data structures, domain models
-- **Dependencies**: None (pure Swift)
-- **Characteristics**:
-  - Value types (structs) preferred
-  - Codable for JSON
-  - Equatable, Hashable where needed
+### API Endpoints
+
+#### `GET /api/tools`
+List registered development tools.
+
+**Response**:
+```json
+{
+  "tools": [
+    {
+      "id": "dev-remote",
+      "name": "Dev Remote",
+      "type": "editor",
+      "url": "http://localhost:3001"
+    },
+    {
+      "id": "vscode",
+      "name": "VS Code",
+      "type": "editor",
+      "url": "http://localhost:8080"
+    },
+    {
+      "id": "xcode",
+      "name": "Xcode",
+      "type": "remote-screen",
+      "url": "vnc://..."
+    }
+  ]
+}
+```
+
+#### `GET /api/files/*`
+Get file tree or file content.
+
+**Endpoints**:
+- `GET /api/files/tree?path=/repo` - Get directory tree
+- `GET /api/files/content?path=/repo/file.js` - Get file content
+- `POST /api/files/save` - Save file changes
+
+#### `POST /api/chat`
+AI coding assistant endpoint.
+
+**Request**:
+```json
+{
+  "message": "Explain this function",
+  "context": {
+    "file": "/repo/src/utils.js",
+    "code": "function example() {...}"
+  }
+}
+```
+
+**Response**:
+```json
+{
+  "response": "This function does...",
+  "suggestions": [...]
+}
+```
 
 ### Service Layer
-- **Responsibility**: External interactions (API, storage, etc.)
-- **Dependencies**: Models, Networking, Storage
-- **Characteristics**:
-  - Protocol-based
-  - Async/await for async operations
-  - Error handling
-  - Testable with mocks
+
+- **FileService**: File system operations
+- **ChatService**: OpenAI integration with context
+- **ToolService**: Tool registry and management
+
+---
+
+## Frontend Architecture
+
+### Technology Stack
+
+- **Framework**: React 18+
+- **Build Tool**: Vite
+- **PWA**: Service Worker + Manifest
+- **Styling**: CSS with Liquid Glass theme
+- **State**: React Context or Redux (TBD)
+
+### Component Structure
+
+#### EditorBar
+Top navigation bar with:
+- Tool selector dropdown
+- Connection status indicator
+- Settings button
+
+#### MainPane
+Container that handles:
+- Portrait mode: Vertical split (top/bottom)
+- Landscape mode: Horizontal split (side-by-side)
+- Tab management (Chat / Editor / Files)
+- Split toggle functionality
+
+#### Chat Component
+- Message list
+- Input field
+- Context awareness (current file/repo)
+- OpenAI integration
+
+#### Editor Component
+- Code editor (Monaco or CodeMirror)
+- Syntax highlighting
+- File tabs
+- Save functionality
+
+#### FileBrowser Component
+- Directory tree
+- File navigation
+- File operations (open, delete, etc.)
+
+### Liquid Glass Theme
+
+**Design Principles**:
+- Frosted glass effects (backdrop-filter)
+- Transparency with blur
+- Subtle borders and shadows
+- Modern, elegant aesthetic
+- Smooth animations
+
+**CSS Variables**:
+```css
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-blur: blur(10px);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+```
+
+### Responsive Design
+
+**Portrait Mode**:
+```
+┌─────────────────┐
+│   Editor Bar    │
+├─────────────────┤
+│   Tab 1         │
+│   (Top Pane)    │
+├─────────────────┤
+│   Tab 2         │
+│   (Bottom Pane) │
+└─────────────────┘
+```
+
+**Landscape Mode**:
+```
+┌─────────────────────────────────┐
+│         Editor Bar              │
+├──────────────┬──────────────────┤
+│              │                  │
+│   Tab 1      │   Tab 2          │
+│   (Left)     │   (Right)        │
+│              │                  │
+└──────────────┴──────────────────┘
+```
 
 ---
 
 ## Data Flow
 
-### Typical Flow
-1. User interacts with View
-2. View calls ViewModel method
-3. ViewModel processes business logic
-4. ViewModel calls Service
-5. Service fetches/stores data
-6. Service returns result to ViewModel
-7. ViewModel updates state
-8. View automatically updates (SwiftUI)
+### File Operations
+1. User selects file in FileBrowser
+2. Frontend calls `GET /api/files/content?path=...`
+3. Backend reads file from filesystem
+4. Backend returns file content
+5. Frontend displays in Editor
+6. User edits and saves
+7. Frontend calls `POST /api/files/save`
+8. Backend writes to filesystem
 
-### Example
-```swift
-// View
-Button("Load Data") {
-    viewModel.loadData()
-}
+### AI Chat
+1. User types message in Chat
+2. Frontend collects context (current file, repo)
+3. Frontend calls `POST /api/chat` with message + context
+4. Backend calls OpenAI API with context
+5. Backend returns AI response
+6. Frontend displays response
 
-// ViewModel
-func loadData() {
-    Task {
-        do {
-            let data = try await service.fetchData()
-            self.data = data
-        } catch {
-            self.error = error
-        }
-    }
-}
-```
-
----
-
-## State Management
-
-### Approach
-- **SwiftUI State**: @State, @StateObject, @ObservedObject
-- **Modern Swift**: @Observable (iOS 17+)
-- **Shared State**: Environment objects or dependency injection
-
-### Principles
-- Single source of truth
-- Unidirectional data flow
-- Immutable state updates
-- Clear ownership
-
----
-
-## Networking
-
-### Approach
-- **URLSession** with async/await
-- **Protocol-based** API client
-- **Codable** for JSON parsing
-- **Error handling** with custom error types
-
-### Structure
-```swift
-protocol APIClient {
-    func request<T: Decodable>(_ endpoint: Endpoint) async throws -> T
-}
-
-enum Endpoint {
-    case feature1
-    case feature2(id: String)
-}
-```
-
----
-
-## Data Persistence
-
-### Approach
-- **UserDefaults**: Simple preferences
-- **Keychain**: Sensitive data (tokens, passwords)
-- **File System**: Documents, cache
-- **Core Data / SwiftData**: Complex data (if needed)
-
-### Strategy
-- Start simple (UserDefaults)
-- Add complexity as needed
-- Protocol-based storage layer
-
----
-
-## Error Handling
-
-### Strategy
-- **Custom Error Types**: Domain-specific errors
-- **Result Types**: For operations that can fail
-- **User-Friendly Messages**: Translate technical errors
-- **Logging**: Debug information for developers
-
-### Example
-```swift
-enum AppError: LocalizedError {
-    case networkError(Error)
-    case decodingError
-    case unknown
-    
-    var errorDescription: String? {
-        // User-friendly message
-    }
-}
-```
-
----
-
-## Testing Strategy
-
-### Unit Tests
-- ViewModels (business logic)
-- Services (data operations)
-- Utilities and helpers
-- Models (validation, transformations)
-
-### Integration Tests
-- API integration
-- Storage operations
-- Feature workflows
-
-### UI Tests
-- Critical user flows
-- Navigation
-- Form validation
-
-### Test Coverage Target
-- **Minimum**: 80% code coverage
-- **Focus**: Business logic and critical paths
-
----
-
-## Code Style & Standards
-
-### Swift Style
-- Follow [Swift.org API Design Guidelines](https://swift.org/documentation/api-design-guidelines/)
-- Use SwiftLint (optional but recommended)
-- Clear, descriptive naming
-- Documentation comments for public APIs
-
-### File Organization
-- One type per file (with exceptions)
-- Group related files in folders
-- Clear naming conventions
-- Logical folder structure
-
-### Naming Conventions
-- **Views**: `FeatureNameView.swift`
-- **ViewModels**: `FeatureNameViewModel.swift`
-- **Models**: `FeatureNameModel.swift` or `FeatureName.swift`
-- **Services**: `FeatureNameService.swift`
-- **Protocols**: `FeatureNameProtocol.swift` or `FeatureNameable`
-
----
-
-## Dependencies
-
-### Current Dependencies
-- None (starting fresh)
-
-### Future Considerations
-- Networking library (if URLSession becomes limiting)
-- Analytics (if needed)
-- Crash reporting (if needed)
-- Image loading (if needed)
-
-### Dependency Policy
-- Prefer native solutions
-- Add dependencies only when necessary
-- Keep dependencies minimal
-- Regular updates and security audits
+### Tool Selection
+1. User selects tool in EditorBar
+2. Frontend calls `GET /api/tools`
+3. Backend returns available tools
+4. Frontend displays tool in iframe or redirects
 
 ---
 
 ## Security Considerations
 
-### Data Security
-- HTTPS for all network requests
-- Keychain for sensitive data
-- No sensitive data in logs
-- Secure storage practices
+### Network Security
+- **WireGuard VPN**: Primary access method
+- **HTTPS**: All connections encrypted
+- **Cloudflare**: Optional external access with auth
 
-### Code Security
-- No hardcoded secrets
-- Environment-based configuration
-- Regular dependency updates
-- Security best practices
+### Authentication
+- VPN-based (WireGuard) for primary access
+- Token-based for external access (if enabled)
+- No sensitive data in logs
+
+### File System Security
+- Restricted to configured repositories
+- No access to system files
+- Validation of file paths
 
 ---
 
 ## Performance Considerations
 
-### Optimization Strategies
-- Lazy loading where appropriate
-- Efficient image loading and caching
-- Background processing for heavy operations
-- Memory management best practices
-- Profiling and monitoring
+### Backend
+- Efficient file reading (streaming for large files)
+- Caching of file trees
+- Rate limiting for API endpoints
 
-### Monitoring
-- App launch time
-- Memory usage
-- Network performance
-- Battery usage
-- Crash reporting
+### Frontend
+- Code splitting for PWA
+- Lazy loading of components
+- Efficient re-renders (React.memo)
+- Service worker caching
+
+### Network
+- Optimize for mobile networks
+- Compress API responses
+- Minimize round trips
+
+---
+
+## PWA Implementation
+
+### Manifest
+- App name, icons, theme
+- Display mode: standalone
+- Start URL
+
+### Service Worker
+- Cache API responses
+- Offline support
+- Background sync for file saves
 
 ---
 
 ## Future Considerations
 
 ### Scalability
-- Architecture supports feature growth
-- Modular design for team collaboration
-- Clear boundaries between features
-- Reusable components
+- Multiple user support
+- Repository management
+- Tool plugin system
 
-### Platform Expansion
-- Architecture supports macOS (if needed)
-- SwiftUI enables cross-platform
-- Shared business logic
-- Platform-specific UI where needed
+### Features
+- Terminal access
+- Git operations
+- Collaboration features
+- Custom themes
 
 ---
 
 ## Decision Log
 
 ### 2025-01-XX: Initial Architecture Decisions
-- **Decision**: MVVM pattern
-- **Rationale**: Industry standard, SwiftUI-friendly, testable
+- **Decision**: Node.js + Express backend
+- **Rationale**: Fast, simple, well-supported
 - **Status**: Active
 
-- **Decision**: SwiftUI for UI
-- **Rationale**: Modern, declarative, native
+- **Decision**: React + Vite frontend
+- **Rationale**: Modern, fast, PWA-ready
 - **Status**: Active
 
-- **Decision**: iOS 17.0+ minimum
-- **Rationale**: Access to latest features, Swift 5.9+
+- **Decision**: Mobile-first design
+- **Rationale**: Primary use case is iPhone
 - **Status**: Active
 
-- **Decision**: Swift Package Manager
-- **Rationale**: Native, no external tools
+- **Decision**: Liquid Glass theme
+- **Rationale**: Modern, elegant aesthetic
 - **Status**: Active
-
----
-
-## References
-
-- [SwiftUI Documentation](https://developer.apple.com/documentation/swiftui/)
-- [Swift.org API Design Guidelines](https://swift.org/documentation/api-design-guidelines/)
-- [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/)
 
 ---
 
 *This is a living document and will be updated as the architecture evolves.*
-
