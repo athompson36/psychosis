@@ -67,15 +67,30 @@ Psychosis
 
 ### Info.plist Settings
 
-Add to `Info.plist`:
-- **App Transport Security Settings**:
-  - **Allow Arbitrary Loads**: YES (for localhost development)
-  - Or add specific domain exceptions
+If using `GENERATE_INFOPLIST_FILE = YES` (default in modern Xcode):
+- No manual Info.plist needed
+- Settings are in Build Settings
+
+If you need to add App Transport Security:
+1. Select project → Target → Info tab
+2. Add key: **App Transport Security Settings** (Dictionary)
+3. Add sub-key: **Allow Arbitrary Loads** (Boolean = YES)
+   - Or add specific domain exceptions
 
 ### Build Settings
 
 - **iOS Deployment Target**: 17.0
 - **Swift Language Version**: Swift 5.9
+- **Generate Info.plist File**: YES (default)
+
+### Fix Duplicate File Errors
+
+If you see "Multiple commands produce" errors:
+1. Check Project Navigator for duplicate file references
+2. Remove duplicates (Delete → Remove Reference)
+3. Clean build folder (⇧⌘K)
+4. Rebuild (⌘B)
+5. See `FIX_DUPLICATE_FILES.md` for detailed instructions
 
 ## Running the App
 

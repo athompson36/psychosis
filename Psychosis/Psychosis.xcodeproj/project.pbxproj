@@ -1,0 +1,717 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4958E92D2ED6C07800A11277 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9192ED6C07800A11277 /* Color+Hex.swift */; };
+		4958E92E2ED6C07800A11277 /* MainPaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9282ED6C07800A11277 /* MainPaneView.swift */; };
+		4958E92F2ED6C07800A11277 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9202ED6C07800A11277 /* ChatView.swift */; };
+		4958E9302ED6C07800A11277 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9152ED6C07800A11277 /* ContentView.swift */; };
+		4958E9312ED6C07800A11277 /* FileBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9262ED6C07800A11277 /* FileBrowserView.swift */; };
+		4958E9322ED6C07800A11277 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E91D2ED6C07800A11277 /* APIClient.swift */; };
+		4958E9332ED6C07800A11277 /* FileItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E91B2ED6C07800A11277 /* FileItem.swift */; };
+		4958E9342ED6C07800A11277 /* HubApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9162ED6C07800A11277 /* HubApp.swift */; };
+		4958E9352ED6C07800A11277 /* EditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9222ED6C07800A11277 /* EditorView.swift */; };
+		4958E9362ED6C07800A11277 /* PsychosisApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9172ED6C07800A11277 /* PsychosisApp.swift */; };
+		4958E9372ED6C07800A11277 /* EditorBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9242ED6C07800A11277 /* EditorBarView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4958E8F92ED6C04000A11277 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4958E8E32ED6C03E00A11277 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4958E8EA2ED6C03E00A11277;
+			remoteInfo = Psychosis;
+		};
+		4958E9032ED6C04100A11277 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4958E8E32ED6C03E00A11277 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4958E8EA2ED6C03E00A11277;
+			remoteInfo = Psychosis;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		4958E8EB2ED6C03E00A11277 /* Psychosis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Psychosis.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4958E8F82ED6C04000A11277 /* PsychosisTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PsychosisTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4958E9022ED6C04100A11277 /* PsychosisUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PsychosisUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4958E9152ED6C07800A11277 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		4958E9162ED6C07800A11277 /* HubApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HubApp.swift; sourceTree = "<group>"; };
+		4958E9172ED6C07800A11277 /* PsychosisApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsychosisApp.swift; sourceTree = "<group>"; };
+		4958E9192ED6C07800A11277 /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
+		4958E91B2ED6C07800A11277 /* FileItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileItem.swift; sourceTree = "<group>"; };
+		4958E91D2ED6C07800A11277 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		4958E9202ED6C07800A11277 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
+		4958E9222ED6C07800A11277 /* EditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorView.swift; sourceTree = "<group>"; };
+		4958E9242ED6C07800A11277 /* EditorBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorBarView.swift; sourceTree = "<group>"; };
+		4958E9262ED6C07800A11277 /* FileBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileBrowserView.swift; sourceTree = "<group>"; };
+		4958E9282ED6C07800A11277 /* MainPaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPaneView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		4958E8ED2ED6C03E00A11277 /* Psychosis */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Psychosis;
+			sourceTree = "<group>";
+		};
+		4958E8FB2ED6C04000A11277 /* PsychosisTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = PsychosisTests;
+			sourceTree = "<group>";
+		};
+		4958E9052ED6C04100A11277 /* PsychosisUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = PsychosisUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4958E8E82ED6C03E00A11277 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4958E8F52ED6C04000A11277 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4958E8FF2ED6C04100A11277 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4958E8E22ED6C03E00A11277 = {
+			isa = PBXGroup;
+			children = (
+				4958E92C2ED6C07800A11277 /* HubApp */,
+				4958E8ED2ED6C03E00A11277 /* Psychosis */,
+				4958E8FB2ED6C04000A11277 /* PsychosisTests */,
+				4958E9052ED6C04100A11277 /* PsychosisUITests */,
+				4958E8EC2ED6C03E00A11277 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4958E8EC2ED6C03E00A11277 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4958E8EB2ED6C03E00A11277 /* Psychosis.app */,
+				4958E8F82ED6C04000A11277 /* PsychosisTests.xctest */,
+				4958E9022ED6C04100A11277 /* PsychosisUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4958E9182ED6C07800A11277 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				4958E9152ED6C07800A11277 /* ContentView.swift */,
+				4958E9162ED6C07800A11277 /* HubApp.swift */,
+				4958E9172ED6C07800A11277 /* PsychosisApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		4958E91A2ED6C07800A11277 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				4958E9192ED6C07800A11277 /* Color+Hex.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		4958E91C2ED6C07800A11277 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				4958E91B2ED6C07800A11277 /* FileItem.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		4958E91E2ED6C07800A11277 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				4958E91D2ED6C07800A11277 /* APIClient.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		4958E91F2ED6C07800A11277 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				4958E91A2ED6C07800A11277 /* Extensions */,
+				4958E91C2ED6C07800A11277 /* Models */,
+				4958E91E2ED6C07800A11277 /* Networking */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		4958E9212ED6C07800A11277 /* Chat */ = {
+			isa = PBXGroup;
+			children = (
+				4958E9202ED6C07800A11277 /* ChatView.swift */,
+			);
+			path = Chat;
+			sourceTree = "<group>";
+		};
+		4958E9232ED6C07800A11277 /* Editor */ = {
+			isa = PBXGroup;
+			children = (
+				4958E9222ED6C07800A11277 /* EditorView.swift */,
+			);
+			path = Editor;
+			sourceTree = "<group>";
+		};
+		4958E9252ED6C07800A11277 /* EditorBar */ = {
+			isa = PBXGroup;
+			children = (
+				4958E9242ED6C07800A11277 /* EditorBarView.swift */,
+			);
+			path = EditorBar;
+			sourceTree = "<group>";
+		};
+		4958E9272ED6C07800A11277 /* FileBrowser */ = {
+			isa = PBXGroup;
+			children = (
+				4958E9262ED6C07800A11277 /* FileBrowserView.swift */,
+			);
+			path = FileBrowser;
+			sourceTree = "<group>";
+		};
+		4958E9292ED6C07800A11277 /* MainPane */ = {
+			isa = PBXGroup;
+			children = (
+				4958E9282ED6C07800A11277 /* MainPaneView.swift */,
+			);
+			path = MainPane;
+			sourceTree = "<group>";
+		};
+		4958E92A2ED6C07800A11277 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				4958E9212ED6C07800A11277 /* Chat */,
+				4958E9232ED6C07800A11277 /* Editor */,
+				4958E9252ED6C07800A11277 /* EditorBar */,
+				4958E9272ED6C07800A11277 /* FileBrowser */,
+				4958E9292ED6C07800A11277 /* MainPane */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		4958E92B2ED6C07800A11277 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		4958E92C2ED6C07800A11277 /* HubApp */ = {
+			isa = PBXGroup;
+			children = (
+				4958E9182ED6C07800A11277 /* App */,
+				4958E91F2ED6C07800A11277 /* Core */,
+				4958E92A2ED6C07800A11277 /* Features */,
+				4958E92B2ED6C07800A11277 /* Resources */,
+			);
+			name = HubApp;
+			path = "../apps/hub-ios/HubApp";
+			sourceTree = SOURCE_ROOT;
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4958E8EA2ED6C03E00A11277 /* Psychosis */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4958E90C2ED6C04100A11277 /* Build configuration list for PBXNativeTarget "Psychosis" */;
+			buildPhases = (
+				4958E8E72ED6C03E00A11277 /* Sources */,
+				4958E8E82ED6C03E00A11277 /* Frameworks */,
+				4958E8E92ED6C03E00A11277 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				4958E8ED2ED6C03E00A11277 /* Psychosis */,
+			);
+			name = Psychosis;
+			packageProductDependencies = (
+			);
+			productName = Psychosis;
+			productReference = 4958E8EB2ED6C03E00A11277 /* Psychosis.app */;
+			productType = "com.apple.product-type.application";
+		};
+		4958E8F72ED6C04000A11277 /* PsychosisTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4958E90F2ED6C04100A11277 /* Build configuration list for PBXNativeTarget "PsychosisTests" */;
+			buildPhases = (
+				4958E8F42ED6C04000A11277 /* Sources */,
+				4958E8F52ED6C04000A11277 /* Frameworks */,
+				4958E8F62ED6C04000A11277 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4958E8FA2ED6C04000A11277 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				4958E8FB2ED6C04000A11277 /* PsychosisTests */,
+			);
+			name = PsychosisTests;
+			packageProductDependencies = (
+			);
+			productName = PsychosisTests;
+			productReference = 4958E8F82ED6C04000A11277 /* PsychosisTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		4958E9012ED6C04100A11277 /* PsychosisUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4958E9122ED6C04100A11277 /* Build configuration list for PBXNativeTarget "PsychosisUITests" */;
+			buildPhases = (
+				4958E8FE2ED6C04100A11277 /* Sources */,
+				4958E8FF2ED6C04100A11277 /* Frameworks */,
+				4958E9002ED6C04100A11277 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4958E9042ED6C04100A11277 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				4958E9052ED6C04100A11277 /* PsychosisUITests */,
+			);
+			name = PsychosisUITests;
+			packageProductDependencies = (
+			);
+			productName = PsychosisUITests;
+			productReference = 4958E9022ED6C04100A11277 /* PsychosisUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4958E8E32ED6C03E00A11277 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1640;
+				LastUpgradeCheck = 1640;
+				TargetAttributes = {
+					4958E8EA2ED6C03E00A11277 = {
+						CreatedOnToolsVersion = 16.4;
+					};
+					4958E8F72ED6C04000A11277 = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 4958E8EA2ED6C03E00A11277;
+					};
+					4958E9012ED6C04100A11277 = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 4958E8EA2ED6C03E00A11277;
+					};
+				};
+			};
+			buildConfigurationList = 4958E8E62ED6C03E00A11277 /* Build configuration list for PBXProject "Psychosis" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 4958E8E22ED6C03E00A11277;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 4958E8EC2ED6C03E00A11277 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4958E8EA2ED6C03E00A11277 /* Psychosis */,
+				4958E8F72ED6C04000A11277 /* PsychosisTests */,
+				4958E9012ED6C04100A11277 /* PsychosisUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4958E8E92ED6C03E00A11277 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4958E8F62ED6C04000A11277 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4958E9002ED6C04100A11277 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4958E8E72ED6C03E00A11277 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4958E92D2ED6C07800A11277 /* Color+Hex.swift in Sources */,
+				4958E92E2ED6C07800A11277 /* MainPaneView.swift in Sources */,
+				4958E92F2ED6C07800A11277 /* ChatView.swift in Sources */,
+				4958E9302ED6C07800A11277 /* ContentView.swift in Sources */,
+				4958E9312ED6C07800A11277 /* FileBrowserView.swift in Sources */,
+				4958E9322ED6C07800A11277 /* APIClient.swift in Sources */,
+				4958E9332ED6C07800A11277 /* FileItem.swift in Sources */,
+				4958E9342ED6C07800A11277 /* HubApp.swift in Sources */,
+				4958E9352ED6C07800A11277 /* EditorView.swift in Sources */,
+				4958E9362ED6C07800A11277 /* PsychosisApp.swift in Sources */,
+				4958E9372ED6C07800A11277 /* EditorBarView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4958E8F42ED6C04000A11277 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4958E8FE2ED6C04100A11277 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		4958E8FA2ED6C04000A11277 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4958E8EA2ED6C03E00A11277 /* Psychosis */;
+			targetProxy = 4958E8F92ED6C04000A11277 /* PBXContainerItemProxy */;
+		};
+		4958E9042ED6C04100A11277 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4958E8EA2ED6C03E00A11277 /* Psychosis */;
+			targetProxy = 4958E9032ED6C04100A11277 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		4958E90A2ED6C04100A11277 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = FH4FKB9AUS;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		4958E90B2ED6C04100A11277 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = FH4FKB9AUS;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		4958E90D2ED6C04100A11277 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FH4FKB9AUS;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "FS-Tech.Psychosis";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4958E90E2ED6C04100A11277 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FH4FKB9AUS;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "FS-Tech.Psychosis";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		4958E9102ED6C04100A11277 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FH4FKB9AUS;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "FS-Tech.PsychosisTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Psychosis.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Psychosis";
+			};
+			name = Debug;
+		};
+		4958E9112ED6C04100A11277 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FH4FKB9AUS;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "FS-Tech.PsychosisTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Psychosis.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Psychosis";
+			};
+			name = Release;
+		};
+		4958E9132ED6C04100A11277 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FH4FKB9AUS;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "FS-Tech.PsychosisUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Psychosis;
+			};
+			name = Debug;
+		};
+		4958E9142ED6C04100A11277 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FH4FKB9AUS;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "FS-Tech.PsychosisUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Psychosis;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4958E8E62ED6C03E00A11277 /* Build configuration list for PBXProject "Psychosis" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4958E90A2ED6C04100A11277 /* Debug */,
+				4958E90B2ED6C04100A11277 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4958E90C2ED6C04100A11277 /* Build configuration list for PBXNativeTarget "Psychosis" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4958E90D2ED6C04100A11277 /* Debug */,
+				4958E90E2ED6C04100A11277 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4958E90F2ED6C04100A11277 /* Build configuration list for PBXNativeTarget "PsychosisTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4958E9102ED6C04100A11277 /* Debug */,
+				4958E9112ED6C04100A11277 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4958E9122ED6C04100A11277 /* Build configuration list for PBXNativeTarget "PsychosisUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4958E9132ED6C04100A11277 /* Debug */,
+				4958E9142ED6C04100A11277 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4958E8E32ED6C03E00A11277 /* Project object */;
+}
