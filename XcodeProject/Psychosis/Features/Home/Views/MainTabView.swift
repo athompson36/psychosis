@@ -36,6 +36,21 @@ struct MainTabView: View {
                     Label("Notes", systemImage: "note.text")
                 }
             
+            MediaView()
+                .tabItem {
+                    Label("Media", systemImage: "photo.on.rectangle")
+                }
+            
+            RemindersView()
+                .tabItem {
+                    Label("Reminders", systemImage: "bell.badge")
+                }
+            
+            AnalyticsView()
+                .tabItem {
+                    Label("Analytics", systemImage: "chart.bar.fill")
+                }
+            
             FavoritesView()
                 .tabItem {
                     Label("Favorites", systemImage: "heart.fill")

@@ -29,6 +29,9 @@ enum Constants {
         static let tasks = "tasks"
         static let calendarEvents = "calendarEvents"
         static let notes = "notes"
+        static let media = "media"
+        static let analytics = "analytics"
+        static let reminders = "reminders"
     }
 }
 

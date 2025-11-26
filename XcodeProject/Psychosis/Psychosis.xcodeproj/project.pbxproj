@@ -40,6 +40,12 @@
 		4958E8CB2ED6B7F500A11277 /* TasksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E8C82ED6B7F500A11277 /* TasksView.swift */; };
 		4958E8CC2ED6B7F500A11277 /* TasksViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E8C62ED6B7F500A11277 /* TasksViewModel.swift */; };
 		4958E8CD2ED6B7F500A11277 /* TaskItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E8C42ED6B7F500A11277 /* TaskItem.swift */; };
+		4958E8DC2ED6B8E700A11277 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E8D22ED6B8E700A11277 /* CalendarView.swift */; };
+		4958E8DD2ED6B8E700A11277 /* CalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E8CE2ED6B8E700A11277 /* CalendarEvent.swift */; };
+		4958E8DE2ED6B8E700A11277 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E8D52ED6B8E700A11277 /* Note.swift */; };
+		4958E8DF2ED6B8E700A11277 /* NotesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E8D72ED6B8E700A11277 /* NotesViewModel.swift */; };
+		4958E8E02ED6B8E700A11277 /* NotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E8D92ED6B8E700A11277 /* NotesView.swift */; };
+		4958E8E12ED6B8E700A11277 /* CalendarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E8D02ED6B8E700A11277 /* CalendarViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -98,6 +104,12 @@
 		4958E8C42ED6B7F500A11277 /* TaskItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskItem.swift; sourceTree = "<group>"; };
 		4958E8C62ED6B7F500A11277 /* TasksViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksViewModel.swift; sourceTree = "<group>"; };
 		4958E8C82ED6B7F500A11277 /* TasksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksView.swift; sourceTree = "<group>"; };
+		4958E8CE2ED6B8E700A11277 /* CalendarEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEvent.swift; sourceTree = "<group>"; };
+		4958E8D02ED6B8E700A11277 /* CalendarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewModel.swift; sourceTree = "<group>"; };
+		4958E8D22ED6B8E700A11277 /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
+		4958E8D52ED6B8E700A11277 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
+		4958E8D72ED6B8E700A11277 /* NotesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesViewModel.swift; sourceTree = "<group>"; };
+		4958E8D92ED6B8E700A11277 /* NotesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -453,6 +465,8 @@
 		4958E85F2ED6B66F00A11277 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				4958E8D42ED6B8E700A11277 /* Calendar */,
+				4958E8DB2ED6B8E700A11277 /* Notes */,
 				4958E8CA2ED6B7F500A11277 /* Tasks */,
 				4958E8282ED6B66F00A11277 /* Detail */,
 				4958E82F2ED6B66F00A11277 /* Favorites */,
@@ -500,6 +514,74 @@
 				4958E8C92ED6B7F500A11277 /* Views */,
 			);
 			path = Tasks;
+			sourceTree = "<group>";
+		};
+		4958E8CF2ED6B8E700A11277 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				4958E8CE2ED6B8E700A11277 /* CalendarEvent.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		4958E8D12ED6B8E700A11277 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				4958E8D02ED6B8E700A11277 /* CalendarViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		4958E8D32ED6B8E700A11277 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				4958E8D22ED6B8E700A11277 /* CalendarView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		4958E8D42ED6B8E700A11277 /* Calendar */ = {
+			isa = PBXGroup;
+			children = (
+				4958E8CF2ED6B8E700A11277 /* Models */,
+				4958E8D12ED6B8E700A11277 /* ViewModels */,
+				4958E8D32ED6B8E700A11277 /* Views */,
+			);
+			path = Calendar;
+			sourceTree = "<group>";
+		};
+		4958E8D62ED6B8E700A11277 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				4958E8D52ED6B8E700A11277 /* Note.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		4958E8D82ED6B8E700A11277 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				4958E8D72ED6B8E700A11277 /* NotesViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		4958E8DA2ED6B8E700A11277 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				4958E8D92ED6B8E700A11277 /* NotesView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		4958E8DB2ED6B8E700A11277 /* Notes */ = {
+			isa = PBXGroup;
+			children = (
+				4958E8D62ED6B8E700A11277 /* Models */,
+				4958E8D82ED6B8E700A11277 /* ViewModels */,
+				4958E8DA2ED6B8E700A11277 /* Views */,
+			);
+			path = Notes;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -667,6 +749,12 @@
 				4958E86F2ED6B66F00A11277 /* FavoriteItem.swift in Sources */,
 				4958E8702ED6B66F00A11277 /* SettingsOption.swift in Sources */,
 				4958E8712ED6B66F00A11277 /* HistoryViewModel.swift in Sources */,
+				4958E8DC2ED6B8E700A11277 /* CalendarView.swift in Sources */,
+				4958E8DD2ED6B8E700A11277 /* CalendarEvent.swift in Sources */,
+				4958E8DE2ED6B8E700A11277 /* Note.swift in Sources */,
+				4958E8DF2ED6B8E700A11277 /* NotesViewModel.swift in Sources */,
+				4958E8E02ED6B8E700A11277 /* NotesView.swift in Sources */,
+				4958E8E12ED6B8E700A11277 /* CalendarViewModel.swift in Sources */,
 				4958E8722ED6B66F00A11277 /* MainTabView.swift in Sources */,
 				4958E8732ED6B66F00A11277 /* ProfileViewModel.swift in Sources */,
 				4958E8742ED6B66F00A11277 /* DetailItem.swift in Sources */,
