@@ -19,6 +19,9 @@ enum Constants {
     enum StorageKeys {
         static let userPreferences = "userPreferences"
         static let homeItems = "homeItems"
+        static let darkModeEnabled = "darkModeEnabled"
+        static let notificationsEnabled = "notificationsEnabled"
+        static let hapticFeedbackEnabled = "hapticFeedbackEnabled"
     }
 }
 

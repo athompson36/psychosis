@@ -38,6 +38,9 @@ struct HomeView: View {
             .refreshable {
                 await viewModel.refresh()
             }
+            .navigationDestination(for: UUID.self) { id in
+                DetailView(itemId: id)
+            }
         }
     }
     
@@ -92,7 +95,9 @@ struct HomeView: View {
                 emptyStateView
             } else {
                 ForEach(viewModel.items) { item in
-                    HomeItemRow(item: item)
+                    NavigationLink(value: item.id) {
+                        HomeItemRow(item: item)
+                    }
                 }
             }
         }
