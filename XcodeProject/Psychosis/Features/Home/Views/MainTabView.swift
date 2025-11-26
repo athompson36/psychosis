@@ -21,6 +21,11 @@ struct MainTabView: View {
                     Label("Search", systemImage: "magnifyingglass")
                 }
             
+            TasksView()
+                .tabItem {
+                    Label("Tasks", systemImage: "checklist")
+                }
+            
             FavoritesView()
                 .tabItem {
                     Label("Favorites", systemImage: "heart.fill")

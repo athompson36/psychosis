@@ -26,6 +26,7 @@ enum Constants {
         static let notifications = "notifications"
         static let favorites = "favorites"
         static let history = "history"
+        static let tasks = "tasks"
     }
 }
 
