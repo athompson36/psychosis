@@ -14,7 +14,6 @@
 		4958E9312ED6C07800A11277 /* FileBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9262ED6C07800A11277 /* FileBrowserView.swift */; };
 		4958E9322ED6C07800A11277 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E91D2ED6C07800A11277 /* APIClient.swift */; };
 		4958E9332ED6C07800A11277 /* FileItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E91B2ED6C07800A11277 /* FileItem.swift */; };
-		4958E9342ED6C07800A11277 /* HubApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9162ED6C07800A11277 /* HubApp.swift */; };
 		4958E9352ED6C07800A11277 /* EditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9222ED6C07800A11277 /* EditorView.swift */; };
 		4958E9362ED6C07800A11277 /* PsychosisApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9172ED6C07800A11277 /* PsychosisApp.swift */; };
 		4958E9372ED6C07800A11277 /* EditorBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9242ED6C07800A11277 /* EditorBarView.swift */; };
@@ -42,7 +41,6 @@
 		4958E8F82ED6C04000A11277 /* PsychosisTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PsychosisTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4958E9022ED6C04100A11277 /* PsychosisUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PsychosisUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4958E9152ED6C07800A11277 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		4958E9162ED6C07800A11277 /* HubApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HubApp.swift; sourceTree = "<group>"; };
 		4958E9172ED6C07800A11277 /* PsychosisApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsychosisApp.swift; sourceTree = "<group>"; };
 		4958E9192ED6C07800A11277 /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
 		4958E91B2ED6C07800A11277 /* FileItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileItem.swift; sourceTree = "<group>"; };
@@ -122,7 +120,6 @@
 			isa = PBXGroup;
 			children = (
 				4958E9152ED6C07800A11277 /* ContentView.swift */,
-				4958E9162ED6C07800A11277 /* HubApp.swift */,
 				4958E9172ED6C07800A11277 /* PsychosisApp.swift */,
 			);
 			path = App;
@@ -384,7 +381,6 @@
 				4958E9312ED6C07800A11277 /* FileBrowserView.swift in Sources */,
 				4958E9322ED6C07800A11277 /* APIClient.swift in Sources */,
 				4958E9332ED6C07800A11277 /* FileItem.swift in Sources */,
-				4958E9342ED6C07800A11277 /* HubApp.swift in Sources */,
 				4958E9352ED6C07800A11277 /* EditorView.swift in Sources */,
 				4958E9362ED6C07800A11277 /* PsychosisApp.swift in Sources */,
 				4958E9372ED6C07800A11277 /* EditorBarView.swift in Sources */,
