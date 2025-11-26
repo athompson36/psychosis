@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import EditorBar from './components/EditorBar/EditorBar';
 import MainPane from './components/MainPane/MainPane';
 import Chat from './components/Chat/Chat';
 import Editor from './components/Editor/Editor';
