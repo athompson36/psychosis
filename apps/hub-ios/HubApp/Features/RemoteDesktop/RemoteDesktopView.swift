@@ -8,29 +8,22 @@
 import SwiftUI
 
 struct RemoteDesktopView: View {
-    @State private var selectedTool: String = "dev-remote"
+    let remoteServer: RemoteServer
     @State private var isConnected: Bool = false
-    
-    let tools = [
-        ("dev-remote", "⚡", "Dev Remote"),
-        ("vscode", "📝", "VS Code"),
-        ("xcode", "🔨", "Xcode")
-    ]
+    @State private var connectionError: String?
     
     var body: some View {
         VStack(spacing: 0) {
-            // Tool Selector
+            // Connection Header
             HStack {
-                Picker("Tool", selection: $selectedTool) {
-                    ForEach(tools, id: \.0) { tool in
-                        HStack {
-                            Text(tool.1)
-                            Text(tool.2)
-                        }
-                        .tag(tool.0)
-                    }
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(remoteServer.name)
+                        .font(.headline)
+                    
+                    Text(remoteServer.host)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                 }
-                .pickerStyle(.menu)
                 
                 Spacer()
                 
@@ -44,31 +37,45 @@ struct RemoteDesktopView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
+                
+                if !isConnected {
+                    Button("Connect") {
+                        connectToServer()
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
             }
             .padding()
             .background(.ultraThinMaterial)
             
             Divider()
             
-            // Remote Screen Area
+            // Remote Cursor Chat Interface
             ZStack {
                 Color.black
                 
                 if isConnected {
-                    // Remote screen would be displayed here
+                    // Remote Cursor chat interface would be displayed here
+                    // This would be a web view or remote desktop stream showing Cursor's chat
                     VStack(spacing: 16) {
-                        Image(systemName: "display")
+                        Image(systemName: "cursorarrow.click")
                             .font(.system(size: 60))
                             .foregroundColor(.white.opacity(0.5))
                         
-                        Text("Remote Desktop")
+                        Text("Cursor Chat")
                             .font(.title2)
                             .foregroundColor(.white)
                         
-                        Text("\(selectedTool) screen would appear here")
+                        Text("Remote desktop view of Cursor chat interface")
                             .font(.caption)
                             .foregroundColor(.white.opacity(0.7))
+                            .multilineTextAlignment(.center)
+                        
+                        Text("Connected to: \(remoteServer.name)")
+                            .font(.caption2)
+                            .foregroundColor(.white.opacity(0.5))
                     }
+                    .padding()
                 } else {
                     VStack(spacing: 16) {
                         Image(systemName: "display.trianglebadge.exclamationmark")
@@ -79,9 +86,16 @@ struct RemoteDesktopView: View {
                             .font(.title2)
                             .foregroundColor(.white)
                         
-                        Button("Connect") {
-                            // TODO: Implement connection
-                            isConnected = true
+                        if let error = connectionError {
+                            Text(error)
+                                .font(.caption)
+                                .foregroundColor(.red)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal)
+                        }
+                        
+                        Button("Connect to \(remoteServer.name)") {
+                            connectToServer()
                         }
                         .buttonStyle(.borderedProminent)
                     }
@@ -91,11 +105,43 @@ struct RemoteDesktopView: View {
         }
         .background(.ultraThinMaterial)
         .cornerRadius(12)
+        .onAppear {
+            // Auto-connect on appear if configured
+            if remoteServer.autoConnect {
+                connectToServer()
+            }
+        }
+    }
+    
+    private func connectToServer() {
+        isConnected = false
+        connectionError = nil
+        
+        Task {
+            // TODO: Implement actual remote desktop connection
+            // This would connect via VNC, RDP, or a custom protocol
+            // to the remote server running Cursor
+            
+            // Simulate connection
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            
+            await MainActor.run {
+                // For now, simulate successful connection
+                // In production, this would check actual connection status
+                isConnected = true
+            }
+        }
     }
 }
 
+
 #Preview {
-    RemoteDesktopView()
-        .background(Color.black)
+    RemoteDesktopView(remoteServer: RemoteServer(
+        name: "fs-dev Ubuntu",
+        host: "fs-dev.local",
+        type: .ubuntu
+    ))
+    .background(Color.black)
 }
+
 

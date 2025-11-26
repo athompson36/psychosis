@@ -7,16 +7,23 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4958E92D2ED6C07800A11277 /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9192ED6C07800A11277 /* Color+Hex.swift */; };
-		4958E92E2ED6C07800A11277 /* MainPaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9282ED6C07800A11277 /* MainPaneView.swift */; };
-		4958E9302ED6C07800A11277 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9152ED6C07800A11277 /* ContentView.swift */; };
-		4958E9312ED6C07800A11277 /* FileBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9262ED6C07800A11277 /* FileBrowserView.swift */; };
-		4958E9322ED6C07800A11277 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E91D2ED6C07800A11277 /* APIClient.swift */; };
-		4958E9332ED6C07800A11277 /* FileItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E91B2ED6C07800A11277 /* FileItem.swift */; };
-		4958E9352ED6C07800A11277 /* EditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9222ED6C07800A11277 /* EditorView.swift */; };
-		4958E9362ED6C07800A11277 /* PsychosisApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9172ED6C07800A11277 /* PsychosisApp.swift */; };
-		4958E9372ED6C07800A11277 /* EditorBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9242ED6C07800A11277 /* EditorBarView.swift */; };
-		4958E9392ED6C07800A11277 /* CursorChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4958E9382ED6C07800A11277 /* CursorChatView.swift */; };
+		4933F7272ED6C8A4007F04FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4933F7242ED6C8A4007F04FA /* Assets.xcassets */; };
+		4933F7282ED6C8A4007F04FA /* PsychosisApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F70C2ED6C8A4007F04FA /* PsychosisApp.swift */; };
+		4933F7292ED6C8A4007F04FA /* EditorBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F71B2ED6C8A4007F04FA /* EditorBarView.swift */; };
+		4933F72A2ED6C8A4007F04FA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F70A2ED6C8A4007F04FA /* ContentView.swift */; };
+		4933F72B2ED6C8A4007F04FA /* Color+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F70E2ED6C8A4007F04FA /* Color+Hex.swift */; };
+		4933F72C2ED6C8A4007F04FA /* MainPaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F71F2ED6C8A4007F04FA /* MainPaneView.swift */; };
+		4933F72D2ED6C8A4007F04FA /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F7132ED6C8A4007F04FA /* APIClient.swift */; };
+		4933F72E2ED6C8A4007F04FA /* RemoteServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F7112ED6C8A4007F04FA /* RemoteServer.swift */; };
+		4933F72F2ED6C8A4007F04FA /* FileItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F7102ED6C8A4007F04FA /* FileItem.swift */; };
+		4933F7302ED6C8A4007F04FA /* FileBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F71D2ED6C8A4007F04FA /* FileBrowserView.swift */; };
+		4933F7312ED6C8A4007F04FA /* CursorChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F7172ED6C8A4007F04FA /* CursorChatView.swift */; };
+		4933F7332ED6C8A4007F04FA /* RemoteDesktopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F7212ED6C8A4007F04FA /* RemoteDesktopView.swift */; };
+		4933F7342ED6C8A4007F04FA /* EditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F7192ED6C8A4007F04FA /* EditorView.swift */; };
+		4933F7382ED6C933007F04FA /* RemoteServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F7362ED6C933007F04FA /* RemoteServer.swift */; };
+		4933F7392ED6C933007F04FA /* FileItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F7352ED6C933007F04FA /* FileItem.swift */; };
+		4933F73C2ED6C948007F04FA /* RemoteDesktopView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F73A2ED6C948007F04FA /* RemoteDesktopView.swift */; };
+		4933F73F2ED6C965007F04FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4933F73D2ED6C965007F04FA /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,19 +44,27 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4933F70A2ED6C8A4007F04FA /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		4933F70B2ED6C8A4007F04FA /* HubApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HubApp.swift; sourceTree = "<group>"; };
+		4933F70C2ED6C8A4007F04FA /* PsychosisApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsychosisApp.swift; sourceTree = "<group>"; };
+		4933F70E2ED6C8A4007F04FA /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
+		4933F7102ED6C8A4007F04FA /* FileItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileItem.swift; sourceTree = "<group>"; };
+		4933F7112ED6C8A4007F04FA /* RemoteServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteServer.swift; sourceTree = "<group>"; };
+		4933F7132ED6C8A4007F04FA /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		4933F7172ED6C8A4007F04FA /* CursorChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorChatView.swift; sourceTree = "<group>"; };
+		4933F7192ED6C8A4007F04FA /* EditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorView.swift; sourceTree = "<group>"; };
+		4933F71B2ED6C8A4007F04FA /* EditorBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorBarView.swift; sourceTree = "<group>"; };
+		4933F71D2ED6C8A4007F04FA /* FileBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileBrowserView.swift; sourceTree = "<group>"; };
+		4933F71F2ED6C8A4007F04FA /* MainPaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPaneView.swift; sourceTree = "<group>"; };
+		4933F7212ED6C8A4007F04FA /* RemoteDesktopView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteDesktopView.swift; sourceTree = "<group>"; };
+		4933F7242ED6C8A4007F04FA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		4933F7352ED6C933007F04FA /* FileItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileItem.swift; sourceTree = "<group>"; };
+		4933F7362ED6C933007F04FA /* RemoteServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteServer.swift; sourceTree = "<group>"; };
+		4933F73A2ED6C948007F04FA /* RemoteDesktopView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteDesktopView.swift; sourceTree = "<group>"; };
+		4933F73D2ED6C965007F04FA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4958E8EB2ED6C03E00A11277 /* Psychosis.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Psychosis.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4958E8F82ED6C04000A11277 /* PsychosisTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PsychosisTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4958E9022ED6C04100A11277 /* PsychosisUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PsychosisUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		4958E9152ED6C07800A11277 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		4958E9172ED6C07800A11277 /* PsychosisApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsychosisApp.swift; sourceTree = "<group>"; };
-		4958E9192ED6C07800A11277 /* Color+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Hex.swift"; sourceTree = "<group>"; };
-		4958E91B2ED6C07800A11277 /* FileItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileItem.swift; sourceTree = "<group>"; };
-		4958E91D2ED6C07800A11277 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
-		4958E9222ED6C07800A11277 /* EditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorView.swift; sourceTree = "<group>"; };
-		4958E9242ED6C07800A11277 /* EditorBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorBarView.swift; sourceTree = "<group>"; };
-		4958E9262ED6C07800A11277 /* FileBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileBrowserView.swift; sourceTree = "<group>"; };
-		4958E9282ED6C07800A11277 /* MainPaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPaneView.swift; sourceTree = "<group>"; };
-		4958E9382ED6C07800A11277 /* CursorChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorChatView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -90,10 +105,174 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4933F70D2ED6C8A4007F04FA /* App */ = {
+			isa = PBXGroup;
+			children = (
+				4933F70A2ED6C8A4007F04FA /* ContentView.swift */,
+				4933F70B2ED6C8A4007F04FA /* HubApp.swift */,
+				4933F70C2ED6C8A4007F04FA /* PsychosisApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		4933F70F2ED6C8A4007F04FA /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				4933F70E2ED6C8A4007F04FA /* Color+Hex.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		4933F7122ED6C8A4007F04FA /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				4933F7102ED6C8A4007F04FA /* FileItem.swift */,
+				4933F7112ED6C8A4007F04FA /* RemoteServer.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		4933F7142ED6C8A4007F04FA /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				4933F7132ED6C8A4007F04FA /* APIClient.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		4933F7152ED6C8A4007F04FA /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				4933F70F2ED6C8A4007F04FA /* Extensions */,
+				4933F7122ED6C8A4007F04FA /* Models */,
+				4933F7142ED6C8A4007F04FA /* Networking */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		4933F7162ED6C8A4007F04FA /* Chat */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Chat;
+			sourceTree = "<group>";
+		};
+		4933F7182ED6C8A4007F04FA /* CursorChat */ = {
+			isa = PBXGroup;
+			children = (
+				4933F7172ED6C8A4007F04FA /* CursorChatView.swift */,
+			);
+			path = CursorChat;
+			sourceTree = "<group>";
+		};
+		4933F71A2ED6C8A4007F04FA /* Editor */ = {
+			isa = PBXGroup;
+			children = (
+				4933F7192ED6C8A4007F04FA /* EditorView.swift */,
+			);
+			path = Editor;
+			sourceTree = "<group>";
+		};
+		4933F71C2ED6C8A4007F04FA /* EditorBar */ = {
+			isa = PBXGroup;
+			children = (
+				4933F71B2ED6C8A4007F04FA /* EditorBarView.swift */,
+			);
+			path = EditorBar;
+			sourceTree = "<group>";
+		};
+		4933F71E2ED6C8A4007F04FA /* FileBrowser */ = {
+			isa = PBXGroup;
+			children = (
+				4933F71D2ED6C8A4007F04FA /* FileBrowserView.swift */,
+			);
+			path = FileBrowser;
+			sourceTree = "<group>";
+		};
+		4933F7202ED6C8A4007F04FA /* MainPane */ = {
+			isa = PBXGroup;
+			children = (
+				4933F71F2ED6C8A4007F04FA /* MainPaneView.swift */,
+			);
+			path = MainPane;
+			sourceTree = "<group>";
+		};
+		4933F7222ED6C8A4007F04FA /* RemoteDesktop */ = {
+			isa = PBXGroup;
+			children = (
+				4933F7212ED6C8A4007F04FA /* RemoteDesktopView.swift */,
+			);
+			path = RemoteDesktop;
+			sourceTree = "<group>";
+		};
+		4933F7232ED6C8A4007F04FA /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				4933F7162ED6C8A4007F04FA /* Chat */,
+				4933F7182ED6C8A4007F04FA /* CursorChat */,
+				4933F71A2ED6C8A4007F04FA /* Editor */,
+				4933F71C2ED6C8A4007F04FA /* EditorBar */,
+				4933F71E2ED6C8A4007F04FA /* FileBrowser */,
+				4933F7202ED6C8A4007F04FA /* MainPane */,
+				4933F7222ED6C8A4007F04FA /* RemoteDesktop */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		4933F7252ED6C8A4007F04FA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				4933F7242ED6C8A4007F04FA /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		4933F7262ED6C8A4007F04FA /* HubApp */ = {
+			isa = PBXGroup;
+			children = (
+				4933F73E2ED6C965007F04FA /* Resources */,
+				4933F73B2ED6C948007F04FA /* RemoteDesktop */,
+				4933F7372ED6C933007F04FA /* Models */,
+				4933F70D2ED6C8A4007F04FA /* App */,
+				4933F7152ED6C8A4007F04FA /* Core */,
+				4933F7232ED6C8A4007F04FA /* Features */,
+				4933F7252ED6C8A4007F04FA /* Resources */,
+			);
+			name = HubApp;
+			path = "../apps/hub-ios/HubApp";
+			sourceTree = SOURCE_ROOT;
+		};
+		4933F7372ED6C933007F04FA /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				4933F7352ED6C933007F04FA /* FileItem.swift */,
+				4933F7362ED6C933007F04FA /* RemoteServer.swift */,
+			);
+			name = Models;
+			path = Core/Models;
+			sourceTree = "<group>";
+		};
+		4933F73B2ED6C948007F04FA /* RemoteDesktop */ = {
+			isa = PBXGroup;
+			children = (
+				4933F73A2ED6C948007F04FA /* RemoteDesktopView.swift */,
+			);
+			name = RemoteDesktop;
+			path = Features/RemoteDesktop;
+			sourceTree = "<group>";
+		};
+		4933F73E2ED6C965007F04FA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				4933F73D2ED6C965007F04FA /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		4958E8E22ED6C03E00A11277 = {
 			isa = PBXGroup;
 			children = (
-				4958E92C2ED6C07800A11277 /* HubApp */,
+				4933F7262ED6C8A4007F04FA /* HubApp */,
 				4958E8FB2ED6C04000A11277 /* PsychosisTests */,
 				4958E9052ED6C04100A11277 /* PsychosisUITests */,
 				4958E8EC2ED6C03E00A11277 /* Products */,
@@ -109,120 +288,6 @@
 			);
 			name = Products;
 			sourceTree = "<group>";
-		};
-		4958E9182ED6C07800A11277 /* App */ = {
-			isa = PBXGroup;
-			children = (
-				4958E9152ED6C07800A11277 /* ContentView.swift */,
-				4958E9172ED6C07800A11277 /* PsychosisApp.swift */,
-			);
-			path = App;
-			sourceTree = "<group>";
-		};
-		4958E91A2ED6C07800A11277 /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-				4958E9192ED6C07800A11277 /* Color+Hex.swift */,
-			);
-			path = Extensions;
-			sourceTree = "<group>";
-		};
-		4958E91C2ED6C07800A11277 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				4958E91B2ED6C07800A11277 /* FileItem.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		4958E91E2ED6C07800A11277 /* Networking */ = {
-			isa = PBXGroup;
-			children = (
-				4958E91D2ED6C07800A11277 /* APIClient.swift */,
-			);
-			path = Networking;
-			sourceTree = "<group>";
-		};
-		4958E91F2ED6C07800A11277 /* Core */ = {
-			isa = PBXGroup;
-			children = (
-				4958E91A2ED6C07800A11277 /* Extensions */,
-				4958E91C2ED6C07800A11277 /* Models */,
-				4958E91E2ED6C07800A11277 /* Networking */,
-			);
-			path = Core;
-			sourceTree = "<group>";
-		};
-		4958E9212ED6C07800A11277 /* CursorChat */ = {
-			isa = PBXGroup;
-			children = (
-				4958E9382ED6C07800A11277 /* CursorChatView.swift */,
-			);
-			path = CursorChat;
-			sourceTree = "<group>";
-		};
-		4958E9232ED6C07800A11277 /* Editor */ = {
-			isa = PBXGroup;
-			children = (
-				4958E9222ED6C07800A11277 /* EditorView.swift */,
-			);
-			path = Editor;
-			sourceTree = "<group>";
-		};
-		4958E9252ED6C07800A11277 /* EditorBar */ = {
-			isa = PBXGroup;
-			children = (
-				4958E9242ED6C07800A11277 /* EditorBarView.swift */,
-			);
-			path = EditorBar;
-			sourceTree = "<group>";
-		};
-		4958E9272ED6C07800A11277 /* FileBrowser */ = {
-			isa = PBXGroup;
-			children = (
-				4958E9262ED6C07800A11277 /* FileBrowserView.swift */,
-			);
-			path = FileBrowser;
-			sourceTree = "<group>";
-		};
-		4958E9292ED6C07800A11277 /* MainPane */ = {
-			isa = PBXGroup;
-			children = (
-				4958E9282ED6C07800A11277 /* MainPaneView.swift */,
-			);
-			path = MainPane;
-			sourceTree = "<group>";
-		};
-		4958E92A2ED6C07800A11277 /* Features */ = {
-			isa = PBXGroup;
-			children = (
-				4958E9212ED6C07800A11277 /* CursorChat */,
-				4958E9232ED6C07800A11277 /* Editor */,
-				4958E9252ED6C07800A11277 /* EditorBar */,
-				4958E9272ED6C07800A11277 /* FileBrowser */,
-				4958E9292ED6C07800A11277 /* MainPane */,
-			);
-			path = Features;
-			sourceTree = "<group>";
-		};
-		4958E92B2ED6C07800A11277 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
-		4958E92C2ED6C07800A11277 /* HubApp */ = {
-			isa = PBXGroup;
-			children = (
-				4958E9182ED6C07800A11277 /* App */,
-				4958E91F2ED6C07800A11277 /* Core */,
-				4958E92A2ED6C07800A11277 /* Features */,
-				4958E92B2ED6C07800A11277 /* Resources */,
-			);
-			name = HubApp;
-			path = "../apps/hub-ios/HubApp";
-			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXGroup section */
 
@@ -341,6 +406,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4933F73F2ED6C965007F04FA /* Assets.xcassets in Resources */,
+				4933F7272ED6C8A4007F04FA /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -365,16 +432,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4958E92D2ED6C07800A11277 /* Color+Hex.swift in Sources */,
-				4958E92E2ED6C07800A11277 /* MainPaneView.swift in Sources */,
-				4958E9392ED6C07800A11277 /* CursorChatView.swift in Sources */,
-				4958E9302ED6C07800A11277 /* ContentView.swift in Sources */,
-				4958E9312ED6C07800A11277 /* FileBrowserView.swift in Sources */,
-				4958E9322ED6C07800A11277 /* APIClient.swift in Sources */,
-				4958E9332ED6C07800A11277 /* FileItem.swift in Sources */,
-				4958E9352ED6C07800A11277 /* EditorView.swift in Sources */,
-				4958E9362ED6C07800A11277 /* PsychosisApp.swift in Sources */,
-				4958E9372ED6C07800A11277 /* EditorBarView.swift in Sources */,
+				4933F7282ED6C8A4007F04FA /* PsychosisApp.swift in Sources */,
+				4933F7292ED6C8A4007F04FA /* EditorBarView.swift in Sources */,
+				4933F72A2ED6C8A4007F04FA /* ContentView.swift in Sources */,
+				4933F73C2ED6C948007F04FA /* RemoteDesktopView.swift in Sources */,
+				4933F72B2ED6C8A4007F04FA /* Color+Hex.swift in Sources */,
+				4933F72C2ED6C8A4007F04FA /* MainPaneView.swift in Sources */,
+				4933F72D2ED6C8A4007F04FA /* APIClient.swift in Sources */,
+				4933F72E2ED6C8A4007F04FA /* RemoteServer.swift in Sources */,
+				4933F72F2ED6C8A4007F04FA /* FileItem.swift in Sources */,
+				4933F7382ED6C933007F04FA /* RemoteServer.swift in Sources */,
+				4933F7392ED6C933007F04FA /* FileItem.swift in Sources */,
+				4933F7302ED6C8A4007F04FA /* FileBrowserView.swift in Sources */,
+				4933F7312ED6C8A4007F04FA /* CursorChatView.swift in Sources */,
+				4933F7332ED6C8A4007F04FA /* RemoteDesktopView.swift in Sources */,
+				4933F7342ED6C8A4007F04FA /* EditorView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
