@@ -120,10 +120,25 @@ struct NativeVNCView: View {
                     }
                 }
                 
-                // Keyboard toggle button - always visible when connected
+                // Keyboard input bar - visible at bottom when keyboard is active
                 if connection.isConnected {
                     VStack {
                         Spacer()
+                        
+                        // Text input bar - simple UIViewRepresentable
+                        VNCKeyboardTextFieldView(
+                            connection: connection,
+                            controller: keyboardController
+                        )
+                        .frame(height: 44)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, keyboardHeight > 0 ? keyboardHeight + 8 : 8)
+                        .opacity(keyboardController.shouldShowKeyboard || keyboardController.isKeyboardVisible ? 1.0 : 0.01)
+                        .allowsHitTesting(keyboardController.shouldShowKeyboard || keyboardController.isKeyboardVisible)
+                        .animation(.easeOut(duration: 0.25), value: keyboardController.shouldShowKeyboard)
+                        .animation(.easeOut(duration: 0.25), value: keyboardController.isKeyboardVisible)
+                        
+                        // Keyboard toggle button
                         HStack {
                             Spacer()
                             Button(action: {
@@ -138,24 +153,13 @@ struct NativeVNCView: View {
                                     .clipShape(Circle())
                             }
                             .padding(.trailing, 16)
-                            .padding(.bottom, keyboardHeight > 0 ? 16 : 100) // Adjust based on keyboard
+                            .padding(.bottom, 16)
                         }
                     }
                 }
-                
-                // Keyboard input - always in hierarchy, visible when needed
-                KeyboardInputViewControllerWrapper(
-                    connection: connection,
-                    controller: keyboardController
-                )
-                .frame(width: geometry.size.width - 32, height: 44)
-                .position(x: geometry.size.width / 2, y: geometry.size.height - keyboardHeight - 32)
-                .opacity((keyboardController.shouldShowKeyboard || keyboardController.isKeyboardVisible) ? 1.0 : 0.0)
-                .allowsHitTesting(keyboardController.shouldShowKeyboard || keyboardController.isKeyboardVisible)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding(.bottom, keyboardHeight)
         .background(Color.black)
         .animation(.easeOut(duration: 0.25), value: keyboardHeight)
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { notification in
@@ -246,7 +250,8 @@ struct NativeVNCView: View {
             try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
             connection.sendMouse(x: clampedX, y: clampedY, buttonMask: 0)
             
-            // Show keyboard after tap
+            // Always show keyboard after any tap on VNC screen
+            print("🖱️ Showing keyboard after tap")
             await MainActor.run {
                 keyboardController.showKeyboard()
             }
@@ -616,9 +621,9 @@ class VNCKeyboardTextField: UITextField {
     }
     
     private func setupTextField() {
-        // Ensure text field is properly configured for input
-        self.text = " "
-        self.placeholder = " "
+        // Text field will be configured by the view controller
+        self.borderStyle = .none
+        self.backgroundColor = .clear
     }
     
     override var canBecomeFirstResponder: Bool { 
@@ -727,9 +732,133 @@ class VNCKeyboardTextField: UITextField {
     }
 }
 
-// MARK: - Keyboard Input View Controller Wrapper
+// MARK: - Simple Keyboard Text Field View
 
-struct KeyboardInputViewControllerWrapper: UIViewControllerRepresentable {
+struct VNCKeyboardTextFieldView: UIViewRepresentable {
+    let connection: VNCConnection
+    @ObservedObject var controller: KeyboardController
+    
+    func makeUIView(context: Context) -> VNCKeyboardTextField {
+        print("⌨️ VNCKeyboardTextFieldView makeUIView")
+        let textField = VNCKeyboardTextField()
+        textField.delegate = context.coordinator
+        textField.connection = connection
+        textField.keyboardController = controller
+        
+        // Configure for visible, functional input
+        textField.autocorrectionType = .no
+        textField.autocapitalizationType = .none
+        textField.spellCheckingType = .no
+        textField.smartQuotesType = .no
+        textField.smartDashesType = .no
+        textField.smartInsertDeleteType = .no
+        textField.keyboardType = .default
+        textField.returnKeyType = .default
+        textField.backgroundColor = UIColor.black.withAlphaComponent(0.7)
+        textField.textColor = UIColor.white
+        textField.tintColor = UIColor.white
+        textField.placeholder = "VNC Input"
+        textField.text = ""
+        textField.borderStyle = .roundedRect
+        textField.layer.cornerRadius = 8
+        textField.layer.borderWidth = 1
+        textField.layer.borderColor = UIColor.white.withAlphaComponent(0.5).cgColor
+        textField.font = UIFont.systemFont(ofSize: 16)
+        
+        // Register with controller
+        controller.register(textField)
+        
+        return textField
+    }
+    
+    func updateUIView(_ uiView: VNCKeyboardTextField, context: Context) {
+        uiView.connection = connection
+        uiView.keyboardController = controller
+        controller.register(uiView)
+        
+        // Become first responder when requested
+        if controller.shouldShowKeyboard && !uiView.isFirstResponder {
+            print("⌨️ updateUIView: attempting to show keyboard, window: \(uiView.window != nil)")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                if uiView.window != nil {
+                    let success = uiView.becomeFirstResponder()
+                    print("⌨️ updateUIView becomeFirstResponder: \(success)")
+                } else {
+                    print("⚠️ updateUIView: text field not in window")
+                }
+            }
+        } else if !controller.shouldShowKeyboard && uiView.isFirstResponder {
+            uiView.resignFirstResponder()
+        }
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(connection: connection, controller: controller)
+    }
+    
+    class Coordinator: NSObject, UITextFieldDelegate {
+        let connection: VNCConnection
+        let controller: KeyboardController
+        
+        init(connection: VNCConnection, controller: KeyboardController) {
+            self.connection = connection
+            self.controller = controller
+        }
+        
+        func textFieldDidEndEditing(_ textField: UITextField) {
+            DispatchQueue.main.async {
+                self.controller.setKeyboardVisible(false)
+                self.controller.shouldShowKeyboard = false
+            }
+        }
+        
+        func textFieldDidBeginEditing(_ textField: UITextField) {
+            DispatchQueue.main.async {
+                self.controller.setKeyboardVisible(true)
+            }
+        }
+        
+        func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+            if string.isEmpty {
+                print("⌨️ Backspace pressed")
+                connection.sendKey(key: 0xFF08, pressed: true)
+                connection.sendKey(key: 0xFF08, pressed: false)
+            } else {
+                for char in string {
+                    if let keysym = charToKeysym(char) {
+                        print("⌨️ Key pressed: '\(char)' -> keysym: \(keysym)")
+                        connection.sendKey(key: keysym, pressed: true)
+                        connection.sendKey(key: keysym, pressed: false)
+                    }
+                }
+            }
+            return true // Allow text to update
+        }
+        
+        func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+            print("⌨️ Enter pressed")
+            connection.sendKey(key: 0xFF0D, pressed: true)
+            connection.sendKey(key: 0xFF0D, pressed: false)
+            return false
+        }
+        
+        private func charToKeysym(_ char: Character) -> UInt32? {
+            guard let ascii = char.asciiValue else { return nil }
+            if ascii >= 0x20 && ascii <= 0x7E {
+                return UInt32(ascii)
+            }
+            switch char {
+            case "\t": return 0xFF09
+            case "\n", "\r": return 0xFF0D
+            default: return nil
+            }
+        }
+    }
+}
+
+// MARK: - OLD Keyboard Input View Controller Wrapper (keeping for reference but not used)
+
+struct KeyboardInputViewControllerWrapper_OLD: UIViewControllerRepresentable {
     let connection: VNCConnection
     @ObservedObject var controller: KeyboardController
     
@@ -787,11 +916,13 @@ class KeyboardInputViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .clear
-        view.isUserInteractionEnabled = true
+        view.backgroundColor = UIColor.black.withAlphaComponent(0.8)
+        view.layer.cornerRadius = 8
+        view.layer.masksToBounds = true
         
-        // Configure text field - MUST be visible and real for iOS input system to work
-        // iOS RTI (Remote Text Input) requires a valid, visible input view to establish session
+        print("⌨️ KeyboardInputViewController viewDidLoad START")
+        
+        // Configure text field - make it VISIBLE and functional
         textField.delegate = self
         textField.connection = connection
         textField.keyboardController = controller
@@ -802,40 +933,50 @@ class KeyboardInputViewController: UIViewController {
         textField.smartDashesType = .no
         textField.smartInsertDeleteType = .no
         textField.keyboardType = .default
-        textField.returnKeyType = .default
+        textField.returnKeyType = .send
         
-        // Make it visible but subtle - iOS needs a real input view
-        textField.backgroundColor = UIColor.black.withAlphaComponent(0.7)
-        textField.textColor = UIColor.white
-        textField.tintColor = UIColor.white
-        textField.alpha = 1.0 // Fully opaque - required for input system
-        textField.placeholder = "VNC Input"
-        textField.text = "" // Start empty
+        // Make it VISIBLE and styled
+        textField.backgroundColor = UIColor.systemGray6
+        textField.textColor = UIColor.label
+        textField.tintColor = UIColor.systemBlue
+        textField.font = UIFont.systemFont(ofSize: 16)
+        textField.placeholder = "Type to send to remote desktop..."
+        textField.text = ""
+        textField.borderStyle = .roundedRect
+        textField.clearButtonMode = .whileEditing
         textField.isUserInteractionEnabled = true
         textField.isEnabled = true
         textField.isHidden = false
-        textField.borderStyle = .roundedRect
-        textField.layer.cornerRadius = 8
-        textField.layer.borderWidth = 1
-        textField.layer.borderColor = UIColor.white.withAlphaComponent(0.5).cgColor
-        textField.font = UIFont.systemFont(ofSize: 16)
         
-        // Make text field larger and properly positioned at bottom
+        // Add a label to show context
+        let label = UILabel()
+        label.text = "Remote Input"
+        label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+        label.textColor = UIColor.secondaryLabel
+        label.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(label)
+        
+        // Position text field with proper layout
         textField.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(textField)
-        NSLayoutConstraint.activate([
-            textField.widthAnchor.constraint(equalToConstant: 200),
-            textField.heightAnchor.constraint(equalToConstant: 44),
-            textField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            textField.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10)
-        ])
         
-        // Don't create UITextView - just use the text field
-        // Having both was causing conflicts
+        NSLayoutConstraint.activate([
+            // Label at top
+            label.topAnchor.constraint(equalTo: view.topAnchor, constant: 4),
+            label.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
+            label.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
+            
+            // Text field below label
+            textField.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 2),
+            textField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
+            textField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
+            textField.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -4),
+            textField.heightAnchor.constraint(equalToConstant: 36)
+        ])
         
         // Register with controller
         controller?.register(textField)
-        print("⌨️ KeyboardInputViewController viewDidLoad, text field and text view created")
+        print("⌨️ KeyboardInputViewController viewDidLoad COMPLETE, textField: \(textField)")
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -847,33 +988,12 @@ class KeyboardInputViewController: UIViewController {
         textField.keyboardController = controller
         controller?.register(textField)
         
-        // Ensure text field is in the responder chain
-        if textField.superview == nil {
-            view.addSubview(textField)
-        }
-        
-        // Try to become first responder if requested - try text view first, then text field
-        if controller?.shouldShowKeyboard == true {
-            let workItem = DispatchWorkItem {
-                // Try text view first (sometimes works better)
-                if let tv = self.textView, tv.window != nil {
-                    let success = tv.becomeFirstResponder()
-                    print("⌨️ viewDidAppear textView becomeFirstResponder: \(success)")
-                    if success {
-                        self.controller?.register(tv) // Register text view
-                        return
-                    }
-                }
-                
-                // Fall back to text field
-                if self.textField.window != nil {
-                    let success = self.textField.becomeFirstResponder()
-                    print("⌨️ viewDidAppear textField becomeFirstResponder: \(success), isFirstResponder: \(self.textField.isFirstResponder)")
-                } else {
-                    print("⚠️ viewDidAppear: text field not in window")
-                }
+        // Automatically focus text field to show keyboard
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            if self.textField.window != nil {
+                let success = self.textField.becomeFirstResponder()
+                print("⌨️ viewDidAppear auto-focus textField: \(success)")
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: workItem)
         }
     }
     
@@ -923,8 +1043,16 @@ extension KeyboardInputViewController: UITextFieldDelegate {
             }
         }
         
-        // Don't actually insert text
-        return false
+        // Allow text to show in field for visual feedback
+        // Clear it after a short delay
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            if let text = textField.text, text.count > 20 {
+                // Keep field clean - clear if it gets too long
+                textField.text = ""
+            }
+        }
+        
+        return true
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
