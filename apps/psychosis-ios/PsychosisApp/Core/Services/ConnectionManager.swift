@@ -81,10 +81,17 @@ class ConnectionManager: ObservableObject {
         }
         
         // Add query parameters for noVNC/VNC web clients
+        // IMPORTANT: Use resize=remote and quality=9 to avoid keyboard issues
+        // resize=scale can break backtick, tilde, and some Ctrl combos
         var queryItems: [URLQueryItem] = []
         queryItems.append(URLQueryItem(name: "autoconnect", value: "true"))
-        queryItems.append(URLQueryItem(name: "resize", value: "scale"))
-        queryItems.append(URLQueryItem(name: "quality", value: "6"))
+        queryItems.append(URLQueryItem(name: "resize", value: "remote"))  // remote instead of scale to fix keyboard
+        queryItems.append(URLQueryItem(name: "quality", value: "9"))  // Higher quality, better input handling
+        queryItems.append(URLQueryItem(name: "view_only", value: "false"))  // Enable keyboard/mouse input
+        queryItems.append(URLQueryItem(name: "clip", value: "true"))  // Enable clipboard
+        queryItems.append(URLQueryItem(name: "shared", value: "true"))  // Allow shared sessions
+        queryItems.append(URLQueryItem(name: "show_dot", value: "true"))  // Show cursor dot
+        queryItems.append(URLQueryItem(name: "bell", value: "false"))  // Disable bell (can cause issues)
         
         // Add password as query parameter for VNC authentication
         // Note: This is for VNC password, not HTTP authentication

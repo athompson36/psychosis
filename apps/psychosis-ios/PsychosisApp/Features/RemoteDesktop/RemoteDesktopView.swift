@@ -8,9 +8,36 @@
 import SwiftUI
 import WebKit
 
+// MARK: - Cursor Pane Enum
+enum CursorPane: String, CaseIterable {
+    case editor = "Editor"
+    case files = "Files"
+    case chat = "Chat"
+    case terminal = "Terminal"
+    
+    var icon: String {
+        switch self {
+        case .editor: return "doc.text.fill"
+        case .files: return "folder.fill"
+        case .chat: return "message.fill"
+        case .terminal: return "terminal.fill"
+        }
+    }
+    
+    var color: Color {
+        switch self {
+        case .editor: return .blue
+        case .files: return .green
+        case .chat: return .purple
+        case .terminal: return .orange
+        }
+    }
+}
+
 // MARK: - Remote Desktop View
 struct RemoteDesktopView: View {
     let remoteServer: RemoteServer
+    @Binding var selectedPane: CursorPane
     @StateObject private var connectionManager = ConnectionManager.shared
     @StateObject private var historyManager = ConnectionHistoryManager.shared
     @StateObject private var qualityMonitor = ConnectionQualityMonitor.shared
@@ -34,81 +61,61 @@ struct RemoteDesktopView: View {
             if isConnected, let url = connectionURL {
                 // Full screen native view when connected
                 ZStack {
-                    // WebView fills entire space
-                    WebViewWrapper(
-                        url: url,
-                        username: remoteServer.username,
-                        password: remoteServer.password,
-                        isLoading: $webViewIsLoading,
-                        errorMessage: $webViewError,
-                        onScreenshot: { webView in
-                            webViewReference = webView
+                        WebViewWrapper(
+                            url: url,
+                            username: remoteServer.username,
+                            password: remoteServer.password,
+                            isLoading: $webViewIsLoading,
+                            errorMessage: $webViewError,
+                            selectedPane: selectedPane,
+                            onScreenshot: { webView in
+                                webViewReference = webView
+                            }
+                        )
+                        .opacity(webViewIsLoading ? 0.5 : 1.0)
+                        
+                        if webViewIsLoading {
+                            ProgressView()
+                                .scaleEffect(1.5)
+                                .tint(.white)
                         }
-                    )
-                    .opacity(webViewIsLoading ? 0.5 : 1.0)
-                    
-                    if webViewIsLoading {
-                        ProgressView()
-                            .scaleEffect(1.5)
-                            .tint(.white)
-                    }
-                    
-                    if let error = webViewError {
-                        VStack(spacing: 12) {
-                            Image(systemName: "exclamationmark.triangle")
-                                .font(.title)
-                                .foregroundColor(.red)
-                            
-                            Text("Connection Error")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                            
-                            Text(error)
-                                .font(.caption)
-                                .foregroundColor(.white.opacity(0.8))
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal)
-                        }
-                        .padding()
-                        .background(Color.black.opacity(0.8))
-                        .cornerRadius(12)
+                        
+                        if let error = webViewError {
+                            VStack(spacing: 12) {
+                                Image(systemName: "exclamationmark.triangle")
+                                    .font(.title)
+                                    .foregroundColor(.red)
+                                
+                                Text("Connection Error")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                
+                                Text(error)
+                                    .font(.caption)
+                                    .foregroundColor(.white.opacity(0.8))
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal)
+                            }
+                            .padding()
+                            .background(Color.black.opacity(0.8))
+                            .cornerRadius(12)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .overlay(alignment: .topTrailing) {
-                    // Minimal connection indicator overlay
-                    HStack(spacing: 6) {
-                        // Connection Quality Indicator
-                        HStack(spacing: 4) {
-                            Image(systemName: qualityMonitor.quality.icon)
-                                .foregroundColor(qualityMonitor.quality.color)
-                                .font(.caption2)
-                            
-                            if let latency = qualityMonitor.latency {
-                                Text("\(Int(latency))ms")
-                                    .font(.caption2)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                        .onChange(of: qualityMonitor.quality) { oldQuality, newQuality in
-                            // Notify on quality degradation
-                            if newQuality == .poor && oldQuality != .poor {
-                                notificationManager.notifyQualityWarning(
-                                    serverName: remoteServer.name,
-                                    quality: newQuality.description
-                                )
-                            }
-                        }
+                    // Minimal disconnect indicator (quality moved to header)
+                    Button(action: {
+                        disconnectFromServer()
+                    }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.title3)
+                            .foregroundColor(.secondary)
+                            .padding(8)
+                            .background(.ultraThinMaterial)
+                            .cornerRadius(8)
                     }
-                    .padding(8)
-                    .background(.ultraThinMaterial)
-                    .cornerRadius(8)
                     .padding(8)
                     .opacity(0.7)
-                    .onLongPressGesture {
-                        // Show disconnect option on long press
-                        disconnectFromServer()
-                    }
                 }
                 .overlay(alignment: .bottom) {
                     // Virtual Keyboard Overlay
@@ -296,6 +303,12 @@ struct RemoteDesktopView: View {
                 )
             }
         }
+        .onChange(of: selectedPane) { oldPane, newPane in
+            // Update pane when selection changes from MainPaneView
+            if isConnected {
+                showPane(newPane)
+            }
+        }
     }
     
     private var statusText: String {
@@ -361,6 +374,14 @@ struct RemoteDesktopView: View {
                                 print("✅ Cursor started and focused")
                             case .failed:
                                 print("⚠️ Failed to manage Cursor - may need manual start")
+                            }
+                            
+                            // After Cursor is focused, wait a bit more then show the selected pane
+                            Task {
+                                try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second
+                                await MainActor.run {
+                                    showPane(selectedPane)
+                                }
                             }
                         }
                     }
@@ -666,6 +687,469 @@ struct RemoteDesktopView: View {
         return message
     }
     
+    private func showPane(_ pane: CursorPane) {
+        guard let webView = webViewReference else { return }
+        
+        // IMPORTANT: noVNC renders the remote desktop as a canvas (pixels).
+        // We CANNOT manipulate Cursor's DOM because it's running on the remote server.
+        // Instead, we send VNC keyboard shortcuts through noVNC's RFB API.
+        //
+        // Cursor keyboard shortcuts (Linux/Ubuntu):
+        // - Ctrl+B: Toggle sidebar (files)
+        // - Ctrl+J: Toggle panel (terminal/output)
+        // - Ctrl+L: Open Cursor AI chat
+        // - Ctrl+Shift+E: Focus file explorer
+        
+        let script: String
+        
+        switch pane {
+        case .chat:
+            // Activate Zen Mode with Ctrl+K Z (fullscreen, distraction-free mode)
+            // Then open Chat with Ctrl+L
+            script = """
+                (function() {
+                    console.log('🎯 Activating Zen Mode (Ctrl+K Z) then opening Chat (Ctrl+L)');
+                    
+                    // Use the RFB instance stored by the setup script
+                    var rfb = window.psychosisRFB || window.rfb || (typeof UI !== 'undefined' && UI.rfb) || null;
+                    
+                    // If not found, try to find it now
+                    if (!rfb) {
+                        var canvas = document.querySelector('canvas');
+                        if (canvas && canvas.rfb) rfb = canvas.rfb;
+                    }
+                    
+                    console.log('RFB instance:', rfb ? 'found' : 'NOT FOUND');
+                    var result = { rfbFound: false, keysSent: false };
+                    
+                    // Function to send keys via RFB API
+                    function sendKeysRFB(keys) {
+                        if (rfb && typeof rfb.sendKey === 'function') {
+                            result.rfbFound = true;
+                            try {
+                                console.log('📤 Sending keys via RFB API:', keys.length, 'keys');
+                                keys.forEach(function(key, index) {
+                                    console.log('  Key', index + ':', key.keyName, key.down ? 'DOWN' : 'UP', 'keysym:', '0x' + key.keysym.toString(16));
+                                    rfb.sendKey(key.keysym, key.down);
+                                    // Small delay between keys for better reliability
+                                    if (index < keys.length - 1) {
+                                        // Use synchronous delay (blocking)
+                                        var start = Date.now();
+                                        while (Date.now() - start < 20) {} // 20ms delay
+                                    }
+                                });
+                                result.keysSent = true;
+                                console.log('✅ Sent', keys.length, 'keys via RFB API');
+                                return true;
+                            } catch(e) {
+                                console.error('❌ Error with RFB sendKey:', e);
+                                console.error('  Stack:', e.stack);
+                                return false;
+                            }
+                        } else {
+                            console.warn('⚠️ RFB API not available:', {
+                                hasRFB: !!rfb,
+                                hasSendKey: rfb && typeof rfb.sendKey === 'function',
+                                rfbType: typeof rfb,
+                                rfbKeys: rfb ? Object.keys(rfb).slice(0, 10) : []
+                            });
+                        }
+                        return false;
+                    }
+                    
+                    // Function to send keys via keyboard events (fallback)
+                    function sendKeysEvents(keys, delay) {
+                        var canvas = document.querySelector('canvas');
+                        if (!canvas) {
+                            console.error('❌ Canvas not found');
+                            return false;
+                        }
+                        
+                        // Ensure canvas is focusable and focused
+                        canvas.setAttribute('tabindex', '0');
+                        canvas.style.outline = 'none';
+                        canvas.focus();
+                        canvas.click();
+                        
+                        setTimeout(function() {
+                            keys.forEach(function(key) {
+                                var eventProps = {
+                                    key: key.keyName,
+                                    code: key.code,
+                                    keyCode: key.keyCode,
+                                    which: key.which || key.keyCode,
+                                    ctrlKey: key.ctrl || false,
+                                    metaKey: false,
+                                    altKey: false,
+                                    shiftKey: key.shift || false,
+                                    bubbles: true,
+                                    cancelable: true,
+                                    composed: true
+                                };
+                                
+                                // Send to document (where VS Code/Cursor keyboard handlers listen)
+                                var event1 = new KeyboardEvent(key.down ? 'keydown' : 'keyup', eventProps);
+                                document.dispatchEvent(event1);
+                                
+                                // Also send to body
+                                var event2 = new KeyboardEvent(key.down ? 'keydown' : 'keyup', eventProps);
+                                document.body.dispatchEvent(event2);
+                                
+                                // And to active element
+                                if (document.activeElement) {
+                                    var event3 = new KeyboardEvent(key.down ? 'keydown' : 'keyup', eventProps);
+                                    document.activeElement.dispatchEvent(event3);
+                                }
+                            });
+                            
+                            result.keysSent = true;
+                            console.log('✅ Sent keys via keyboard events');
+                        }, delay || 50);
+                        
+                        return true;
+                    }
+                    
+                    // Step 1: Activate Zen Mode (Ctrl+K Z)
+                    // Zen mode is a chord: Ctrl+K (press and release), then Z
+                    // VS Code shows "Ctrl+K" in status bar, then waits for next key
+                    var ctrlKKeys = [
+                        {keysym: 0xFFE3, keyName: 'Control', code: 'ControlLeft', keyCode: 17, which: 17, ctrl: true, shift: false, down: true},
+                        {keysym: 0x006B, keyName: 'k', code: 'KeyK', keyCode: 75, which: 75, ctrl: true, shift: false, down: true},
+                        {keysym: 0x006B, keyName: 'k', code: 'KeyK', keyCode: 75, which: 75, ctrl: true, shift: false, down: false},
+                        {keysym: 0xFFE3, keyName: 'Control', code: 'ControlLeft', keyCode: 17, which: 17, ctrl: false, shift: false, down: false}
+                    ];
+                    
+                    var zKey = [
+                        {keysym: 0x007A, keyName: 'z', code: 'KeyZ', keyCode: 90, which: 90, ctrl: false, shift: false, down: true},
+                        {keysym: 0x007A, keyName: 'z', code: 'KeyZ', keyCode: 90, which: 90, ctrl: false, shift: false, down: false}
+                    ];
+                    
+                    // Send Ctrl+K first
+                    if (!sendKeysRFB(ctrlKKeys)) {
+                        sendKeysEvents(ctrlKKeys, 50);
+                    }
+                    
+                    // Wait for VS Code to recognize the chord (shows "Ctrl+K" in status bar)
+                    setTimeout(function() {
+                        // Now send Z to complete the chord
+                        if (!sendKeysRFB(zKey)) {
+                            sendKeysEvents(zKey, 0);
+                        }
+                        
+                        // Step 2: After Zen mode activates, open Chat (Ctrl+L)
+                        setTimeout(function() {
+                            var chatKeys = [
+                                {keysym: 0xFFE3, keyName: 'Control', code: 'ControlLeft', keyCode: 17, which: 17, ctrl: true, shift: false, down: true},
+                                {keysym: 0x006C, keyName: 'l', code: 'KeyL', keyCode: 76, which: 76, ctrl: true, shift: false, down: true},
+                                {keysym: 0x006C, keyName: 'l', code: 'KeyL', keyCode: 76, which: 76, ctrl: true, shift: false, down: false},
+                                {keysym: 0xFFE3, keyName: 'Control', code: 'ControlLeft', keyCode: 17, which: 17, ctrl: false, shift: false, down: false}
+                            ];
+                            
+                            if (!sendKeysRFB(chatKeys)) {
+                                sendKeysEvents(chatKeys, 0);
+                            }
+                            
+                            console.log('✅ Sent Zen Mode (Ctrl+K Z) then Chat (Ctrl+L)');
+                        }, 400); // Wait 400ms for Zen mode to fully activate
+                    }, 150); // Wait 150ms between Ctrl+K and Z (chord recognition delay)
+                    
+                    return result;
+                })();
+            """
+            
+        case .editor:
+            // Focus editor using Ctrl+1 (focus first editor group) per Cursor docs
+            script = """
+                (function() {
+                    console.log('🎯 Focusing editor with Ctrl+1');
+                    
+                    // Use the RFB instance stored by the setup script
+                    var rfb = window.psychosisRFB || window.rfb || (typeof UI !== 'undefined' && UI.rfb) || null;
+                    if (!rfb) {
+                        var canvas = document.querySelector('canvas');
+                        if (canvas && canvas.rfb) rfb = canvas.rfb;
+                    }
+                    
+                    var result = { rfbFound: false, keysSent: false };
+                    
+                    // Fallback: Send keyboard events to document/body (Cursor listens globally)
+                    var canvas = document.querySelector('canvas');
+                    if (canvas) {
+                        canvas.setAttribute('tabindex', '0');
+                        canvas.style.outline = 'none';
+                        canvas.focus();
+                        canvas.click();
+                        
+                        setTimeout(function() {
+                            // Send Ctrl+1 to document (where Cursor's keyboard handler listens)
+                            var keys = [
+                                {keyName: 'Control', code: 'ControlLeft', keyCode: 17, which: 17, ctrl: true, down: true},
+                                {keyName: '1', code: 'Digit1', keyCode: 49, which: 49, ctrl: true, down: true},
+                                {keyName: '1', code: 'Digit1', keyCode: 49, which: 49, ctrl: true, down: false},
+                                {keyName: 'Control', code: 'ControlLeft', keyCode: 17, which: 17, ctrl: false, down: false}
+                            ];
+                            
+                            for (var i = 0; i < keys.length; i++) {
+                                var key = keys[i];
+                                var eventProps = {
+                                    key: key.keyName,
+                                    code: key.code,
+                                    keyCode: key.keyCode,
+                                    which: key.which,
+                                    ctrlKey: key.ctrl,
+                                    metaKey: false,
+                                    altKey: false,
+                                    shiftKey: false,
+                                    bubbles: true,
+                                    cancelable: true,
+                                    composed: true
+                                };
+                                
+                                var event1 = new KeyboardEvent(key.down ? 'keydown' : 'keyup', eventProps);
+                                document.dispatchEvent(event1);
+                                
+                                var event2 = new KeyboardEvent(key.down ? 'keydown' : 'keyup', eventProps);
+                                document.body.dispatchEvent(event2);
+                                
+                                if (document.activeElement) {
+                                    var event3 = new KeyboardEvent(key.down ? 'keydown' : 'keyup', eventProps);
+                                    document.activeElement.dispatchEvent(event3);
+                                }
+                            }
+                            
+                            result.keysSent = true;
+                            console.log('✅ Sent Ctrl+1 to document/body');
+                        }, 50);
+                    } else {
+                        console.error('❌ Canvas not found');
+                    }
+                    
+                    return result;
+                })();
+            """
+            
+        case .files:
+            // Show file explorer with Ctrl+Shift+E
+            script = """
+                (function() {
+                    console.log('🎯 Showing files explorer');
+                    
+                    // Use the RFB instance stored by the setup script
+                    var rfb = window.psychosisRFB || window.rfb || (typeof UI !== 'undefined' && UI.rfb) || null;
+                    if (!rfb) {
+                        var canvas = document.querySelector('canvas');
+                        if (canvas && canvas.rfb) rfb = canvas.rfb;
+                    }
+                    
+                    var result = { rfbFound: false, keysSent: false };
+                    
+                    // Send keyboard events directly to document/body (Cursor listens globally)
+                    var canvas = document.querySelector('canvas');
+                    if (canvas) {
+                        canvas.setAttribute('tabindex', '0');
+                        canvas.focus();
+                        canvas.click();
+                        
+                        // Send Ctrl+B first
+                        setTimeout(function() {
+                            var keys1 = [
+                                {keyName: 'Control', code: 'ControlLeft', keyCode: 17, which: 17, ctrl: true, shift: false, down: true},
+                                {keyName: 'b', code: 'KeyB', keyCode: 66, which: 66, ctrl: true, shift: false, down: true},
+                                {keyName: 'b', code: 'KeyB', keyCode: 66, which: 66, ctrl: true, shift: false, down: false},
+                                {keyName: 'Control', code: 'ControlLeft', keyCode: 17, which: 17, ctrl: false, shift: false, down: false}
+                            ];
+                            
+                            for (var i = 0; i < keys1.length; i++) {
+                                var key = keys1[i];
+                                var eventProps = {
+                                    key: key.keyName,
+                                    code: key.code,
+                                    keyCode: key.keyCode,
+                                    which: key.which,
+                                    ctrlKey: key.ctrl,
+                                    shiftKey: key.shift,
+                                    metaKey: false,
+                                    altKey: false,
+                                    bubbles: true,
+                                    cancelable: true,
+                                    composed: true
+                                };
+                                
+                                var event1 = new KeyboardEvent(key.down ? 'keydown' : 'keyup', eventProps);
+                                document.dispatchEvent(event1);
+                                
+                                var event2 = new KeyboardEvent(key.down ? 'keydown' : 'keyup', eventProps);
+                                document.body.dispatchEvent(event2);
+                                
+                                if (document.activeElement) {
+                                    var event3 = new KeyboardEvent(key.down ? 'keydown' : 'keyup', eventProps);
+                                    document.activeElement.dispatchEvent(event3);
+                                }
+                            }
+                            
+                            // Then Ctrl+Shift+E after delay
+                            setTimeout(function() {
+                                var keys2 = [
+                                    {keyName: 'Control', code: 'ControlLeft', keyCode: 17, which: 17, ctrl: true, shift: false, down: true},
+                                    {keyName: 'Shift', code: 'ShiftLeft', keyCode: 16, which: 16, ctrl: true, shift: true, down: true},
+                                    {keyName: 'e', code: 'KeyE', keyCode: 69, which: 69, ctrl: true, shift: true, down: true},
+                                    {keyName: 'e', code: 'KeyE', keyCode: 69, which: 69, ctrl: true, shift: true, down: false},
+                                    {keyName: 'Shift', code: 'ShiftLeft', keyCode: 16, which: 16, ctrl: true, shift: false, down: false},
+                                    {keyName: 'Control', code: 'ControlLeft', keyCode: 17, which: 17, ctrl: false, shift: false, down: false}
+                                ];
+                                
+                                for (var j = 0; j < keys2.length; j++) {
+                                    var key2 = keys2[j];
+                                    var event2 = new KeyboardEvent(key2.down ? 'keydown' : 'keyup', {
+                                        key: key2.keyName,
+                                        code: key2.code,
+                                        keyCode: key2.keyCode,
+                                        which: key2.which,
+                                        ctrlKey: key2.ctrl,
+                                        shiftKey: key2.shift,
+                                        metaKey: false,
+                                        altKey: false,
+                                        bubbles: true,
+                                        cancelable: true,
+                                        composed: true
+                                    });
+                                    document.dispatchEvent(event2);
+                                    
+                                    // Create new events for body and activeElement
+                                    var event2Body = new KeyboardEvent(key2.down ? 'keydown' : 'keyup', {
+                                        key: key2.keyName,
+                                        code: key2.code,
+                                        keyCode: key2.keyCode,
+                                        which: key2.which,
+                                        ctrlKey: key2.ctrl,
+                                        shiftKey: key2.shift,
+                                        metaKey: false,
+                                        altKey: false,
+                                        bubbles: true,
+                                        cancelable: true,
+                                        composed: true
+                                    });
+                                    document.body.dispatchEvent(event2Body);
+                                    
+                                    if (document.activeElement) {
+                                        var event2Active = new KeyboardEvent(key2.down ? 'keydown' : 'keyup', {
+                                            key: key2.keyName,
+                                            code: key2.code,
+                                            keyCode: key2.keyCode,
+                                            which: key2.which,
+                                            ctrlKey: key2.ctrl,
+                                            shiftKey: key2.shift,
+                                            metaKey: false,
+                                            altKey: false,
+                                            bubbles: true,
+                                            cancelable: true,
+                                            composed: true
+                                        });
+                                        document.activeElement.dispatchEvent(event2Active);
+                                    }
+                                }
+                                
+                                result.keysSent = true;
+                                console.log('✅ Sent Ctrl+B and Ctrl+Shift+E for file explorer');
+                            }, 200);
+                        }, 50);
+                    } else {
+                        console.error('❌ Canvas not found');
+                    }
+                    
+                    return result;
+                })();
+            """
+            
+        case .terminal:
+            // Show terminal with Ctrl+J (toggle panel)
+            script = """
+                (function() {
+                    console.log('🎯 Showing terminal with Ctrl+J');
+                    
+                    // Use the RFB instance stored by the setup script
+                    var rfb = window.psychosisRFB || window.rfb || (typeof UI !== 'undefined' && UI.rfb) || null;
+                    if (!rfb) {
+                        var canvas = document.querySelector('canvas');
+                        if (canvas && canvas.rfb) rfb = canvas.rfb;
+                    }
+                    
+                    var result = { rfbFound: false, keysSent: false };
+                    
+                    // Send keyboard events directly to document/body (Cursor listens globally)
+                    var canvas = document.querySelector('canvas');
+                    if (canvas) {
+                        canvas.setAttribute('tabindex', '0');
+                        canvas.style.outline = 'none';
+                        canvas.focus();
+                        canvas.click();
+                        
+                        setTimeout(function() {
+                            var keys = [
+                                {keyName: 'Control', code: 'ControlLeft', keyCode: 17, which: 17, ctrl: true, shift: false, down: true},
+                                {keyName: 'j', code: 'KeyJ', keyCode: 74, which: 74, ctrl: true, shift: false, down: true},
+                                {keyName: 'j', code: 'KeyJ', keyCode: 74, which: 74, ctrl: true, shift: false, down: false},
+                                {keyName: 'Control', code: 'ControlLeft', keyCode: 17, which: 17, ctrl: false, shift: false, down: false}
+                            ];
+                            
+                            for (var i = 0; i < keys.length; i++) {
+                                var key = keys[i];
+                                var eventProps = {
+                                    key: key.keyName,
+                                    code: key.code,
+                                    keyCode: key.keyCode,
+                                    which: key.which,
+                                    ctrlKey: key.ctrl,
+                                    shiftKey: key.shift,
+                                    metaKey: false,
+                                    altKey: false,
+                                    bubbles: true,
+                                    cancelable: true,
+                                    composed: true
+                                };
+                                
+                                var event1 = new KeyboardEvent(key.down ? 'keydown' : 'keyup', eventProps);
+                                document.dispatchEvent(event1);
+                                
+                                var event2 = new KeyboardEvent(key.down ? 'keydown' : 'keyup', eventProps);
+                                document.body.dispatchEvent(event2);
+                                
+                                if (document.activeElement) {
+                                    var event3 = new KeyboardEvent(key.down ? 'keydown' : 'keyup', eventProps);
+                                    document.activeElement.dispatchEvent(event3);
+                                }
+                            }
+                            
+                            result.keysSent = true;
+                            console.log('✅ Sent Ctrl+J for terminal');
+                        }, 50);
+                    } else {
+                        console.error('❌ Canvas not found');
+                    }
+                    
+                    return result;
+                })();
+            """
+        }
+        
+        webView.evaluateJavaScript(script) { result, error in
+            if let error = error {
+                print("❌ Error sending VNC keys: \(error.localizedDescription)")
+            } else {
+                // Check if we got a result indicating success
+                if let resultDict = result as? [String: Any] {
+                    if let found = resultDict["rfbFound"] as? Bool {
+                        print("RFB found: \(found)")
+                    }
+                    if let sent = resultDict["keysSent"] as? Bool {
+                        print("Keys sent: \(sent)")
+                    }
+                }
+                print("✅ Sent VNC shortcut for \(pane.rawValue) pane")
+            }
+        }
+    }
+    
     private func disconnectFromServer() {
         // Check if was connected before disconnecting
         let wasConnected = isConnected
@@ -705,11 +1189,12 @@ struct RemoteDesktopView: View {
 
 
 #Preview {
+    @Previewable @State var pane: CursorPane = .chat
     RemoteDesktopView(remoteServer: RemoteServer(
         name: "fs-dev Ubuntu",
         host: "fs-dev.local",
         type: .ubuntu
-    ))
+    ), selectedPane: $pane)
     .background(Color.black)
 }
 

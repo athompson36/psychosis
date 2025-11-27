@@ -12,6 +12,7 @@ import toolsRouter from './routes/tools.js';
 import filesRouter from './routes/files.js';
 import chatRouter from './routes/chat.js';
 import remoteRouter from './routes/remote.js';
+import vncRouter from './routes/vnc.js';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler.js';
@@ -21,7 +22,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
@@ -46,6 +47,7 @@ app.use('/api/tools', toolsRouter);
 app.use('/api/files', filesRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/remote', remoteRouter);
+app.use('/api/vnc', vncRouter);
 
 // 404 handler
 app.use((req, res) => {

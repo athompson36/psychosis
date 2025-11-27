@@ -8,9 +8,19 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @StateObject private var serverManager = RemoteServerManager.shared
     @State private var showAddServerSheet: Bool = false
     @State private var serverToEdit: RemoteServer?
+    @Environment(\.dismiss) var dismiss
+    
+    let onConnect: ((RemoteServer) -> Void)?
+    
+    private var serverManager: RemoteServerManager {
+        RemoteServerManager.shared
+    }
+    
+    init(onConnect: ((RemoteServer) -> Void)? = nil) {
+        self.onConnect = onConnect
+    }
     
     var body: some View {
         NavigationView {
@@ -29,20 +39,53 @@ struct SettingsView: View {
                             
                             Spacer()
                             
-                            if server.autoConnect {
-                                Image(systemName: "bolt.fill")
-                                    .foregroundColor(.yellow)
-                                    .font(.caption)
+                            HStack(spacing: 12) {
+                                // Connect Button
+                                Button(action: {
+                                    if let latestServer = serverManager.servers.first(where: { $0.id == server.id }) {
+                                        // Call the connect callback if provided
+                                        onConnect?(latestServer)
+                                        // Dismiss settings sheet
+                                        dismiss()
+                                    }
+                                }) {
+                                    HStack(spacing: 4) {
+                                        Image(systemName: "play.circle.fill")
+                                        Text("Connect")
+                                            .font(.caption)
+                                    }
+                                    .foregroundColor(.green)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(Color.green.opacity(0.15))
+                                    .cornerRadius(6)
+                                }
+                                .buttonStyle(.plain)
+                                
+                                // Edit Button
+                                Button(action: {
+                                    if let latestServer = serverManager.servers.first(where: { $0.id == server.id }) {
+                                        serverToEdit = latestServer
+                                        showAddServerSheet = true
+                                    }
+                                }) {
+                                    Image(systemName: "pencil")
+                                        .foregroundColor(.blue)
+                                        .font(.caption)
+                                        .padding(6)
+                                        .background(Color.blue.opacity(0.15))
+                                        .cornerRadius(6)
+                                }
+                                .buttonStyle(.plain)
+                                
+                                if server.autoConnect {
+                                    Image(systemName: "bolt.fill")
+                                        .foregroundColor(.yellow)
+                                        .font(.caption)
+                                }
                             }
                         }
                         .contentShape(Rectangle())
-                        .onTapGesture {
-                            // Get the latest server from manager to ensure we have the most up-to-date data
-                            if let latestServer = serverManager.servers.first(where: { $0.id == server.id }) {
-                                serverToEdit = latestServer
-                                showAddServerSheet = true
-                            }
-                        }
                     }
                     .onDelete { indexSet in
                         serverManager.deleteServer(at: indexSet)
@@ -116,9 +159,9 @@ struct SettingsView: View {
                 }
                 .id(serverToEdit?.id ?? UUID()) // Force recreation when serverToEdit changes
             }
-            .onChange(of: showAddServerSheet) { isPresented in
+            .onChange(of: showAddServerSheet) { oldValue, newValue in
                 // Clear serverToEdit when sheet is dismissed
-                if !isPresented {
+                if !newValue {
                     serverToEdit = nil
                 }
             }
@@ -127,6 +170,8 @@ struct SettingsView: View {
 }
 
 #Preview {
-    SettingsView()
+    SettingsView { server in
+        print("Connect to: \(server.name)")
+    }
 }
 

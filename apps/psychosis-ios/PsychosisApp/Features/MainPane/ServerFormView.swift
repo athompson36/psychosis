@@ -21,6 +21,11 @@ struct ServerFormView: View {
     @State private var password: String = ""
     @State private var useSSL: Bool = false
     @State private var connectionPath: String = "/vnc.html"
+    @FocusState private var focusedField: Field?
+    
+    enum Field: Hashable {
+        case name, host, port, username, password, path
+    }
     
     var body: some View {
         NavigationView {
@@ -29,15 +34,30 @@ struct ServerFormView: View {
                     TextField("Server Name", text: $name)
                         .textContentType(.none)
                         .autocapitalization(.words)
+                        .focused($focusedField, equals: .name)
+                        .submitLabel(.next)
+                        .onSubmit {
+                            focusedField = .host
+                        }
                     
                     TextField("Host or IP Address", text: $host)
                         .keyboardType(.URL)
                         .autocapitalization(.none)
                         .textContentType(.URL)
+                        .focused($focusedField, equals: .host)
+                        .submitLabel(.next)
+                        .onSubmit {
+                            focusedField = .port
+                        }
                     
                     TextField("Port", text: $port)
                         .keyboardType(.numberPad)
                         .textContentType(.none)
+                        .focused($focusedField, equals: .port)
+                        .submitLabel(.next)
+                        .onSubmit {
+                            focusedField = nil
+                        }
                     
                     Picker("Server Type", selection: $type) {
                         ForEach(ServerType.allCases, id: \.self) { serverType in
@@ -57,6 +77,11 @@ struct ServerFormView: View {
                         .keyboardType(.default)
                         .autocapitalization(.none)
                         .textContentType(.none)
+                        .focused($focusedField, equals: .path)
+                        .submitLabel(.next)
+                        .onSubmit {
+                            focusedField = .username
+                        }
                 }
                 
                 Section(header: Text("Authentication (Optional)")) {
@@ -64,9 +89,19 @@ struct ServerFormView: View {
                         .keyboardType(.default)
                         .autocapitalization(.none)
                         .textContentType(.username)
+                        .focused($focusedField, equals: .username)
+                        .submitLabel(.next)
+                        .onSubmit {
+                            focusedField = .password
+                        }
                     
                     SecureField("Password", text: $password)
                         .textContentType(.password)
+                        .focused($focusedField, equals: .password)
+                        .submitLabel(.done)
+                        .onSubmit {
+                            focusedField = nil
+                        }
                 }
                 
                 Section {
@@ -81,14 +116,22 @@ struct ServerFormView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
+                        focusedField = nil
                         dismiss()
+                    }
+                }
+                
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") {
+                        focusedField = nil
                     }
                 }
             }
             .onAppear {
                 loadServerData()
             }
-            .onChange(of: serverToEdit?.id) { _ in
+            .onChange(of: serverToEdit?.id) {
                 loadServerData()
             }
         }

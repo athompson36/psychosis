@@ -135,3 +135,125 @@ docker run -d --name novnc -p 6080:8080 \
 - **VNC server won't start:** Check logs in `~/.vnc/fs-dev:1.log`
 - **Can't connect:** Ensure firewall allows ports 6080 and 5900/5901
 
+---
+
+## Keyboard Shortcuts Not Working in Cursor/VS Code via VNC
+
+### Root Causes
+
+1. **noVNC steals keyboard chords** - Captures Ctrl+Alt, Ctrl+Shift, backtick, etc.
+2. **iOS Safari intercepts shortcuts** - ⌘+L, ⌘+B, ⌘+1 are consumed by the browser
+3. **resize=scale breaks keyboard input** - Use `resize=remote` instead
+4. **x11vnc -repeat flag** - Ensure keyboard repeat is enabled
+
+### Fixes Applied in Psychosis App
+
+1. **URL Parameters Changed:**
+   - `resize=remote` (not `scale`) - fixes backtick and Ctrl combos
+   - `quality=9` (not `6`) - better input handling
+   - `view_only=false` - enable keyboard/mouse
+   - `show_dot=true` - cursor visibility
+   - `bell=false` - prevent audio issues
+
+2. **JavaScript Keyboard Passthrough:**
+   ```javascript
+   // Enable all keys on RFB instance
+   rfb.keyboard.setAllKeysAllowed(true);
+   rfb.focusOnClick = true;
+   rfb.viewOnly = false;
+   ```
+
+3. **Canvas Focus:**
+   - Canvas element set to `tabindex="0"` and `contenteditable="true"`
+   - Auto-focus on canvas after connection
+
+### Server-Side x11vnc Flags
+
+For best keyboard support, start x11vnc with these **enhanced flags**:
+
+```bash
+# Kill existing x11vnc
+pkill x11vnc
+
+# Start with enhanced keyboard support
+x11vnc -display :10 \
+  -auth guess \
+  -forever \
+  -loop \
+  -noxdamage \
+  -repeat \
+  -modtweak \
+  -xkb \
+  -noscr \
+  -nowf \
+  -wait 10 \
+  -defer 10 \
+  -rfbauth ~/.vnc/passwd \
+  -rfbport 5900 \
+  -shared \
+  -bg \
+  -o /tmp/x11vnc.log \
+  -verbose
+```
+
+**Critical keyboard flags:**
+- `-repeat` - Enable key repeat (critical for shortcuts)
+- `-modtweak` - **Better modifier key handling (Ctrl, Alt, Shift)** ⚠️ CRITICAL
+- `-xkb` - Use X keyboard extension (better key mapping)
+- `-noxdamage` - Avoid X damage extension issues
+- `-wait 10` - Wait 10ms between key events (prevents key loss)
+- `-defer 10` - Defer updates by 10ms (smoother input)
+- `-verbose` - Log keyboard events for debugging
+
+**Also enable keyboard repeat on X server:**
+```bash
+# Enable keyboard repeat
+xset r on
+xset r rate 200 30
+
+# Make persistent
+echo "xset r on" >> ~/.xprofile
+echo "xset r rate 200 30" >> ~/.xprofile
+```
+
+### Cursor Keybindings Override
+
+If shortcuts still don't work, override them in Cursor's `keybindings.json`:
+
+```json
+{
+  "key": "ctrl+shift+e",
+  "command": "workbench.view.explorer"
+},
+{
+  "key": "ctrl+shift+f",
+  "command": "workbench.action.findInFiles"
+},
+{
+  "key": "ctrl+l",
+  "command": "cursorChat.open"
+},
+{
+  "key": "ctrl+`",
+  "command": "workbench.action.terminal.toggleTerminal"
+},
+{
+  "key": "ctrl+1",
+  "command": "workbench.action.focusFirstEditorGroup"
+}
+```
+
+### Alternative: Use code-server Instead of VNC
+
+For keyboard-driven IDE work, consider using code-server:
+
+```bash
+# Install code-server
+curl -fsSL https://code-server.dev/install.sh | sh
+
+# Start code-server
+code-server --bind-addr 0.0.0.0:8443
+```
+
+Then access via browser at `http://192.168.4.100:8443` - full keyboard support without VNC limitations.
+

@@ -19,6 +19,7 @@ struct ContentView: View {
                     endPoint: .bottomTrailing
                 )
             )
+            .ignoresSafeArea(.container, edges: .bottom)
     }
 }
 

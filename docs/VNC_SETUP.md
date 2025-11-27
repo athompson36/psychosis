@@ -107,3 +107,4 @@ Once VNC is set up, update your server configuration in the iOS app:
 - **Can't connect:** Ensure firewall allows port 6080 and 5900/5901
 - **Wrong desktop:** Make sure VNC server is sharing the correct display
 
+

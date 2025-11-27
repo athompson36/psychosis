@@ -7,7 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		027342DDF1E684396FD85C27 /* LiquidGlassOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42D3B276922DE08238CFFB92 /* LiquidGlassOverlay.swift */; };
 		2BEFA7A73414E8D5CAEBC701 /* ScreenshotManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE12DE940128F3A5BBB102C /* ScreenshotManager.swift */; };
+		2D2E1470799DE36EED438DD0 /* VNCFrameBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3105B7BEAC8C843FAE39205 /* VNCFrameBuffer.swift */; };
+		2FD13F0AD6B17CC58B4B76E0 /* RemoteDesktopViewV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0D3E708456BF0968B1845BF /* RemoteDesktopViewV2.swift */; };
 		40252F9F20894B5D301D497F /* ServerPresets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22AB8D515E960E09873ADB4A /* ServerPresets.swift */; };
 		4933F7282ED6C8A4007F04FA /* PsychosisApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F70C2ED6C8A4007F04FA /* PsychosisApp.swift */; };
 		4933F7292ED6C8A4007F04FA /* EditorBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F71B2ED6C8A4007F04FA /* EditorBarView.swift */; };
@@ -28,9 +31,12 @@
 		4933F74C2ED6CCF7007F04FA /* AddRemoteServerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4933F7482ED6CCF7007F04FA /* AddRemoteServerView.swift */; };
 		81217341D2A8CCA9C5EB4AEF /* RecentConnectionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D0C8F19E0D48507A80E7A9B /* RecentConnectionsView.swift */; };
 		85E25C14382DC943192CC3BE /* ConnectionHistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC68D1A0AACB8DDE86F418EB /* ConnectionHistoryManager.swift */; };
+		98381CCC5C4C5C4DF4B6723C /* VNCConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D91D8267CDBD3CC935132E0 /* VNCConnection.swift */; };
+		9AE7707B7B00AC54EA73D8BC /* NativeVNCView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A92A81D688F1DB1EF0A4D01 /* NativeVNCView.swift */; };
 		A30C2B8860AC056FC7DC3E31 /* RemoteDesktopToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B2E7261A58F3D8DFBEA5AE /* RemoteDesktopToolbar.swift */; };
 		B55F73A16219120ECAE38821 /* WebViewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B9F906FAED75996234BDFBB /* WebViewWrapper.swift */; };
 		C8C8F1F223602EB87068878F /* VirtualKeyboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E9C726FCE66A6CD826FCB58 /* VirtualKeyboardView.swift */; };
+		D265BF6C95F345BDFBA79E28 /* CursorPaneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E358505836D4B5491474578F /* CursorPaneController.swift */; };
 		D4296546287FEF6C253E8BA8 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41CBEF52D51F9904DF46C1DE /* NotificationManager.swift */; };
 		DDC00C6C565E39EE307F4DB2 /* RemoteCommandService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9753FB131DD2CC35B44CC65A /* RemoteCommandService.swift */; };
 		F10CA4A7D7AF96970EC493D7 /* ServerFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44E82250F81F99306DA57F1F /* ServerFormView.swift */; };
@@ -55,8 +61,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0A92A81D688F1DB1EF0A4D01 /* NativeVNCView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NativeVNCView.swift; path = "/Users/andrew/Documents/fs-tech/psychosis/apps/psychosis-ios/PsychosisApp/Features/RemoteDesktop/NativeVNCView.swift"; sourceTree = "<absolute>"; };
 		22AB8D515E960E09873ADB4A /* ServerPresets.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ServerPresets.swift; path = "../apps/psychosis-ios/PsychosisApp/Core/Services/ServerPresets.swift"; sourceTree = "<group>"; };
+		3D91D8267CDBD3CC935132E0 /* VNCConnection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = VNCConnection.swift; path = "/Users/andrew/Documents/fs-tech/psychosis/apps/psychosis-ios/PsychosisApp/Core/VNC/VNCConnection.swift"; sourceTree = "<absolute>"; };
 		41CBEF52D51F9904DF46C1DE /* NotificationManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NotificationManager.swift; path = "../apps/psychosis-ios/PsychosisApp/Core/Services/NotificationManager.swift"; sourceTree = "<group>"; };
+		42D3B276922DE08238CFFB92 /* LiquidGlassOverlay.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LiquidGlassOverlay.swift; path = "/Users/andrew/Documents/fs-tech/psychosis/apps/psychosis-ios/PsychosisApp/Features/RemoteDesktop/LiquidGlassOverlay.swift"; sourceTree = "<absolute>"; };
 		44E82250F81F99306DA57F1F /* ServerFormView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ServerFormView.swift; path = "../apps/psychosis-ios/PsychosisApp/Features/MainPane/ServerFormView.swift"; sourceTree = "<group>"; };
 		4933F70A2ED6C8A4007F04FA /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		4933F70B2ED6C8A4007F04FA /* PsychosisApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsychosisApp.swift; sourceTree = "<group>"; };
@@ -89,8 +98,11 @@
 		8616B3B530B92CC5E042C30D /* ConnectionQualityMonitor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ConnectionQualityMonitor.swift; path = "../apps/psychosis-ios/PsychosisApp/Core/Services/ConnectionQualityMonitor.swift"; sourceTree = "<group>"; };
 		8E9C726FCE66A6CD826FCB58 /* VirtualKeyboardView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = VirtualKeyboardView.swift; path = "../apps/psychosis-ios/PsychosisApp/Features/RemoteDesktop/VirtualKeyboardView.swift"; sourceTree = "<group>"; };
 		9753FB131DD2CC35B44CC65A /* RemoteCommandService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RemoteCommandService.swift; path = "../apps/psychosis-ios/PsychosisApp/Core/Services/RemoteCommandService.swift"; sourceTree = "<group>"; };
+		B3105B7BEAC8C843FAE39205 /* VNCFrameBuffer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = VNCFrameBuffer.swift; path = "/Users/andrew/Documents/fs-tech/psychosis/apps/psychosis-ios/PsychosisApp/Core/VNC/VNCFrameBuffer.swift"; sourceTree = "<absolute>"; };
 		BC68D1A0AACB8DDE86F418EB /* ConnectionHistoryManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ConnectionHistoryManager.swift; path = "../apps/psychosis-ios/PsychosisApp/Core/Services/ConnectionHistoryManager.swift"; sourceTree = "<group>"; };
+		D0D3E708456BF0968B1845BF /* RemoteDesktopViewV2.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RemoteDesktopViewV2.swift; path = "/Users/andrew/Documents/fs-tech/psychosis/apps/psychosis-ios/PsychosisApp/Features/RemoteDesktop/RemoteDesktopViewV2.swift"; sourceTree = "<absolute>"; };
 		DBE12DE940128F3A5BBB102C /* ScreenshotManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ScreenshotManager.swift; path = "../apps/psychosis-ios/PsychosisApp/Core/Utilities/ScreenshotManager.swift"; sourceTree = "<group>"; };
+		E358505836D4B5491474578F /* CursorPaneController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CursorPaneController.swift; path = "/Users/andrew/Documents/fs-tech/psychosis/apps/psychosis-ios/PsychosisApp/Core/Services/CursorPaneController.swift"; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -289,6 +301,8 @@
 				4933F7152ED6C8A4007F04FA /* Core */,
 				4933F7232ED6C8A4007F04FA /* Features */,
 				4933F7252ED6C8A4007F04FA /* Resources */,
+				C37533CE2414D5EA628198FA /* Core */,
+				BA540FA7F256E73C01E46621 /* Features */,
 			);
 			name = PsychosisApp;
 			path = "../apps/psychosis-ios/PsychosisApp";
@@ -411,6 +425,14 @@
 			name = Services;
 			sourceTree = "<group>";
 		};
+		7648E330778C776405FF8D0A /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				E358505836D4B5491474578F /* CursorPaneController.swift */,
+			);
+			name = Services;
+			sourceTree = "<group>";
+		};
 		8F76C7EA0AA31BDECE1B6F41 /* RemoteDesktop */ = {
 			isa = PBXGroup;
 			children = (
@@ -418,6 +440,23 @@
 				8E9C726FCE66A6CD826FCB58 /* VirtualKeyboardView.swift */,
 			);
 			name = RemoteDesktop;
+			sourceTree = "<group>";
+		};
+		9D601BB0A5159F8241C7D312 /* VNC */ = {
+			isa = PBXGroup;
+			children = (
+				3D91D8267CDBD3CC935132E0 /* VNCConnection.swift */,
+				B3105B7BEAC8C843FAE39205 /* VNCFrameBuffer.swift */,
+			);
+			name = VNC;
+			sourceTree = "<group>";
+		};
+		BA540FA7F256E73C01E46621 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				FA5CB5A8582A58EFB7CBEF84 /* RemoteDesktop */,
+			);
+			name = Features;
 			sourceTree = "<group>";
 		};
 		BEFB14FBA2ECE7B9422F7A2A /* Core */ = {
@@ -428,6 +467,25 @@
 				4F4E02DCB5B9B26E6ABF7D52 /* Utilities */,
 			);
 			name = Core;
+			sourceTree = "<group>";
+		};
+		C37533CE2414D5EA628198FA /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				9D601BB0A5159F8241C7D312 /* VNC */,
+				7648E330778C776405FF8D0A /* Services */,
+			);
+			name = Core;
+			sourceTree = "<group>";
+		};
+		FA5CB5A8582A58EFB7CBEF84 /* RemoteDesktop */ = {
+			isa = PBXGroup;
+			children = (
+				0A92A81D688F1DB1EF0A4D01 /* NativeVNCView.swift */,
+				42D3B276922DE08238CFFB92 /* LiquidGlassOverlay.swift */,
+				D0D3E708456BF0968B1845BF /* RemoteDesktopViewV2.swift */,
+			);
+			name = RemoteDesktop;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -593,6 +651,12 @@
 				D4296546287FEF6C253E8BA8 /* NotificationManager.swift in Sources */,
 				F10CA4A7D7AF96970EC493D7 /* ServerFormView.swift in Sources */,
 				DDC00C6C565E39EE307F4DB2 /* RemoteCommandService.swift in Sources */,
+				98381CCC5C4C5C4DF4B6723C /* VNCConnection.swift in Sources */,
+				2D2E1470799DE36EED438DD0 /* VNCFrameBuffer.swift in Sources */,
+				D265BF6C95F345BDFBA79E28 /* CursorPaneController.swift in Sources */,
+				9AE7707B7B00AC54EA73D8BC /* NativeVNCView.swift in Sources */,
+				027342DDF1E684396FD85C27 /* LiquidGlassOverlay.swift in Sources */,
+				2FD13F0AD6B17CC58B4B76E0 /* RemoteDesktopViewV2.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -14,6 +14,7 @@ struct WebViewWrapper: UIViewRepresentable {
     let password: String?
     @Binding var isLoading: Bool
     @Binding var errorMessage: String?
+    var selectedPane: CursorPane?
     var onScreenshot: ((WKWebView) -> Void)?
     
     init(
@@ -22,6 +23,7 @@ struct WebViewWrapper: UIViewRepresentable {
         password: String? = nil,
         isLoading: Binding<Bool>,
         errorMessage: Binding<String?>,
+        selectedPane: CursorPane? = nil,
         onScreenshot: ((WKWebView) -> Void)? = nil
     ) {
         self.url = url
@@ -29,6 +31,7 @@ struct WebViewWrapper: UIViewRepresentable {
         self.password = password
         self._isLoading = isLoading
         self._errorMessage = errorMessage
+        self.selectedPane = selectedPane
         self.onScreenshot = onScreenshot
     }
     
@@ -46,6 +49,106 @@ struct WebViewWrapper: UIViewRepresentable {
         }
         config.allowsInlineMediaPlayback = true
         config.mediaTypesRequiringUserActionForPlayback = []
+        
+        // Add user script to capture RFB instance and enable all keyboard passthrough
+        let rfbCaptureScript = """
+            (function() {
+                // Function to enable full keyboard passthrough on RFB instance
+                function enableFullKeyboard(rfb) {
+                    if (!rfb) return;
+                    
+                    console.log('🔧 Enabling full keyboard passthrough on RFB instance');
+                    
+                    // Enable all keys - critical for Ctrl+Shift combos
+                    if (rfb.keyboard && typeof rfb.keyboard.setAllKeysAllowed === 'function') {
+                        rfb.keyboard.setAllKeysAllowed(true);
+                        console.log('✅ rfb.keyboard.setAllKeysAllowed(true)');
+                    }
+                    
+                    // Enable focus on click
+                    if (typeof rfb.focusOnClick !== 'undefined') {
+                        rfb.focusOnClick = true;
+                        console.log('✅ rfb.focusOnClick = true');
+                    }
+                    
+                    // Disable view-only mode
+                    if (typeof rfb.viewOnly !== 'undefined') {
+                        rfb.viewOnly = false;
+                        console.log('✅ rfb.viewOnly = false');
+                    }
+                    
+                    // Enable clipboard
+                    if (typeof rfb.clipViewport !== 'undefined') {
+                        rfb.clipViewport = true;
+                    }
+                    
+                    // Try to focus the canvas
+                    if (rfb._target) {
+                        rfb._target.focus();
+                        console.log('✅ Focused RFB target canvas');
+                    }
+                    
+                    // Mark as configured
+                    rfb._psychosisConfigured = true;
+                }
+                
+                // Override RFB constructor to capture all instances
+                if (typeof window.RFB === 'function') {
+                    var OriginalRFB = window.RFB;
+                    window.RFB = function() {
+                        var instance = OriginalRFB.apply(this, arguments);
+                        console.log('🎯 Captured RFB instance via constructor override');
+                        window.psychosisRFB = instance;
+                        if (!window.rfb) window.rfb = instance;
+                        
+                        // Enable keyboard immediately
+                        setTimeout(function() {
+                            enableFullKeyboard(instance);
+                        }, 100);
+                        
+                        return instance;
+                    };
+                    window.RFB.prototype = OriginalRFB.prototype;
+                }
+                
+                // Watch for rfb assignment using Proxy (if available)
+                try {
+                    var rfbProxy = new Proxy({}, {
+                        set: function(target, prop, value) {
+                            if (prop === 'rfb' && value && typeof value.sendKey === 'function') {
+                                console.log('🎯 RFB assigned via Proxy');
+                                window.psychosisRFB = value;
+                                enableFullKeyboard(value);
+                            }
+                            target[prop] = value;
+                            return true;
+                        }
+                    });
+                } catch(e) {}
+                
+                // Also check periodically for RFB instance after page load
+                var checkCount = 0;
+                var checkInterval = setInterval(function() {
+                    checkCount++;
+                    var rfb = window.psychosisRFB || window.rfb || (typeof UI !== 'undefined' && UI.rfb);
+                    
+                    if (rfb && !rfb._psychosisConfigured) {
+                        console.log('🎯 Found RFB instance on check #' + checkCount);
+                        window.psychosisRFB = rfb;
+                        enableFullKeyboard(rfb);
+                        clearInterval(checkInterval);
+                    }
+                    
+                    // Stop after 30 seconds
+                    if (checkCount > 60) {
+                        clearInterval(checkInterval);
+                        console.log('⚠️ Stopped looking for RFB instance after 30s');
+                    }
+                }, 500);
+            })();
+        """
+        let userScript = WKUserScript(source: rfbCaptureScript, injectionTime: .atDocumentStart, forMainFrameOnly: true)
+        config.userContentController.addUserScript(userScript)
         
         // Enable zoom and pan for remote desktop
         let webView = WKWebView(frame: .zero, configuration: config)
@@ -83,6 +186,9 @@ struct WebViewWrapper: UIViewRepresentable {
         webView.backgroundColor = .clear
         webView.scrollView.backgroundColor = .clear
         
+        // Enable keyboard interaction
+        webView.scrollView.keyboardDismissMode = .interactive
+        
         // Add gesture recognizers for better interaction
         let pinchGesture = UIPinchGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handlePinch(_:)))
         webView.addGestureRecognizer(pinchGesture)
@@ -96,6 +202,11 @@ struct WebViewWrapper: UIViewRepresentable {
     }
     
     func updateUIView(_ webView: WKWebView, context: Context) {
+        // Update pane selection if changed
+        if let pane = selectedPane, webView.url != nil {
+            context.coordinator.updatePaneSelection(pane)
+        }
+        
         // Reset tracking if URL is nil (disconnected)
         if url == nil {
             context.coordinator.lastLoadedURL = nil
@@ -245,8 +356,6 @@ struct WebViewWrapper: UIViewRepresentable {
                 return
             }
             
-            let modString = modifiers.isEmpty ? "false" : modifiers.joined(separator: ", ")
-            
             let script = """
                 (function() {
                     var activeElement = document.activeElement || document.body;
@@ -312,6 +421,302 @@ struct WebViewWrapper: UIViewRepresentable {
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             parent.isLoading = false
             isCurrentlyLoading = false
+            
+            // Wait a bit for noVNC to initialize, then inject RFB finder
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                self.injectRFBFinder(webView: webView)
+            }
+        }
+        
+        func injectRFBFinder(webView: WKWebView) {
+            // Inject script to enable keyboard input and find RFB instance
+            let rfbSetupScript = """
+                (function() {
+                    // First, ensure keyboard input is enabled on the page
+                    console.log('🔍 Enabling keyboard input and finding RFB...');
+                    
+                    // Make canvas interactive and focusable
+                    function setupCanvas() {
+                        var canvas = document.querySelector('canvas');
+                        if (canvas) {
+                            canvas.setAttribute('tabindex', '0');
+                            canvas.setAttribute('contenteditable', 'true');
+                            canvas.style.outline = 'none';
+                            canvas.style.cursor = 'default';
+                            
+                            // Add keyboard event listeners directly to canvas
+                            canvas.addEventListener('keydown', function(e) {
+                                console.log('Canvas keydown:', e.key, e.code);
+                            }, true);
+                            
+                            canvas.addEventListener('keyup', function(e) {
+                                console.log('Canvas keyup:', e.key, e.code);
+                            }, true);
+                            
+                            // Focus canvas when clicked
+                            canvas.addEventListener('click', function() {
+                                canvas.focus();
+                                console.log('Canvas focused');
+                            });
+                            
+                            console.log('✅ Canvas set up for keyboard input');
+                            return canvas;
+                        }
+                        return null;
+                    }
+                    
+                    // Set up canvas immediately
+                    var canvas = setupCanvas();
+                    
+                    // Also watch for canvas creation
+                    var observer = new MutationObserver(function(mutations) {
+                        if (!canvas) {
+                            canvas = setupCanvas();
+                        }
+                    });
+                    observer.observe(document.body || document.documentElement, {
+                        childList: true,
+                        subtree: true
+                    });
+                    
+                    // Try to focus canvas after a delay
+                    setTimeout(function() {
+                        if (canvas) {
+                            canvas.focus();
+                            canvas.click();
+                        }
+                    }, 1000);
+                })();
+                
+                (function() {
+                    console.log('🔍 Setting up RFB finder (v2)...');
+                    
+                    // Function to find RFB instance using multiple methods
+                    function findRFB() {
+                        // Method 1: Direct window property (most common)
+                        if (window.rfb && typeof window.rfb.sendKey === 'function') {
+                            console.log('✅ Found RFB at window.rfb');
+                            return window.rfb;
+                        }
+                        
+                        // Method 2: UI object (noVNC UI wrapper)
+                        if (typeof UI !== 'undefined') {
+                            if (UI.rfb && typeof UI.rfb.sendKey === 'function') {
+                                console.log('✅ Found RFB at UI.rfb');
+                                return UI.rfb;
+                            }
+                            // Check UI._rfb
+                            if (UI._rfb && typeof UI._rfb.sendKey === 'function') {
+                                console.log('✅ Found RFB at UI._rfb');
+                                return UI._rfb;
+                            }
+                        }
+                        
+                        // Method 3: Check iframes (noVNC might load in an iframe)
+                        var iframes = document.querySelectorAll('iframe');
+                        for (var i = 0; i < iframes.length; i++) {
+                            try {
+                                var iframe = iframes[i];
+                                var iframeWindow = iframe.contentWindow;
+                                if (iframeWindow) {
+                                    if (iframeWindow.rfb && typeof iframeWindow.rfb.sendKey === 'function') {
+                                        console.log('✅ Found RFB in iframe');
+                                        return iframeWindow.rfb;
+                                    }
+                                    if (iframeWindow.UI && iframeWindow.UI.rfb) {
+                                        console.log('✅ Found RFB in iframe UI');
+                                        return iframeWindow.UI.rfb;
+                                    }
+                                }
+                            } catch(e) {
+                                // Cross-origin iframe, can't access
+                            }
+                        }
+                        
+                        // Method 4: Look for RFB in all window properties
+                        for (var key in window) {
+                            try {
+                                var obj = window[key];
+                                if (obj && typeof obj === 'object' && typeof obj.sendKey === 'function') {
+                                    // Check if it looks like an RFB object
+                                    if (obj._target || obj._rfb_connection || obj.sendCtrlAltDel || obj._display || obj._canvas) {
+                                        console.log('✅ Found RFB-like object at window.' + key);
+                                        return obj;
+                                    }
+                                }
+                            } catch(e) {}
+                        }
+                        
+                        // Method 5: Canvas element
+                        var canvas = document.querySelector('canvas');
+                        if (canvas) {
+                            if (canvas.rfb && typeof canvas.rfb.sendKey === 'function') {
+                                console.log('✅ Found RFB at canvas.rfb');
+                                return canvas.rfb;
+                            }
+                            // Check all parent elements
+                            var parent = canvas.parentElement;
+                            var depth = 0;
+                            while (parent && depth < 5) {
+                                if (parent.rfb && typeof parent.rfb.sendKey === 'function') {
+                                    console.log('✅ Found RFB at canvas parent (depth ' + depth + ')');
+                                    return parent.rfb;
+                                }
+                                parent = parent.parentElement;
+                                depth++;
+                            }
+                        }
+                        
+                        return null;
+                    }
+                    
+                    // Hook into noVNC's RFB creation
+                    var originalRFB = window.RFB;
+                    if (typeof window.RFB === 'function') {
+                        window.RFB = function() {
+                            var instance = originalRFB.apply(this, arguments);
+                            console.log('✅ Captured RFB instance from constructor');
+                            window.psychosisRFB = instance;
+                            // Enable keyboard passthrough after a brief delay
+                            setTimeout(function() {
+                                enableFullKeyboard(instance);
+                            }, 100);
+                            return instance;
+                        };
+                        window.RFB.prototype = originalRFB.prototype;
+                    }
+                    
+                    // Use MutationObserver to watch for RFB creation
+                    var observer = new MutationObserver(function(mutations) {
+                        if (!window.psychosisRFB) {
+                            window.psychosisRFB = findRFB();
+                            if (window.psychosisRFB) {
+                                console.log('✅ Found RFB via MutationObserver');
+                                enableFullKeyboard(window.psychosisRFB);
+                                observer.disconnect();
+                            }
+                        }
+                    });
+                    
+                    // Observe the entire document
+                    observer.observe(document.body || document.documentElement, {
+                        childList: true,
+                        subtree: true,
+                        attributes: true,
+                        attributeFilter: ['class', 'id']
+                    });
+                    
+                    // Function to enable full keyboard passthrough
+                    function enableFullKeyboard(rfb) {
+                        if (!rfb || rfb._psychosisConfigured) return;
+                        
+                        console.log('🔧 Enabling full keyboard passthrough on RFB instance');
+                        
+                        // CRITICAL: Enable all keys - fixes Ctrl+Shift combos
+                        if (rfb.keyboard && typeof rfb.keyboard.setAllKeysAllowed === 'function') {
+                            rfb.keyboard.setAllKeysAllowed(true);
+                            console.log('✅ rfb.keyboard.setAllKeysAllowed(true)');
+                        }
+                        
+                        // Also try _keyboard (private property)
+                        if (rfb._keyboard && typeof rfb._keyboard.setAllKeysAllowed === 'function') {
+                            rfb._keyboard.setAllKeysAllowed(true);
+                            console.log('✅ rfb._keyboard.setAllKeysAllowed(true)');
+                        }
+                        
+                        // Enable focus on click
+                        if (typeof rfb.focusOnClick !== 'undefined') {
+                            rfb.focusOnClick = true;
+                            console.log('✅ rfb.focusOnClick = true');
+                        }
+                        
+                        // Disable view-only mode
+                        if (typeof rfb.viewOnly !== 'undefined') {
+                            rfb.viewOnly = false;
+                            console.log('✅ rfb.viewOnly = false');
+                        }
+                        
+                        // Enable clipboard
+                        if (typeof rfb.clipViewport !== 'undefined') {
+                            rfb.clipViewport = true;
+                        }
+                        
+                        // Try to focus the canvas/target
+                        if (rfb._target) {
+                            rfb._target.focus();
+                            console.log('✅ Focused RFB target canvas');
+                        }
+                        
+                        // Mark as configured
+                        rfb._psychosisConfigured = true;
+                    }
+                    
+                    // Try to find RFB immediately
+                    window.psychosisRFB = findRFB();
+                    if (window.psychosisRFB) {
+                        console.log('✅ RFB instance found immediately');
+                        enableFullKeyboard(window.psychosisRFB);
+                        observer.disconnect();
+                    }
+                    
+                    // Also set up interval watcher
+                    var attempts = 0;
+                    var maxAttempts = 60; // 30 seconds
+                    var checkInterval = setInterval(function() {
+                        attempts++;
+                        if (!window.psychosisRFB) {
+                            window.psychosisRFB = findRFB();
+                            if (window.psychosisRFB) {
+                                clearInterval(checkInterval);
+                                observer.disconnect();
+                                console.log('✅ Found noVNC RFB instance after ' + attempts + ' attempts');
+                                enableFullKeyboard(window.psychosisRFB);
+                            }
+                        } else {
+                            // RFB exists but may not be configured yet
+                            if (!window.psychosisRFB._psychosisConfigured) {
+                                enableFullKeyboard(window.psychosisRFB);
+                            }
+                            clearInterval(checkInterval);
+                            observer.disconnect();
+                        }
+                        
+                        if (attempts >= maxAttempts) {
+                            clearInterval(checkInterval);
+                            observer.disconnect();
+                            if (!window.psychosisRFB) {
+                                console.warn('⚠️ Could not find noVNC RFB instance');
+                                console.log('All window keys:', Object.keys(window).slice(0, 30));
+                                var vncKeys = Object.keys(window).filter(k => {
+                                    var lower = k.toLowerCase();
+                                    return lower.includes('rfb') || lower.includes('vnc') || lower.includes('novnc') || lower.includes('ui');
+                                });
+                                console.log('VNC-related keys:', vncKeys.length > 0 ? vncKeys : 'none found');
+                                
+                                // Try to find any object with sendKey
+                                var sendKeyObjects = [];
+                                for (var key in window) {
+                                    try {
+                                        var obj = window[key];
+                                        if (obj && typeof obj === 'object' && typeof obj.sendKey === 'function') {
+                                            sendKeyObjects.push(key);
+                                        }
+                                    } catch(e) {}
+                                }
+                                console.log('Objects with sendKey:', sendKeyObjects);
+                            }
+                        }
+                    }, 500);
+                })();
+            """
+            
+            webView.evaluateJavaScript(rfbSetupScript) { result, error in
+                if let error = error {
+                    print("⚠️ Error setting up RFB finder: \(error.localizedDescription)")
+                } else {
+                    print("✅ RFB finder script injected (v2)")
+                }
+            }
         }
         
         func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -371,6 +776,12 @@ struct WebViewWrapper: UIViewRepresentable {
                 webView.scrollView.setContentOffset(newOffset, animated: false)
                 gesture.setTranslation(.zero, in: webView)
             }
+        }
+        
+        func updatePaneSelection(_ pane: CursorPane) {
+            // Pane switching via VNC keyboard shortcuts is handled in RemoteDesktopView.showPane()
+            // noVNC renders the remote desktop as a canvas, so DOM manipulation doesn't work.
+            print("Pane selection: \(pane.rawValue) - VNC shortcuts sent from RemoteDesktopView")
         }
     }
 }
