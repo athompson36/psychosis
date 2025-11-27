@@ -143,16 +143,15 @@ struct NativeVNCView: View {
                     }
                 }
                 
-                // Keyboard input - visible text field at bottom when keyboard should be shown
-                if keyboardController.shouldShowKeyboard || keyboardController.isKeyboardVisible {
-                    KeyboardInputViewControllerWrapper(
-                        connection: connection,
-                        controller: keyboardController
-                    )
-                    .frame(width: geometry.size.width - 32, height: 44)
-                    .position(x: geometry.size.width / 2, y: geometry.size.height - keyboardHeight - 32)
-                    .transition(.move(edge: .bottom))
-                }
+                // Keyboard input - always in hierarchy, visible when needed
+                KeyboardInputViewControllerWrapper(
+                    connection: connection,
+                    controller: keyboardController
+                )
+                .frame(width: geometry.size.width - 32, height: 44)
+                .position(x: geometry.size.width / 2, y: geometry.size.height - keyboardHeight - 32)
+                .opacity((keyboardController.shouldShowKeyboard || keyboardController.isKeyboardVisible) ? 1.0 : 0.0)
+                .allowsHitTesting(keyboardController.shouldShowKeyboard || keyboardController.isKeyboardVisible)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
