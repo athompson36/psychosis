@@ -12,53 +12,65 @@ struct MainPaneView: View {
     
     @StateObject private var serverManager = RemoteServerManager.shared
     @State private var remoteServers: [RemoteServer] = []
-    @State private var selectedEditorTab: RemoteServer?
+    @State private var selectedServer: RemoteServer?
     @State private var selectedPaneTab: PaneTab = .chat
     @State private var isSplit: Bool = false
     @State private var showAddServerSheet: Bool = false
     @State private var serverToEdit: RemoteServer?
-    @State private var showEditorTabs: Bool = false
-    @State private var showPaneTabs: Bool = false
-    @State private var tabsVisible: Bool = false
-    @State private var dragOffset: CGFloat = 0
-    @State private var autoHideTask: Task<Void, Never>?
-    @State private var newServerName: String = ""
-    @State private var newServerHost: String = ""
-    @State private var newServerPort: String = "5900"
-    @State private var newServerUsername: String = ""
-    @State private var newServerPassword: String = ""
-    @State private var newServerUseSSL: Bool = false
-    @State private var newServerPath: String = "/vnc.html"
-    @State private var newServerType: ServerType = .ubuntu
     @State private var showSettings: Bool = false
     @State private var cursorPane: CursorPane = .chat
-    @FocusState private var focusedField: Field?
     
-    enum Field: Hashable {
-        case serverName, host, port, username, password
-    }
+    // Header visibility state
+    @State private var headerVisible: Bool = false
+    @State private var showServerTabs: Bool = false
+    @State private var showPaneTabs: Bool = false
+    @State private var autoHideTask: Task<Void, Never>?
+    @State private var dragOffset: CGFloat = 0
     
     enum PaneTab: String, CaseIterable {
         case chat = "Chat"
         case editor = "Editor"
         case files = "Files"
-        case terminal = "Terminal"
         
         var icon: String {
             switch self {
             case .chat: return "message.fill"
             case .editor: return "doc.text.fill"
             case .files: return "folder.fill"
-            case .terminal: return "terminal.fill"
             }
         }
     }
     
     var body: some View {
-        ZStack {
-            backgroundView
-            mainContentStack
+        ZStack(alignment: .top) {
+            // Background
+            Color.black.ignoresSafeArea()
+            
+            // Main content
+            VStack(spacing: 0) {
+                // Spacer for header when visible
+                if headerVisible {
+                    Color.clear
+                        .frame(height: headerHeight)
+                }
+                
+                // VNC content area
+                contentArea
+            }
+            
+            // Pull-down indicator (always visible at top)
+            VStack(spacing: 0) {
+                pullDownIndicator
+                
+                // Collapsible header
+                if headerVisible {
+                    headerContent
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                }
+            }
+            .animation(.spring(response: 0.3, dampingFraction: 0.8), value: headerVisible)
         }
+        .gesture(headerDragGesture)
         .ignoresSafeArea(.container, edges: .bottom)
         .sheet(isPresented: $showSettings) {
             settingsSheet
@@ -69,154 +81,169 @@ struct MainPaneView: View {
         .onAppear {
             remoteServers = serverManager.servers
         }
-        .onChange(of: serverManager.servers) { oldServers, newServers in
-            handleServersChange(oldServers: oldServers, newServers: newServers)
+        .onChange(of: serverManager.servers) { _, newServers in
+            remoteServers = newServers
+            if let selected = selectedServer, !newServers.contains(where: { $0.id == selected.id }) {
+                selectedServer = newServers.first
+            }
         }
-        .onChange(of: selectedEditorTab) { oldServer, newServer in
-            handleEditorTabChange(oldServer: oldServer, newServer: newServer)
-        }
-        .onChange(of: selectedPaneTab) { oldValue, newValue in
-            handlePaneTabChange(newValue: newValue)
+        .onChange(of: selectedPaneTab) { _, newValue in
+            switch newValue {
+            case .chat: cursorPane = .chat
+            case .editor: cursorPane = .editor
+            case .files: cursorPane = .files
+            }
         }
     }
     
-    // MARK: - Sub-views
+    // MARK: - Computed Properties
     
-    private var backgroundView: some View {
-        Color.black.ignoresSafeArea()
+    private var headerHeight: CGFloat {
+        var height: CGFloat = 60 // Base header height
+        if showServerTabs { height += 50 }
+        if showPaneTabs { height += 50 }
+        return height
     }
     
-    private var mainContentStack: some View {
+    // MARK: - Pull-down Indicator
+    
+    private var pullDownIndicator: some View {
+        Button(action: toggleHeader) {
+            VStack(spacing: 4) {
+                // Arrow indicator
+                Image(systemName: headerVisible ? "chevron.up" : "chevron.down")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.white.opacity(0.6))
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 24)
+            .background(
+                LinearGradient(
+                    colors: [Color.black.opacity(0.8), Color.clear],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            )
+        }
+        .buttonStyle(.plain)
+    }
+    
+    // MARK: - Header Content
+    
+    private var headerContent: some View {
         VStack(spacing: 0) {
-            headerBar
-            
-            if showEditorTabs {
-                editorTabsScrollView
-            }
-            
-            if showPaneTabs {
-                paneTabsScrollView
-            }
-            
-            contentArea
-        }
-    }
-    
-    private var headerBar: some View {
-        VStack(spacing: 0) {
-            headerButtons
-                .padding(.horizontal, 16)
-                .padding(.bottom, 4)
-        }
-        .padding(.top)
-        .background(.ultraThinMaterial)
-        .zIndex(100)
-    }
-    
-    private var headerButtons: some View {
-        HStack(spacing: 12) {
-            editorTabsToggleButton
-            paneTabsToggleButton
-            Spacer()
-            connectionQualityIndicator
-            settingsButton
-        }
-    }
-    
-    private var editorTabsToggleButton: some View {
-        Button(action: toggleEditorTabs) {
-            HStack(spacing: 6) {
-                Image(systemName: showEditorTabs ? "chevron.down" : "chevron.right")
-                Text("Editors")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-            .background(showEditorTabs ? Color.blue.opacity(0.2) : Color.blue.opacity(0.1))
-            .foregroundColor(showEditorTabs ? .blue : .secondary)
-            .cornerRadius(8)
-        }
-    }
-    
-    private var paneTabsToggleButton: some View {
-        Button(action: togglePaneTabs) {
-            HStack(spacing: 6) {
-                Image(systemName: showPaneTabs ? "chevron.down" : "chevron.right")
-                Text("Panes")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-            .background(showPaneTabs ? Color.blue.opacity(0.2) : Color.blue.opacity(0.1))
-            .foregroundColor(showPaneTabs ? .blue : .secondary)
-            .cornerRadius(8)
-        }
-    }
-    
-    @ViewBuilder
-    private var connectionQualityIndicator: some View {
-        if selectedEditorTab != nil {
-            let qualityMonitor = ConnectionQualityMonitor.shared
-            HStack(spacing: 4) {
-                Image(systemName: qualityMonitor.quality.icon)
-                    .foregroundColor(qualityMonitor.quality.color)
-                    .font(.caption2)
+            // Main header bar with Servers button and Settings
+            HStack(spacing: 12) {
+                // Servers toggle button
+                Button(action: toggleServerTabs) {
+                    HStack(spacing: 6) {
+                        Image(systemName: showServerTabs ? "chevron.down" : "chevron.right")
+                        Text("Servers")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .background(showServerTabs ? Color.blue.opacity(0.3) : Color.blue.opacity(0.15))
+                    .foregroundColor(showServerTabs ? .blue : .white.opacity(0.8))
+                    .cornerRadius(8)
+                }
                 
-                if let latency = qualityMonitor.latency {
-                    Text("\(Int(latency))ms")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
+                Spacer()
+                
+                // Connection quality indicator
+                if selectedServer != nil {
+                    connectionQualityIndicator
+                }
+                
+                // Settings button
+                Button(action: { showSettings = true }) {
+                    Image(systemName: "gearshape.fill")
+                        .font(.title3)
+                        .padding(8)
+                        .background(Color.white.opacity(0.1))
+                        .foregroundColor(.white.opacity(0.8))
+                        .cornerRadius(8)
                 }
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 6)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
             .background(.ultraThinMaterial)
-            .cornerRadius(6)
+            
+            // Server tabs (nested level 1)
+            if showServerTabs {
+                serverTabsBar
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+            
+            // Pane tabs (nested level 2 - under selected server)
+            if showPaneTabs && selectedServer != nil {
+                paneTabsBar
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
         }
+        .animation(.spring(response: 0.25, dampingFraction: 0.8), value: showServerTabs)
+        .animation(.spring(response: 0.25, dampingFraction: 0.8), value: showPaneTabs)
     }
     
-    private var settingsButton: some View {
-        Button(action: { showSettings = true }) {
-            Image(systemName: "gearshape.fill")
-                .font(.title3)
-                .padding(8)
-                .background(Color.blue.opacity(0.1))
-                .foregroundColor(.blue)
-                .cornerRadius(8)
-        }
-    }
+    // MARK: - Server Tabs Bar
     
-    private var editorTabsScrollView: some View {
+    private var serverTabsBar: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 ForEach(remoteServers) { server in
-                    editorTabButton(for: server)
+                    serverTabButton(for: server)
                 }
-                addEditorMenu
+                
+                // Add server button
+                Button(action: {
+                    serverToEdit = nil
+                    showAddServerSheet = true
+                }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "plus.circle.fill")
+                        Text("Add")
+                            .font(.caption)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(Color.green.opacity(0.2))
+                    .foregroundColor(.green)
+                    .cornerRadius(8)
+                }
             }
             .padding(.horizontal, 16)
         }
         .padding(.vertical, 8)
-        .background(.ultraThinMaterial)
-        .transition(.move(edge: .top).combined(with: .opacity))
+        .background(Color.black.opacity(0.3))
     }
     
-    private func editorTabButton(for server: RemoteServer) -> some View {
+    private func serverTabButton(for server: RemoteServer) -> some View {
         Button(action: {
-            selectedEditorTab = server
-            resetAutoHide()
+            withAnimation {
+                if selectedServer?.id == server.id {
+                    // Toggle pane tabs if tapping the same server
+                    showPaneTabs.toggle()
+                } else {
+                    selectedServer = server
+                    showPaneTabs = true
+                }
+                resetAutoHide()
+            }
         }) {
             HStack(spacing: 6) {
                 Text(server.type.icon)
                 Text(server.name)
                     .font(.caption)
+                if selectedServer?.id == server.id {
+                    Image(systemName: showPaneTabs ? "chevron.down" : "chevron.right")
+                        .font(.caption2)
+                }
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .background(selectedEditorTab?.id == server.id ? Color.blue.opacity(0.3) : Color.blue.opacity(0.1))
-            .foregroundColor(selectedEditorTab?.id == server.id ? .blue : .secondary)
+            .background(selectedServer?.id == server.id ? Color.blue.opacity(0.3) : Color.white.opacity(0.1))
+            .foregroundColor(selectedServer?.id == server.id ? .blue : .white.opacity(0.8))
             .cornerRadius(8)
         }
         .contextMenu {
@@ -228,463 +255,284 @@ struct MainPaneView: View {
             }
             
             Button(role: .destructive, action: {
-                deleteServer(server)
+                serverManager.deleteServer(server)
+                if selectedServer?.id == server.id {
+                    selectedServer = remoteServers.first
+                }
             }) {
                 Label("Delete", systemImage: "trash")
             }
         }
     }
     
-    private var addEditorMenu: some View {
-        Menu {
-            Button(action: {
-                resetForm()
-                serverToEdit = nil
-                showAddServerSheet = true
-            }) {
-                Label("Custom Server", systemImage: "plus.circle")
-            }
-            
-            Divider()
-            
-            ForEach(ServerPreset.presets, id: \.name) { preset in
-                Button(action: {
-                    addPresetServer(preset)
-                }) {
-                    HStack {
-                        Text(preset.icon)
-                        VStack(alignment: .leading) {
-                            Text(preset.name)
-                            Text(preset.description)
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                }
-            }
-        } label: {
-            HStack(spacing: 4) {
-                Image(systemName: "plus.circle.fill")
-                Text("Add Editor")
-                    .font(.caption)
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(Color.green.opacity(0.2))
-            .foregroundColor(.green)
-            .cornerRadius(8)
-        }
-    }
+    // MARK: - Pane Tabs Bar
     
-    private var paneTabsScrollView: some View {
+    private var paneTabsBar: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 ForEach(PaneTab.allCases, id: \.self) { tab in
                     paneTabButton(for: tab)
                 }
-                Spacer()
-                splitToggleButton
             }
             .padding(.horizontal, 16)
         }
         .padding(.vertical, 8)
-        .background(.ultraThinMaterial)
-        .transition(.move(edge: .top).combined(with: .opacity))
+        .background(Color.black.opacity(0.2))
     }
     
     private func paneTabButton(for tab: PaneTab) -> some View {
         Button(action: {
-            selectedPaneTab = tab
-            if tab == .terminal {
-                isSplit = true
+            withAnimation {
+                selectedPaneTab = tab
+                resetAutoHide()
             }
-            resetAutoHide()
         }) {
             HStack(spacing: 6) {
                 Image(systemName: tab.icon)
-                    .font(.system(size: 14))
+                    .font(.system(size: 12))
                 Text(tab.rawValue)
-                    .font(.subheadline)
+                    .font(.caption)
             }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 10)
-            .background(selectedPaneTab == tab ? Color.blue.opacity(0.3) : Color.blue.opacity(0.1))
-            .foregroundColor(selectedPaneTab == tab ? .blue : .secondary)
-            .cornerRadius(8)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(selectedPaneTab == tab ? Color.purple.opacity(0.3) : Color.white.opacity(0.1))
+            .foregroundColor(selectedPaneTab == tab ? .purple : .white.opacity(0.8))
+            .cornerRadius(6)
         }
     }
     
-    private var splitToggleButton: some View {
-        Button(action: {
-            isSplit.toggle()
-            resetAutoHide()
-        }) {
-            Image(systemName: isSplit ? "rectangle.split.2x1" : "rectangle")
-                .font(.title3)
-                .padding(8)
-                .background(isSplit ? Color.blue.opacity(0.2) : Color.clear)
-                .foregroundColor(isSplit ? .blue : .secondary)
-                .cornerRadius(8)
+    // MARK: - Connection Quality Indicator
+    
+    private var connectionQualityIndicator: some View {
+        let qualityMonitor = ConnectionQualityMonitor.shared
+        return HStack(spacing: 4) {
+            Image(systemName: qualityMonitor.quality.icon)
+                .foregroundColor(qualityMonitor.quality.color)
+                .font(.caption2)
+            
+            if let latency = qualityMonitor.latency {
+                Text("\(Int(latency))ms")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
         }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .background(Color.white.opacity(0.1))
+        .cornerRadius(6)
     }
+    
+    // MARK: - Content Area
     
     private var contentArea: some View {
         GeometryReader { geometry in
-            if isSplit {
-                splitView(geometry: geometry)
+            if let server = selectedServer {
+                // Show VNC view for selected server
+                RemoteDesktopViewV2(remoteServer: server, selectedPane: $cursorPane)
+                    .id(server.id)
             } else {
-                singleView
+                // Show server list when no server selected
+                serverListView
             }
         }
     }
     
-    @ViewBuilder
-    private func splitView(geometry: GeometryProxy) -> some View {
-        if geometry.size.width > geometry.size.height {
-            landscapeSplitView(geometry: geometry)
-        } else {
-            portraitSplitView(geometry: geometry)
+    // MARK: - Server List View
+    
+    private var serverListView: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                if remoteServers.isEmpty {
+                    emptyServerListView
+                } else {
+                    serverCardsView
+                }
+            }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
-    private func landscapeSplitView(geometry: GeometryProxy) -> some View {
-        HStack(spacing: 0) {
-            paneContent(selectedPaneTab, isPrimary: true)
-                .frame(width: geometry.size.width / 2)
+    private var emptyServerListView: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "server.rack")
+                .font(.system(size: 60))
+                .foregroundColor(.secondary)
             
-            Divider()
+            Text("No Servers Configured")
+                .font(.title2)
+                .fontWeight(.semibold)
+                .foregroundColor(.white)
             
-            paneContent(terminalPaneForSplit, isPrimary: false)
-                .frame(width: geometry.size.width / 2)
+            Text("Add a server to get started")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+            
+            Button(action: { showAddServerSheet = true }) {
+                HStack {
+                    Image(systemName: "plus.circle.fill")
+                    Text("Add Server")
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(10)
+            }
+            .padding(.top, 8)
         }
+        .frame(maxWidth: .infinity)
+        .padding(.top, 100)
     }
     
-    private func portraitSplitView(geometry: GeometryProxy) -> some View {
-        VStack(spacing: 0) {
-            paneContent(selectedPaneTab, isPrimary: true)
-                .frame(height: geometry.size.height / 2)
-            
-            Divider()
-            
-            paneContent(terminalPaneForSplit, isPrimary: false)
-                .frame(height: geometry.size.height / 2)
+    private var serverCardsView: some View {
+        VStack(spacing: 12) {
+            ForEach(remoteServers) { server in
+                serverCard(for: server)
+            }
         }
+        .padding(.horizontal, 16)
+        .padding(.top, 20)
     }
     
-    private var singleView: some View {
-        paneContent(selectedPaneTab, isPrimary: true)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+    private func serverCard(for server: RemoteServer) -> some View {
+        HStack(spacing: 12) {
+            Text(server.type.icon)
+                .font(.title2)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(server.name)
+                    .font(.headline)
+                    .foregroundColor(.white)
+                
+                Text("\(server.host):\(server.port)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            
+            Spacer()
+            
+            // Connect Button
+            Button(action: {
+                selectedServer = server
+                headerVisible = true
+                showServerTabs = true
+                showPaneTabs = true
+            }) {
+                HStack(spacing: 6) {
+                    Image(systemName: "play.circle.fill")
+                    Text("Connect")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                }
+                .foregroundColor(.white)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(Color.green)
+                .cornerRadius(8)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding()
+        .background(.ultraThinMaterial)
+        .cornerRadius(12)
     }
+    
+    // MARK: - Sheets
     
     private var settingsSheet: some View {
         SettingsView(onConnect: { server in
-            selectedEditorTab = server
-            showEditorTabs = true
-            tabsVisible = true
-            if selectedPaneTab == .terminal && !isSplit {
-                selectedPaneTab = .chat
-            }
+            selectedServer = server
+            headerVisible = true
+            showServerTabs = true
+            showPaneTabs = true
         })
     }
     
     private var addServerSheet: some View {
         ServerFormView(serverToEdit: serverToEdit) { server in
-            if let existing = serverToEdit {
+            if serverToEdit != nil {
                 serverManager.updateServer(server)
-                if selectedEditorTab?.id == existing.id {
-                    selectedEditorTab = server
+                if selectedServer?.id == serverToEdit?.id {
+                    selectedServer = server
                 }
             } else {
                 serverManager.addServer(server)
-                selectedEditorTab = server
+                selectedServer = server
             }
             serverToEdit = nil
         }
     }
     
-    // MARK: - Action Methods
+    // MARK: - Gestures
     
-    private func toggleEditorTabs() {
+    private var headerDragGesture: some Gesture {
+        DragGesture()
+            .onChanged { value in
+                if value.translation.height > 30 && !headerVisible {
+                    withAnimation {
+                        headerVisible = true
+                        showServerTabs = true
+                        if selectedServer != nil {
+                            showPaneTabs = true
+                        }
+                    }
+                    resetAutoHide()
+                } else if value.translation.height < -30 && headerVisible {
+                    withAnimation {
+                        hideHeader()
+                    }
+                }
+            }
+    }
+    
+    // MARK: - Actions
+    
+    private func toggleHeader() {
         withAnimation {
-            if showEditorTabs {
-                showEditorTabs = false
-                hideTabsIfNeeded()
+            if headerVisible {
+                hideHeader()
             } else {
-                showEditorTabs = true
-                showPaneTabs = false
-                tabsVisible = true
+                headerVisible = true
+                showServerTabs = true
+                if selectedServer != nil {
+                    showPaneTabs = true
+                }
                 resetAutoHide()
             }
         }
     }
     
-    private func togglePaneTabs() {
+    private func toggleServerTabs() {
         withAnimation {
-            if showPaneTabs {
+            showServerTabs.toggle()
+            if !showServerTabs {
                 showPaneTabs = false
-                hideTabsIfNeeded()
-            } else {
-                showPaneTabs = true
-                showEditorTabs = false
-                tabsVisible = true
-                resetAutoHide()
             }
+            resetAutoHide()
         }
     }
     
-    private func deleteServer(_ server: RemoteServer) {
-        serverManager.deleteServer(server)
-        if selectedEditorTab?.id == server.id {
-            selectedEditorTab = remoteServers.first
-        }
-    }
-    
-    private func addPresetServer(_ preset: ServerPreset) {
-        let newServer = preset.server
-        serverManager.addServer(newServer)
-        selectedEditorTab = newServer
-    }
-    
-    private func handleServersChange(oldServers: [RemoteServer], newServers: [RemoteServer]) {
-        remoteServers = newServers
-        if let selected = selectedEditorTab, !newServers.contains(where: { $0.id == selected.id }) {
-            selectedEditorTab = newServers.first
-        }
-    }
-    
-    private func handleEditorTabChange(oldServer: RemoteServer?, newServer: RemoteServer?) {
-        print("🔄 selectedEditorTab changed from \(oldServer?.name ?? "nil") to \(newServer?.name ?? "nil")")
-        if newServer != nil {
-            if selectedPaneTab == .terminal && !isSplit {
-                selectedPaneTab = .chat
-            }
-        }
-    }
-    
-    private func handlePaneTabChange(newValue: PaneTab) {
-        switch newValue {
-        case .chat: cursorPane = .chat
-        case .editor: cursorPane = .editor
-        case .files: cursorPane = .files
-        case .terminal: cursorPane = .terminal
-        }
-    }
-    
-    private var terminalPaneForSplit: PaneTab {
-        // When split is active, show terminal in secondary pane
-        return .terminal
-    }
-    
-    private func showTabs() {
-        tabsVisible = true
-        resetAutoHide()
-    }
-    
-    private func hideTabsIfNeeded() {
-        if !showEditorTabs && !showPaneTabs {
-            withAnimation {
-                tabsVisible = false
-            }
-        }
+    private func hideHeader() {
+        headerVisible = false
+        showServerTabs = false
+        showPaneTabs = false
     }
     
     private func resetAutoHide() {
         autoHideTask?.cancel()
-        // Only auto-hide if both toggles are off
         autoHideTask = Task {
-            try? await Task.sleep(nanoseconds: 5_000_000_000)
+            try? await Task.sleep(nanoseconds: 4_000_000_000) // 4 seconds
             await MainActor.run {
-                if !showEditorTabs && !showPaneTabs {
-                    withAnimation {
-                        tabsVisible = false
-                    }
+                withAnimation {
+                    hideHeader()
                 }
             }
         }
-    }
-    
-    private func resetForm() {
-        newServerName = ""
-        newServerHost = ""
-        newServerPort = "5900"
-        newServerUsername = ""
-        newServerPassword = ""
-        newServerUseSSL = false
-        newServerPath = "/vnc.html"
-        newServerType = .ubuntu
-        serverToEdit = nil
-    }
-    
-    @ViewBuilder
-    private func paneContent(_ tab: PaneTab, isPrimary: Bool) -> some View {
-        // When terminal is in split and this is the secondary pane, show terminal
-        if !isPrimary && isSplit {
-            terminalView()
-        } else if let server = selectedEditorTab {
-            // Native VNC view when server is selected
-            RemoteDesktopViewV2(remoteServer: server, selectedPane: $cursorPane)
-                .id(server.id)
-                .onAppear {
-                    print("✅ paneContent: RemoteDesktopViewV2 appeared for \(server.name)")
-                }
-        } else {
-            // Show server list or appropriate content
-            switch tab {
-            case .chat, .editor, .files:
-                serverListView()
-            case .terminal:
-                if isPrimary {
-                    serverListView()
-                } else {
-                    terminalView()
-                }
-            }
-        }
-    }
-    
-    @ViewBuilder
-    private func serverListView() -> some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                if remoteServers.isEmpty {
-                    VStack(spacing: 16) {
-                        Image(systemName: "server.rack")
-                            .font(.system(size: 60))
-                            .foregroundColor(.secondary)
-                        
-                        Text("No Servers Configured")
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                        
-                        Text("Add a server in Settings to get started")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-                        
-                        Button(action: {
-                            showSettings = true
-                        }) {
-                            HStack {
-                                Image(systemName: "gearshape.fill")
-                                Text("Open Settings")
-                            }
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 12)
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                        }
-                        .padding(.top, 8)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, 60)
-                } else {
-                    VStack(spacing: 12) {
-                        ForEach(remoteServers) { server in
-                            HStack(spacing: 12) {
-                                Text(server.type.icon)
-                                    .font(.title2)
-                                
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(server.name)
-                                        .font(.headline)
-                                        .foregroundColor(.primary)
-                                    
-                                    Text("\(server.host):\(server.port)")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                    
-                                    if server.autoConnect {
-                                        HStack(spacing: 4) {
-                                            Image(systemName: "bolt.fill")
-                                                .font(.caption2)
-                                            Text("Auto-connect")
-                                                .font(.caption2)
-                                        }
-                                        .foregroundColor(.yellow)
-                                        .padding(.top, 2)
-                                    }
-                                }
-                                
-                                Spacer()
-                                
-                                // Connect Button
-                                Button(action: {
-                                    print("🔌 Connect button tapped for server: \(server.name)")
-                                    selectedEditorTab = server
-                                    showEditorTabs = true
-                                    tabsVisible = true
-                                    // Ensure we show a pane that displays the VNC view
-                                    if selectedPaneTab == .terminal && !isSplit {
-                                        selectedPaneTab = .chat
-                                    }
-                                    cursorPane = .chat
-                                }) {
-                                    HStack(spacing: 6) {
-                                        Image(systemName: "play.circle.fill")
-                                        Text("Connect")
-                                            .font(.subheadline)
-                                            .fontWeight(.medium)
-                                    }
-                                    .foregroundColor(.white)
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 10)
-                                    .background(Color.green)
-                                    .cornerRadius(8)
-                                }
-                                .buttonStyle(.plain)
-                                
-                                // Edit Button
-                                Button(action: {
-                                    serverToEdit = server
-                                    showAddServerSheet = true
-                                }) {
-                                    Image(systemName: "pencil")
-                                        .foregroundColor(.blue)
-                                        .font(.title3)
-                                        .padding(8)
-                                        .background(Color.blue.opacity(0.15))
-                                        .cornerRadius(6)
-                                }
-                                .buttonStyle(.plain)
-                            }
-                            .padding()
-                            .background(.ultraThinMaterial)
-                            .cornerRadius(12)
-                        }
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 20)
-                }
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-    
-    @ViewBuilder
-    private func terminalView() -> some View {
-        VStack(spacing: 16) {
-            if let server = selectedEditorTab {
-                Text("Terminal - \(server.name)")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding()
-                
-                // Terminal content would go here
-                // For now, show placeholder
-                Text("Terminal interface will appear here")
-                    .foregroundColor(.secondary)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                Text("Select a server to access terminal")
-                    .foregroundColor(.secondary)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.black)
     }
 }
+
+// MARK: - Extensions
 
 extension View {
     func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
