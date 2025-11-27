@@ -12,7 +12,6 @@ struct RemoteDesktopViewV2: View {
     @Binding var selectedPane: CursorPane
     @StateObject private var vncConnection = VNCConnection()
     @State private var paneController: CursorPaneController?
-    @State private var showOverlay: Bool = true
     
     init(remoteServer: RemoteServer, selectedPane: Binding<CursorPane>) {
         self.remoteServer = remoteServer
@@ -21,32 +20,9 @@ struct RemoteDesktopViewV2: View {
     
     var body: some View {
         ZStack {
-            // Native VNC View
+            // Native VNC View with keyboard support
             NativeVNCView(connection: vncConnection)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-            
-            // Liquid Glass Overlay
-            if showOverlay {
-                LiquidGlassOverlay(selectedPane: $selectedPane) { pane in
-                    Task {
-                        if let controller = paneController {
-                            switch pane {
-                            case .editor:
-                                await controller.switchToEditor()
-                            case .files:
-                                await controller.switchToFiles()
-                            case .chat:
-                                await controller.switchToChat()
-                            case .terminal:
-                                await controller.switchToTerminal()
-                            }
-                        }
-                    }
-                }
-                .transition(.opacity)
-                .allowsHitTesting(true) // Allow touches on overlay buttons
-                .background(Color.clear) // Make non-button areas transparent to touches
-            }
             
             // Connection Status Overlay
             if vncConnection.isConnecting {
@@ -95,22 +71,6 @@ struct RemoteDesktopViewV2: View {
         .onChange(of: remoteServer.id) { oldId, newId in
             print("🔄 Server changed from \(oldId) to \(newId)")
             connectToServer()
-        }
-        .onChange(of: selectedPane) { oldPane, newPane in
-            Task {
-                if let controller = paneController {
-                    switch newPane {
-                    case .editor:
-                        await controller.switchToEditor()
-                    case .files:
-                        await controller.switchToFiles()
-                    case .chat:
-                        await controller.switchToChat()
-                    case .terminal:
-                        await controller.switchToTerminal()
-                    }
-                }
-            }
         }
     }
     
