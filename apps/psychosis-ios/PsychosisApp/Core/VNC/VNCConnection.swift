@@ -471,41 +471,172 @@ class VNCConnection: ObservableObject {
         
         // Read number of rectangles
         let numRects = try await readUInt16()
-        print("📦 Received framebuffer update with \(numRects) rectangles")
+        if numRects > 1000 {
+            print("⚠️ Suspicious number of rectangles: \(numRects), limiting to 1000")
+            // Protocol might be desynced, but try to continue
+        }
+        let safeNumRects = min(numRects, 1000)
+        print("📦 Received framebuffer update with \(numRects) rectangles (processing \(safeNumRects))")
         
-        for i in 0..<numRects {
+        guard let fb = frameBuffer else {
+            print("⚠️ Frame buffer is nil, skipping update")
+            return
+        }
+        
+        let fbSize = await fb.size
+        var invalidRectCount = 0
+        let maxInvalidRects = 10 // If we see too many invalid rectangles, protocol is desynced
+        
+        for i in 0..<safeNumRects {
             let x = try await readUInt16()
             let y = try await readUInt16()
             let width = try await readUInt16()
             let height = try await readUInt16()
             let encoding = try await readInt32()
             
+            // Validate rectangle dimensions
+            let rectWidth = Int(width)
+            let rectHeight = Int(height)
+            let rectX = Int(x)
+            let rectY = Int(y)
+            
+            // Check for obviously invalid dimensions (likely protocol desync)
+            if rectWidth > Int(fbSize.width) * 2 || rectHeight > Int(fbSize.height) * 2 || 
+               rectWidth == 0 || rectHeight == 0 ||
+               rectX > Int(fbSize.width) * 2 || rectY > Int(fbSize.height) * 2 {
+                print("⚠️ Rectangle \(i): Invalid dimensions \(width)x\(height) at (\(x),\(y)), skipping")
+                // Try to skip data based on encoding, but be conservative
+                try await skipRectangleData(encoding: encoding, width: rectWidth, height: rectHeight)
+                continue
+            }
+            
+            // Validate encoding value (should be reasonable)
+            // Valid encodings: 0-255 for standard, negative for pseudo-encodings
+            // Large positive values suggest protocol desync
+            if encoding > 255 && encoding > 0 {
+                invalidRectCount += 1
+                if invalidRectCount > maxInvalidRects {
+                    print("⚠️ Too many invalid rectangles (\(invalidRectCount)), protocol desynced. Breaking update.")
+                    // Break out - will try to resync on next update request
+                    break
+                }
+                print("⚠️ Rectangle \(i): Invalid encoding value \(encoding) (likely protocol desync)")
+                // Protocol is likely desynced - try to skip a reasonable amount and continue
+                // This is a best-effort recovery
+                let estimatedSkip = min(rectWidth * rectHeight * 4, 1_000_000)
+                if estimatedSkip > 0 && estimatedSkip < 10_000_000 {
+                    do {
+                        _ = try await readData(count: estimatedSkip)
+                    } catch {
+                        print("⚠️ Failed to skip data, protocol may be desynced: \(error)")
+                        // Break out of rectangle loop - will try to resync on next update
+                        break
+                    }
+                }
+                continue
+            }
+            
+            // Reset invalid count on valid encoding
+            invalidRectCount = 0
+            
             print("  Rectangle \(i): \(width)x\(height) at (\(x),\(y)), encoding: \(encoding)")
             
             // Read pixel data based on encoding
-            // For now, assume Raw encoding (0)
             if encoding == 0 {
+                // Raw encoding - read pixel data
                 let pixelSize = 4 // Assume 32-bit pixels
-                let dataSize = Int(width) * Int(height) * pixelSize
+                let dataSize = rectWidth * rectHeight * pixelSize
+                
+                // Safety check for data size
+                if dataSize > 100_000_000 { // 100MB limit
+                    print("⚠️ Rectangle \(i): Data size too large (\(dataSize) bytes), skipping")
+                    continue
+                }
+                
                 let pixelData = try await readData(count: dataSize)
                 
                 print("  📊 Updating frame buffer with \(dataSize) bytes")
-                await frameBuffer?.update(
-                    rect: CGRect(x: Int(x), y: Int(y), width: Int(width), height: Int(height)),
+                await fb.update(
+                    rect: CGRect(x: rectX, y: rectY, width: rectWidth, height: rectHeight),
                     data: pixelData
                 )
                 
                 // Update image - already on MainActor since class is @MainActor
-                if let fb = frameBuffer {
-                    let newImage = await fb.toImage()
-                    print("  🖼️ Generated image: \(newImage != nil ? "success" : "failed")")
+                let newImage = await fb.toImage()
+                if newImage != nil {
                     self.frameBufferImage = newImage
-                } else {
-                    print("  ⚠️ Frame buffer is nil!")
+                }
+            } else if encoding == 1 {
+                // CopyRect encoding - copy from another location
+                // Read source coordinates (2 bytes each)
+                let sourceX = try await readUInt16()
+                let sourceY = try await readUInt16()
+                print("  📋 CopyRect: copying from (\(sourceX), \(sourceY))")
+                
+                // Perform copy operation in frame buffer
+                await fb.copyRect(
+                    from: CGRect(x: Int(sourceX), y: Int(sourceY), width: rectWidth, height: rectHeight),
+                    to: CGRect(x: rectX, y: rectY, width: rectWidth, height: rectHeight)
+                )
+                
+                // Update image
+                let newImage = await fb.toImage()
+                if newImage != nil {
+                    self.frameBufferImage = newImage
                 }
             } else {
-                // Skip other encodings for now
-                print("⚠️ Unsupported encoding: \(encoding)")
+                // Unsupported encoding - must skip the pixel data to keep protocol in sync
+                print("⚠️ Unsupported encoding: \(encoding), skipping pixel data")
+                do {
+                    try await skipRectangleData(encoding: encoding, width: rectWidth, height: rectHeight)
+                } catch {
+                    print("⚠️ Failed to skip rectangle data: \(error)")
+                    // If we can't skip, protocol is likely desynced
+                    break
+                }
+            }
+        }
+    }
+    
+    private func skipRectangleData(encoding: Int32, width: Int, height: Int) async throws {
+        // For unsupported encodings, we need to skip the pixel data
+        // Most encodings have variable-length data, but we can make educated guesses
+        
+        // Common encodings and their data sizes:
+        // - Raw (0): width * height * bytesPerPixel (already handled)
+        // - CopyRect (1): 4 bytes (source x, y)
+        // - RRE (2): variable (sub-rectangles)
+        // - Hextile (5): variable (tiles)
+        // - ZRLE (16): variable (compressed)
+        // - Cursor pseudo-encoding (-239): variable
+        // - DesktopSize pseudo-encoding (-223): 0 bytes
+        
+        switch encoding {
+        case 1: // CopyRect
+            _ = try await readData(count: 4) // Source x, y (2 bytes each)
+        case -223: // DesktopSize pseudo-encoding
+            // No data to skip
+            break
+        case -239: // Cursor pseudo-encoding
+            // Cursor has variable data, but we can estimate
+            // Skip cursor data: width * height * bytesPerPixel + mask data
+            let cursorDataSize = width * height * 4 + ((width + 7) / 8) * height
+            if cursorDataSize < 10_000_000 { // Safety limit
+                _ = try await readData(count: cursorDataSize)
+            }
+        default:
+            // For unknown encodings, try to estimate or skip conservatively
+            // Many encodings are compressed, so we can't easily determine size
+            // We'll try to read a reasonable amount and hope the next rectangle header is valid
+            // This is a fallback - ideally we'd support more encodings
+            print("⚠️ Unknown encoding \(encoding), attempting to skip data")
+            // For compressed encodings, we can't easily determine size
+            // We'll need to rely on the server sending proper data or implement encoding support
+            // For now, try to read a small amount and see if we can resync
+            // This is not ideal but better than hanging
+            let estimatedSize = min(width * height * 4, 1_000_000) // Max 1MB estimate
+            if estimatedSize > 0 && estimatedSize < 10_000_000 {
+                _ = try await readData(count: estimatedSize)
             }
         }
     }

@@ -52,6 +52,55 @@ actor VNCFrameBuffer {
         }
     }
     
+    func copyRect(from sourceRect: CGRect, to destRect: CGRect) {
+        let srcX = Int(sourceRect.origin.x)
+        let srcY = Int(sourceRect.origin.y)
+        let srcW = Int(sourceRect.width)
+        let srcH = Int(sourceRect.height)
+        
+        let dstX = Int(destRect.origin.x)
+        let dstY = Int(destRect.origin.y)
+        let dstW = Int(destRect.width)
+        let dstH = Int(destRect.height)
+        
+        // Ensure source and destination are within bounds
+        guard srcX >= 0, srcY >= 0, srcX + srcW <= width, srcY + srcH <= height,
+              dstX >= 0, dstY >= 0, dstX + dstW <= width, dstY + dstH <= height,
+              srcW == dstW, srcH == dstH else {
+            print("⚠️ Frame buffer copyRect out of bounds: from \(sourceRect) to \(destRect)")
+            return
+        }
+        
+        // Handle overlapping regions by copying in the right direction
+        if srcY < dstY || (srcY == dstY && srcX < dstX) {
+            // Copy from bottom-right to top-left
+            for row in (0..<srcH).reversed() {
+                for col in (0..<srcW).reversed() {
+                    let srcPixelIndex = ((srcY + row) * width + (srcX + col)) * bytesPerPixel
+                    let dstPixelIndex = ((dstY + row) * width + (dstX + col)) * bytesPerPixel
+                    
+                    pixelData[dstPixelIndex] = pixelData[srcPixelIndex]
+                    pixelData[dstPixelIndex + 1] = pixelData[srcPixelIndex + 1]
+                    pixelData[dstPixelIndex + 2] = pixelData[srcPixelIndex + 2]
+                    pixelData[dstPixelIndex + 3] = pixelData[srcPixelIndex + 3]
+                }
+            }
+        } else {
+            // Copy from top-left to bottom-right
+            for row in 0..<srcH {
+                for col in 0..<srcW {
+                    let srcPixelIndex = ((srcY + row) * width + (srcX + col)) * bytesPerPixel
+                    let dstPixelIndex = ((dstY + row) * width + (dstX + col)) * bytesPerPixel
+                    
+                    pixelData[dstPixelIndex] = pixelData[srcPixelIndex]
+                    pixelData[dstPixelIndex + 1] = pixelData[srcPixelIndex + 1]
+                    pixelData[dstPixelIndex + 2] = pixelData[srcPixelIndex + 2]
+                    pixelData[dstPixelIndex + 3] = pixelData[srcPixelIndex + 3]
+                }
+            }
+        }
+    }
+    
     func toImage() -> UIImage? {
         let colorSpace = CGColorSpaceCreateDeviceRGB()
         let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.noneSkipLast.rawValue)
