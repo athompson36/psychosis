@@ -125,25 +125,24 @@ struct NativeVNCView: View {
                     VStack {
                         Spacer()
                         
-                        // Text input bar - simple UIViewRepresentable
-                        VNCKeyboardTextFieldView(
+                        // Custom keyboard view
+                        CustomKeyboardView(
                             connection: connection,
-                            controller: keyboardController
+                            isVisible: Binding(
+                                get: { keyboardController.isKeyboardVisible },
+                                set: { keyboardController.setKeyboardVisible($0) }
+                            )
                         )
-                        .frame(height: 44)
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, keyboardHeight > 0 ? keyboardHeight + 8 : 8)
-                        .opacity(keyboardController.shouldShowKeyboard || keyboardController.isKeyboardVisible ? 1.0 : 0.01)
-                        .allowsHitTesting(keyboardController.shouldShowKeyboard || keyboardController.isKeyboardVisible)
-                        .animation(.easeOut(duration: 0.25), value: keyboardController.shouldShowKeyboard)
-                        .animation(.easeOut(duration: 0.25), value: keyboardController.isKeyboardVisible)
+                        .padding(.bottom, keyboardHeight > 0 ? keyboardHeight : 0)
                         
                         // Keyboard toggle button
                         HStack {
                             Spacer()
                             Button(action: {
                                 print("⌨️ Keyboard button tapped")
-                                keyboardController.toggleKeyboard()
+                                withAnimation {
+                                    keyboardController.toggleKeyboard()
+                                }
                             }) {
                                 Image(systemName: keyboardController.isKeyboardVisible ? "keyboard.chevron.compact.down" : "keyboard")
                                     .font(.title2)
@@ -153,7 +152,7 @@ struct NativeVNCView: View {
                                     .clipShape(Circle())
                             }
                             .padding(.trailing, 16)
-                            .padding(.bottom, 16)
+                            .padding(.bottom, keyboardController.isKeyboardVisible ? 280 : 16) // Adjust when keyboard is visible
                         }
                     }
                 }
@@ -162,20 +161,7 @@ struct NativeVNCView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.black)
         .animation(.easeOut(duration: 0.25), value: keyboardHeight)
-        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { notification in
-            if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
-                withAnimation(.easeOut(duration: 0.25)) {
-                    keyboardHeight = keyboardFrame.height
-                }
-                print("⌨️ Keyboard will show, height: \(keyboardFrame.height)")
-            }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
-            withAnimation(.easeOut(duration: 0.25)) {
-                keyboardHeight = 0
-            }
-            print("⌨️ Keyboard will hide")
-        }
+        // No longer need iOS keyboard notifications - using custom keyboard
         .onChange(of: connection.frameBufferImage) { oldImage, newImage in
             if let newImage = newImage {
                 image = newImage
