@@ -333,8 +333,34 @@ struct TapDetectorView: UIViewRepresentable {
 // MARK: - Keyboard Controller
 
 class KeyboardController: ObservableObject {
-    @Published var isKeyboardVisible: Bool = false
-    @Published var shouldShowKeyboard: Bool = false
+    // Use non-published property to avoid AttributeGraph cycles
+    private var _isKeyboardVisible: Bool = false {
+        didSet {
+            // Only update if changed and use objectWillChange to avoid cycles
+            if oldValue != _isKeyboardVisible {
+                DispatchQueue.main.async { [weak self] in
+                    self?.objectWillChange.send()
+                }
+            }
+        }
+    }
+    
+    var isKeyboardVisible: Bool {
+        get { _isKeyboardVisible }
+        set { _isKeyboardVisible = newValue }
+    }
+    
+    // Use a flag instead of @Published to avoid cycles
+    var shouldShowKeyboard: Bool = false {
+        didSet {
+            if oldValue != shouldShowKeyboard {
+                DispatchQueue.main.async { [weak self] in
+                    self?.objectWillChange.send()
+                }
+            }
+        }
+    }
+    
     private weak var textField: UITextField?
     private weak var textView: UITextView?
     
@@ -350,6 +376,8 @@ class KeyboardController: ObservableObject {
     
     func showKeyboard() {
         print("⌨️ showKeyboard called, textField: \(textField != nil), textView: \(textView != nil)")
+        
+        // Set flag without triggering @Published
         shouldShowKeyboard = true
         
         // Try multiple times with delays to ensure it works
@@ -360,7 +388,8 @@ class KeyboardController: ObservableObject {
                     let success = tv.becomeFirstResponder()
                     print("⌨️ textView becomeFirstResponder attempt \(attempt) result: \(success)")
                     if success {
-                        self.isKeyboardVisible = true
+                        // Update without triggering cycle
+                        self._isKeyboardVisible = true
                         return
                     }
                 }
@@ -392,7 +421,8 @@ class KeyboardController: ObservableObject {
                 print("⌨️ textField becomeFirstResponder attempt \(attempt) result: \(success)")
                 
                 if success {
-                    self.isKeyboardVisible = true
+                    // Update without triggering cycle
+                    self._isKeyboardVisible = true
                 } else if attempt < 3 {
                     // Try again after a short delay
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -410,17 +440,24 @@ class KeyboardController: ObservableObject {
     func hideKeyboard() {
         print("⌨️ hideKeyboard called")
         shouldShowKeyboard = false
-        isKeyboardVisible = false
+        _isKeyboardVisible = false
         textView?.resignFirstResponder()
         textField?.resignFirstResponder()
     }
     
     func toggleKeyboard() {
-        print("⌨️ toggleKeyboard called, current state: \(isKeyboardVisible)")
-        if isKeyboardVisible {
+        print("⌨️ toggleKeyboard called, current state: \(_isKeyboardVisible)")
+        if _isKeyboardVisible {
             hideKeyboard()
         } else {
             showKeyboard()
+        }
+    }
+    
+    // Safe method to update keyboard state without triggering cycles
+    func setKeyboardVisible(_ visible: Bool) {
+        if _isKeyboardVisible != visible {
+            _isKeyboardVisible = visible
         }
     }
 }
@@ -504,14 +541,14 @@ struct VNCKeyboardInputView: UIViewRepresentable {
         
         func textFieldDidEndEditing(_ textField: UITextField) {
             DispatchQueue.main.async {
-                self.controller.isKeyboardVisible = false
+                self.controller.setKeyboardVisible(false)
                 self.controller.shouldShowKeyboard = false
             }
         }
         
         func textFieldDidBeginEditing(_ textField: UITextField) {
             DispatchQueue.main.async {
-                self.controller.isKeyboardVisible = true
+                self.controller.setKeyboardVisible(true)
             }
         }
         
@@ -593,10 +630,6 @@ class VNCKeyboardTextField: UITextField {
         return super.canResignFirstResponder
     }
     
-    override var inputAccessoryView: UIView? {
-        return nil // No accessory view
-    }
-    
     @discardableResult
     override func becomeFirstResponder() -> Bool {
         print("⌨️ VNCKeyboardTextField.becomeFirstResponder() called, window: \(window != nil), superview: \(superview != nil)")
@@ -611,16 +644,17 @@ class VNCKeyboardTextField: UITextField {
         
         if result {
             DispatchQueue.main.async {
-                self.keyboardController?.isKeyboardVisible = true
+                self.keyboardController?.setKeyboardVisible(true)
             }
         } else {
             // Try again after a delay
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            let workItem = DispatchWorkItem {
                 if self.window != nil {
                     let retry = super.becomeFirstResponder()
                     print("⌨️ Retry becomeFirstResponder: \(retry)")
                 }
             }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: workItem)
         }
         return result
     }
@@ -631,7 +665,7 @@ class VNCKeyboardTextField: UITextField {
         print("⌨️ VNCKeyboardTextField.resignFirstResponder() = \(result)")
         if result {
             DispatchQueue.main.async {
-                self.keyboardController?.isKeyboardVisible = false
+                self.keyboardController?.setKeyboardVisible(false)
                 self.keyboardController?.shouldShowKeyboard = false
             }
         }
@@ -727,7 +761,7 @@ struct KeyboardInputViewControllerWrapper: UIViewControllerRepresentable {
         // Respond to shouldShowKeyboard - try text view first
         if controller.shouldShowKeyboard {
             print("⌨️ updateUIViewController: attempting to show keyboard")
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            let workItem = DispatchWorkItem {
                 // Try text view first
                 if let tv = uiViewController.textView, tv.window != nil, !tv.isFirstResponder {
                     let success = tv.becomeFirstResponder()
@@ -743,6 +777,7 @@ struct KeyboardInputViewControllerWrapper: UIViewControllerRepresentable {
                     print("⚠️ updateUIViewController: text field not in window yet")
                 }
             }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: workItem)
         } else {
             // Hide keyboard
             uiViewController.textView?.resignFirstResponder()
@@ -757,7 +792,7 @@ class KeyboardInputViewController: UIViewController {
     var connection: VNCConnection?
     var controller: KeyboardController?
     let textField = VNCKeyboardTextField()
-    private var textView: UITextView?
+    var textView: UITextView?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -846,7 +881,7 @@ class KeyboardInputViewController: UIViewController {
         
         // Try to become first responder if requested - try text view first, then text field
         if controller?.shouldShowKeyboard == true {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            let workItem = DispatchWorkItem {
                 // Try text view first (sometimes works better)
                 if let tv = self.textView, tv.window != nil {
                     let success = tv.becomeFirstResponder()
@@ -865,6 +900,7 @@ class KeyboardInputViewController: UIViewController {
                     print("⚠️ viewDidAppear: text field not in window")
                 }
             }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: workItem)
         }
     }
     
@@ -875,10 +911,6 @@ class KeyboardInputViewController: UIViewController {
     
     override var canBecomeFirstResponder: Bool {
         return true
-    }
-    
-    override var inputAccessoryView: UIView? {
-        return nil // No accessory view
     }
 }
 
@@ -933,32 +965,18 @@ extension KeyboardInputViewController: UITextFieldDelegate {
         connection.sendKey(key: 0xFF0D, pressed: false)
         return false
     }
-    
-    private func charToKeysym(_ char: Character) -> UInt32? {
-        guard let ascii = char.asciiValue else { return nil }
-        
-        if ascii >= 0x20 && ascii <= 0x7E {
-            return UInt32(ascii)
-        }
-        
-        switch char {
-        case "\t": return 0xFF09  // Tab
-        case "\n", "\r": return 0xFF0D  // Return
-        default: return nil
-        }
-    }
 }
 
 extension KeyboardInputViewController: UITextViewDelegate {
     func textViewDidBeginEditing(_ textView: UITextView) {
         DispatchQueue.main.async {
-            self.controller?.isKeyboardVisible = true
+            self.controller?.setKeyboardVisible(true)
         }
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
         DispatchQueue.main.async {
-            self.controller?.isKeyboardVisible = false
+            self.controller?.setKeyboardVisible(false)
             self.controller?.shouldShowKeyboard = false
         }
     }
@@ -993,8 +1011,12 @@ extension KeyboardInputViewController: UITextViewDelegate {
         }
         return false
     }
-    
-    private func charToKeysym(_ char: Character) -> UInt32? {
+}
+
+// MARK: - KeyboardInputViewController Helper Methods
+
+private extension KeyboardInputViewController {
+    func charToKeysym(_ char: Character) -> UInt32? {
         guard let ascii = char.asciiValue else { return nil }
         
         if ascii >= 0x20 && ascii <= 0x7E {
