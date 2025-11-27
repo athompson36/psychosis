@@ -143,15 +143,16 @@ struct NativeVNCView: View {
                     }
                 }
                 
-                // Keyboard input - use UIViewController wrapper for proper keyboard handling
-                // Make it small but not zero-sized so it's in the view hierarchy
-                KeyboardInputViewControllerWrapper(
-                    connection: connection,
-                    controller: keyboardController
-                )
-                .frame(width: 44, height: 44)
-                .opacity(0.01)
-                .allowsHitTesting(true) // Allow hit testing so text field can receive focus
+                // Keyboard input - visible text field at bottom when keyboard should be shown
+                if keyboardController.shouldShowKeyboard || keyboardController.isKeyboardVisible {
+                    KeyboardInputViewControllerWrapper(
+                        connection: connection,
+                        controller: keyboardController
+                    )
+                    .frame(width: geometry.size.width - 32, height: 44)
+                    .position(x: geometry.size.width / 2, y: geometry.size.height - keyboardHeight - 32)
+                    .transition(.move(edge: .bottom))
+                }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -553,6 +554,7 @@ struct VNCKeyboardInputView: UIViewRepresentable {
         }
         
         func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+            // Send keys to VNC
             if string.isEmpty {
                 // Backspace pressed
                 print("⌨️ Backspace pressed")
@@ -569,8 +571,8 @@ struct VNCKeyboardInputView: UIViewRepresentable {
                 }
             }
             
-            // Don't actually insert text into the hidden field
-            return false
+            // Allow text to update in field for visual feedback and input session
+            return true
         }
         
         func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -673,25 +675,14 @@ class VNCKeyboardTextField: UITextField {
     }
     
     override func deleteBackward() {
-        // Handle backspace
+        // Handle backspace - send to VNC
         if let connection = connection {
             print("⌨️ Backspace")
             connection.sendKey(key: 0xFF08, pressed: true)
             connection.sendKey(key: 0xFF08, pressed: false)
         }
-        // Keep the dummy text
-        if text?.isEmpty != false {
-            text = " "
-        }
-    }
-    
-    // Keep some text in the field to maintain input session
-    override var text: String? {
-        didSet {
-            if text?.isEmpty == true || text == nil {
-                super.text = " "
-            }
-        }
+        // Allow normal text deletion for visual feedback
+        super.deleteBackward()
     }
     
     // Capture all key commands for hardware keyboard
@@ -800,7 +791,8 @@ class KeyboardInputViewController: UIViewController {
         view.backgroundColor = .clear
         view.isUserInteractionEnabled = true
         
-        // Configure text field - make it more "real" for input system
+        // Configure text field - MUST be visible and real for iOS input system to work
+        // iOS RTI (Remote Text Input) requires a valid, visible input view to establish session
         textField.delegate = self
         textField.connection = connection
         textField.keyboardController = controller
@@ -810,55 +802,37 @@ class KeyboardInputViewController: UIViewController {
         textField.smartQuotesType = .no
         textField.smartDashesType = .no
         textField.smartInsertDeleteType = .no
-        textField.keyboardType = .default // Use default instead of asciiCapable
+        textField.keyboardType = .default
         textField.returnKeyType = .default
-        textField.backgroundColor = UIColor.white.withAlphaComponent(0.01) // Slight background
-        textField.textColor = UIColor.clear
-        textField.tintColor = UIColor.clear
-        textField.alpha = 0.05 // More visible for input system
-        textField.placeholder = " "
-        textField.text = " " // Keep text for input session
+        
+        // Make it visible but subtle - iOS needs a real input view
+        textField.backgroundColor = UIColor.black.withAlphaComponent(0.7)
+        textField.textColor = UIColor.white
+        textField.tintColor = UIColor.white
+        textField.alpha = 1.0 // Fully opaque - required for input system
+        textField.placeholder = "VNC Input"
+        textField.text = "" // Start empty
         textField.isUserInteractionEnabled = true
         textField.isEnabled = true
         textField.isHidden = false
+        textField.borderStyle = .roundedRect
+        textField.layer.cornerRadius = 8
+        textField.layer.borderWidth = 1
+        textField.layer.borderColor = UIColor.white.withAlphaComponent(0.5).cgColor
+        textField.font = UIFont.systemFont(ofSize: 16)
         
-        // Make text field larger and properly positioned
+        // Make text field larger and properly positioned at bottom
         textField.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(textField)
         NSLayoutConstraint.activate([
-            textField.widthAnchor.constraint(equalToConstant: 200), // Larger for input system
+            textField.widthAnchor.constraint(equalToConstant: 200),
             textField.heightAnchor.constraint(equalToConstant: 44),
             textField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             textField.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10)
         ])
         
-        // Also create a UITextView as backup - sometimes works better with input system
-        let tv = UITextView()
-        tv.delegate = self
-        tv.backgroundColor = UIColor.white.withAlphaComponent(0.01)
-        tv.textColor = UIColor.clear
-        tv.tintColor = UIColor.clear
-        tv.alpha = 0.05
-        tv.text = " "
-        tv.autocorrectionType = .no
-        tv.autocapitalizationType = .none
-        tv.spellCheckingType = .no
-        tv.smartQuotesType = .no
-        tv.smartDashesType = .no
-        tv.smartInsertDeleteType = .no
-        tv.keyboardType = .default
-        tv.returnKeyType = .default
-        tv.isUserInteractionEnabled = true
-        tv.isHidden = false
-        tv.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(tv)
-        NSLayoutConstraint.activate([
-            tv.widthAnchor.constraint(equalToConstant: 200),
-            tv.heightAnchor.constraint(equalToConstant: 44),
-            tv.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            tv.topAnchor.constraint(equalTo: view.topAnchor, constant: 10)
-        ])
-        textView = tv
+        // Don't create UITextView - just use the text field
+        // Having both was causing conflicts
         
         // Register with controller
         controller?.register(textField)
