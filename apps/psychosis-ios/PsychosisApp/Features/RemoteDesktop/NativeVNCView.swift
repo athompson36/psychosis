@@ -143,13 +143,13 @@ struct NativeVNCView: View {
                     }
                 }
                 
-                // Hidden keyboard input - ALWAYS present so it can receive focus
+                // Keyboard input - positioned at bottom, visible enough for input system
                 VNCKeyboardInputView(
                     connection: connection,
                     controller: keyboardController
                 )
-                .frame(width: 1, height: 1)
-                .opacity(0.01)
+                .frame(width: 44, height: 44)
+                .position(x: 22, y: geometry.size.height - 22)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -383,6 +383,9 @@ struct VNCKeyboardInputView: UIViewRepresentable {
         let textField = VNCKeyboardTextField()
         textField.delegate = context.coordinator
         textField.connection = connection
+        textField.keyboardController = controller
+        
+        // Configure for invisible but functional input
         textField.autocorrectionType = .no
         textField.autocapitalizationType = .none
         textField.spellCheckingType = .no
@@ -391,29 +394,45 @@ struct VNCKeyboardInputView: UIViewRepresentable {
         textField.smartInsertDeleteType = .no
         textField.keyboardType = .asciiCapable
         textField.returnKeyType = .default
-        textField.backgroundColor = .clear
-        textField.textColor = .clear
-        textField.tintColor = .clear
         
-        // Register with controller immediately
-        DispatchQueue.main.async {
-            controller.register(textField)
-        }
+        // Make invisible but still functional
+        textField.alpha = 0.02 // Nearly invisible but not zero
+        textField.backgroundColor = UIColor.clear
+        textField.textColor = UIColor.clear
+        textField.tintColor = UIColor.clear
+        
+        // Ensure it can become first responder
+        textField.isUserInteractionEnabled = true
+        textField.isEnabled = true
+        
+        // Set placeholder to help with input system
+        textField.placeholder = " "
+        textField.text = " " // Keep some text so input system stays active
+        
+        // Register with controller
+        controller.register(textField)
+        print("⌨️ VNCKeyboardTextField created and registered")
         
         return textField
     }
     
     func updateUIView(_ uiView: VNCKeyboardTextField, context: Context) {
         uiView.connection = connection
+        uiView.keyboardController = controller
         
         // Re-register in case view was recreated
         controller.register(uiView)
         
         // Respond to shouldShowKeyboard
         if controller.shouldShowKeyboard && !uiView.isFirstResponder {
+            // Use async to ensure we're not in a layout pass
             DispatchQueue.main.async {
-                let success = uiView.becomeFirstResponder()
-                print("⌨️ updateUIView becomeFirstResponder: \(success)")
+                if uiView.window != nil {
+                    let success = uiView.becomeFirstResponder()
+                    print("⌨️ updateUIView becomeFirstResponder: \(success), window: \(uiView.window != nil)")
+                } else {
+                    print("⌨️ updateUIView: text field not in window yet")
+                }
             }
         }
     }
@@ -494,17 +513,57 @@ struct VNCKeyboardInputView: UIViewRepresentable {
 
 class VNCKeyboardTextField: UITextField {
     weak var connection: VNCConnection?
+    weak var keyboardController: KeyboardController?
     
-    override var canBecomeFirstResponder: Bool { true }
+    override var canBecomeFirstResponder: Bool { 
+        print("⌨️ canBecomeFirstResponder called, returning true")
+        return true 
+    }
+    
+    override var canResignFirstResponder: Bool { true }
+    
+    @discardableResult
+    override func becomeFirstResponder() -> Bool {
+        let result = super.becomeFirstResponder()
+        print("⌨️ VNCKeyboardTextField.becomeFirstResponder() = \(result)")
+        if result {
+            DispatchQueue.main.async {
+                self.keyboardController?.isKeyboardVisible = true
+            }
+        }
+        return result
+    }
+    
+    @discardableResult
+    override func resignFirstResponder() -> Bool {
+        let result = super.resignFirstResponder()
+        print("⌨️ VNCKeyboardTextField.resignFirstResponder() = \(result)")
+        if result {
+            DispatchQueue.main.async {
+                self.keyboardController?.isKeyboardVisible = false
+                self.keyboardController?.shouldShowKeyboard = false
+            }
+        }
+        return result
+    }
     
     override func deleteBackward() {
-        // Handle hardware keyboard backspace
+        // Handle backspace
         if let connection = connection {
-            print("⌨️ Hardware backspace")
+            print("⌨️ Backspace")
             connection.sendKey(key: 0xFF08, pressed: true)
             connection.sendKey(key: 0xFF08, pressed: false)
         }
-        super.deleteBackward()
+        // Don't call super - we don't want to delete from our dummy text
+    }
+    
+    // Keep some text in the field to maintain input session
+    override var text: String? {
+        didSet {
+            if text?.isEmpty == true {
+                super.text = " "
+            }
+        }
     }
     
     // Capture all key commands for hardware keyboard
