@@ -143,13 +143,13 @@ struct NativeVNCView: View {
                     }
                 }
                 
-                // Keyboard input - positioned at bottom, visible enough for input system
-                VNCKeyboardInputView(
+                // Keyboard input - use UIViewController wrapper for proper keyboard handling
+                KeyboardInputViewControllerWrapper(
                     connection: connection,
                     controller: keyboardController
                 )
-                .frame(width: 44, height: 44)
-                .position(x: 22, y: geometry.size.height - 22)
+                .frame(width: 0, height: 0)
+                .allowsHitTesting(false)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -606,6 +606,156 @@ class VNCKeyboardTextField: UITextField {
         connection?.sendKey(key: 0xFF1B, pressed: true)  // XK_Escape
         connection?.sendKey(key: 0xFF1B, pressed: false)
         resignFirstResponder()
+    }
+}
+
+// MARK: - Keyboard Input View Controller Wrapper
+
+struct KeyboardInputViewControllerWrapper: UIViewControllerRepresentable {
+    let connection: VNCConnection
+    @ObservedObject var controller: KeyboardController
+    
+    func makeUIViewController(context: Context) -> KeyboardInputViewController {
+        let vc = KeyboardInputViewController()
+        vc.connection = connection
+        vc.controller = controller
+        return vc
+    }
+    
+    func updateUIViewController(_ uiViewController: KeyboardInputViewController, context: Context) {
+        uiViewController.connection = connection
+        uiViewController.controller = controller
+        
+        // Respond to shouldShowKeyboard
+        if controller.shouldShowKeyboard && !uiViewController.textField.isFirstResponder {
+            DispatchQueue.main.async {
+                let success = uiViewController.textField.becomeFirstResponder()
+                print("⌨️ KeyboardInputViewController becomeFirstResponder: \(success)")
+            }
+        }
+    }
+}
+
+class KeyboardInputViewController: UIViewController {
+    var connection: VNCConnection?
+    var controller: KeyboardController?
+    let textField = VNCKeyboardTextField()
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        view.backgroundColor = .clear
+        view.isUserInteractionEnabled = false // Don't block touches
+        
+        // Configure text field
+        textField.delegate = self
+        textField.connection = connection
+        textField.keyboardController = controller
+        textField.autocorrectionType = .no
+        textField.autocapitalizationType = .none
+        textField.spellCheckingType = .no
+        textField.smartQuotesType = .no
+        textField.smartDashesType = .no
+        textField.smartInsertDeleteType = .no
+        textField.keyboardType = .asciiCapable
+        textField.returnKeyType = .default
+        textField.backgroundColor = .clear
+        textField.textColor = .clear
+        textField.tintColor = .clear
+        textField.alpha = 0.01
+        textField.placeholder = " "
+        textField.text = " "
+        
+        // Add to view (but make it tiny and invisible)
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(textField)
+        NSLayoutConstraint.activate([
+            textField.widthAnchor.constraint(equalToConstant: 1),
+            textField.heightAnchor.constraint(equalToConstant: 1),
+            textField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            textField.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+        
+        // Register with controller
+        controller?.register(textField)
+        print("⌨️ KeyboardInputViewController viewDidLoad, text field created")
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        print("⌨️ KeyboardInputViewController viewDidAppear")
+        
+        // Update references
+        textField.connection = connection
+        textField.keyboardController = controller
+        controller?.register(textField)
+    }
+}
+
+extension KeyboardInputViewController: UITextFieldDelegate {
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        DispatchQueue.main.async {
+            self.controller?.isKeyboardVisible = false
+            self.controller?.shouldShowKeyboard = false
+        }
+    }
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        DispatchQueue.main.async {
+            self.controller?.isKeyboardVisible = true
+        }
+    }
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        guard let vncTextField = textField as? VNCKeyboardTextField,
+              let connection = vncTextField.connection else {
+            return false
+        }
+        
+        if string.isEmpty {
+            // Backspace pressed
+            print("⌨️ Backspace pressed")
+            connection.sendKey(key: 0xFF08, pressed: true)  // XK_BackSpace
+            connection.sendKey(key: 0xFF08, pressed: false)
+        } else {
+            // Regular characters
+            for char in string {
+                if let keysym = charToKeysym(char) {
+                    print("⌨️ Key pressed: '\(char)' -> keysym: \(keysym)")
+                    connection.sendKey(key: keysym, pressed: true)
+                    connection.sendKey(key: keysym, pressed: false)
+                }
+            }
+        }
+        
+        // Don't actually insert text
+        return false
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        guard let vncTextField = textField as? VNCKeyboardTextField,
+              let connection = vncTextField.connection else {
+            return false
+        }
+        
+        print("⌨️ Enter pressed")
+        connection.sendKey(key: 0xFF0D, pressed: true)  // XK_Return
+        connection.sendKey(key: 0xFF0D, pressed: false)
+        return false
+    }
+    
+    private func charToKeysym(_ char: Character) -> UInt32? {
+        guard let ascii = char.asciiValue else { return nil }
+        
+        if ascii >= 0x20 && ascii <= 0x7E {
+            return UInt32(ascii)
+        }
+        
+        switch char {
+        case "\t": return 0xFF09  // Tab
+        case "\n", "\r": return 0xFF0D  // Return
+        default: return nil
+        }
     }
 }
 
