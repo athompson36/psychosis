@@ -20,6 +20,7 @@ struct NativeVNCView: View {
     @StateObject private var keyboardController = KeyboardController()
     @State private var lastTapTime: Date = .distantPast
     @State private var isDragging: Bool = false
+    @State private var keyboardHeight: CGFloat = 0
     
     var body: some View {
         GeometryReader { geometry in
@@ -137,7 +138,7 @@ struct NativeVNCView: View {
                                     .clipShape(Circle())
                             }
                             .padding(.trailing, 16)
-                            .padding(.bottom, 100) // Above home indicator
+                            .padding(.bottom, keyboardHeight > 0 ? 16 : 100) // Adjust based on keyboard
                         }
                     }
                 }
@@ -152,7 +153,23 @@ struct NativeVNCView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.bottom, keyboardHeight)
         .background(Color.black)
+        .animation(.easeOut(duration: 0.25), value: keyboardHeight)
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { notification in
+            if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                withAnimation(.easeOut(duration: 0.25)) {
+                    keyboardHeight = keyboardFrame.height
+                }
+                print("⌨️ Keyboard will show, height: \(keyboardFrame.height)")
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            withAnimation(.easeOut(duration: 0.25)) {
+                keyboardHeight = 0
+            }
+            print("⌨️ Keyboard will hide")
+        }
         .onChange(of: connection.frameBufferImage) { oldImage, newImage in
             if let newImage = newImage {
                 image = newImage
