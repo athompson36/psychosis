@@ -17,9 +17,9 @@ struct NativeVNCView: View {
     @State private var image: UIImage?
     @State private var initialScaleCalculated: Bool = false
     @State private var imageSize: CGSize = .zero
-    @State private var showKeyboard: Bool = false
-    @State private var keyboardText: String = ""
-    @FocusState private var isKeyboardFocused: Bool
+    @State private var keyboardController = KeyboardController()
+    @State private var lastTapTime: Date = .distantPast
+    @State private var isDragging: Bool = false
     
     var body: some View {
         GeometryReader { geometry in
@@ -32,47 +32,85 @@ struct NativeVNCView: View {
                         .offset(offset)
                         .clipped()
                         .contentShape(Rectangle())
+                        .highPriorityGesture(
+                            // Pinch to zoom
+                            MagnificationGesture()
+                                .onChanged { value in
+                                    scale = lastScale * value
+                                }
+                                .onEnded { value in
+                                    lastScale = scale
+                                    // Clamp scale
+                                    if scale < 0.5 { scale = 0.5; lastScale = 0.5 }
+                                    if scale > 3.0 { scale = 3.0; lastScale = 3.0 }
+                                }
+                        )
                         .gesture(
-                            SimultaneousGesture(
-                                // Pinch to zoom
-                                MagnificationGesture()
-                                    .onChanged { value in
-                                        scale = lastScale * value
+                            // Drag to pan (with tap detection)
+                            DragGesture(minimumDistance: 5)
+                                .onChanged { value in
+                                    isDragging = true
+                                    offset = CGSize(
+                                        width: lastOffset.width + value.translation.width,
+                                        height: lastOffset.height + value.translation.height
+                                    )
+                                }
+                                .onEnded { _ in
+                                    isDragging = false
+                                    lastOffset = offset
+                                }
+                        )
+                        .simultaneousGesture(
+                            // Tap gesture - use TapGesture for more reliable detection
+                            TapGesture()
+                                .onEnded {
+                                    // Only handle if we weren't dragging
+                                    if !isDragging {
+                                        // Get tap location from screen center (approximate)
+                                        // Use a better approach with gesture location
                                     }
-                                    .onEnded { value in
-                                        lastScale = scale
-                                        // Clamp scale
-                                        if scale < 0.5 { scale = 0.5; lastScale = 0.5 }
-                                        if scale > 3.0 { scale = 3.0; lastScale = 3.0 }
-                                    },
-                                // Drag to pan
-                                DragGesture()
-                                    .onChanged { value in
-                                        offset = CGSize(
-                                            width: lastOffset.width + value.translation.width,
-                                            height: lastOffset.height + value.translation.height
-                                        )
-                                    }
-                                    .onEnded { _ in
-                                        lastOffset = offset
-                                    }
+                                }
+                        )
+                        .overlay(
+                            // Invisible tap detector that doesn't conflict with gestures
+                            TapDetectorView(
+                                onTap: { location in
+                                    handleTap(at: location, in: geometry.size)
+                                },
+                                onDoubleTap: { location in
+                                    handleDoubleTap(at: location, in: geometry.size)
+                                }
                             )
                         )
-                        .onTapGesture { location in
-                            handleTap(at: location, in: geometry.size)
-                        }
-                        .onLongPressGesture(minimumDuration: 0.5) {
-                            handleLongPress(at: offset)
-                        }
                     
-                    // Hidden keyboard input field
-                    VNCKeyboardInput(
+                    // Keyboard toggle button
+                    VStack {
+                        Spacer()
+                        HStack {
+                            Spacer()
+                            Button(action: {
+                                print("⌨️ Keyboard button tapped")
+                                keyboardController.toggleKeyboard()
+                            }) {
+                                Image(systemName: keyboardController.isKeyboardVisible ? "keyboard.chevron.compact.down" : "keyboard")
+                                    .font(.title2)
+                                    .foregroundColor(.white)
+                                    .padding(12)
+                                    .background(Color.black.opacity(0.6))
+                                    .clipShape(Circle())
+                            }
+                            .padding(.trailing, 16)
+                            .padding(.bottom, 100) // Above home indicator
+                        }
+                    }
+                    
+                    // Hidden keyboard input - always present
+                    VNCKeyboardInputView(
                         connection: connection,
-                        isActive: $showKeyboard
+                        controller: keyboardController
                     )
                     .frame(width: 1, height: 1)
                     .opacity(0.01)
-                    .position(x: geometry.size.width / 2, y: geometry.size.height - 50)
                 } else {
                     // Loading or disconnected state
                     if connection.isConnecting {
@@ -139,8 +177,6 @@ struct NativeVNCView: View {
     // MARK: - Scaling
     
     private func calculateInitialScale(imageSize: CGSize) {
-        // Don't apply additional scaling - let aspectRatio(.fit) handle it
-        // Start with scale 1.0 so the image displays at its natural fit size
         scale = 1.0
         lastScale = 1.0
         offset = .zero
@@ -149,10 +185,6 @@ struct NativeVNCView: View {
         let screenSize = UIScreen.main.bounds.size
         print("📐 Image size: \(imageSize.width)x\(imageSize.height), screen: \(screenSize.width)x\(screenSize.height), initial scale: 1.0")
     }
-    
-    // MARK: - Image Updates
-    // Image updates are handled via connection.frameBufferImage @Published property
-    // No need for separate update task - VNCConnection updates frameBufferImage directly
     
     // MARK: - Input Handling
     
@@ -192,34 +224,131 @@ struct NativeVNCView: View {
             try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
             connection.sendMouse(x: clampedX, y: clampedY, buttonMask: 0)
             
-            // Show keyboard after tap (for text fields)
+            // Show keyboard after tap
             await MainActor.run {
-                showKeyboard = true
+                keyboardController.showKeyboard()
             }
         }
     }
     
-    private func handleLongPress(at location: CGSize) {
+    private func handleDoubleTap(at location: CGPoint, in viewSize: CGSize) {
         guard let frameBuffer = connection.frameBuffer else { return }
         
-        // Right click (button 2) - TODO: implement proper location calculation
         Task {
             let vncSize = await frameBuffer.size
-            // For now, send right click at center
-            let vncX = Int(vncSize.width / 2)
-            let vncY = Int(vncSize.height / 2)
-            connection.sendMouse(x: vncX, y: vncY, buttonMask: 2)
-            try? await Task.sleep(nanoseconds: 50_000_000)
-            connection.sendMouse(x: vncX, y: vncY, buttonMask: 0)
+            let displayedWidth = viewSize.width * scale
+            let displayedHeight = viewSize.height * scale
+            let relativeX = location.x - offset.width
+            let relativeY = location.y - offset.height
+            let vncX = max(0, min(Int((relativeX / displayedWidth) * vncSize.width), Int(vncSize.width) - 1))
+            let vncY = max(0, min(Int((relativeY / displayedHeight) * vncSize.height), Int(vncSize.height) - 1))
+            
+            print("🖱️ Double-tap at VNC (\(vncX), \(vncY))")
+            
+            // Send double-click
+            for _ in 0..<2 {
+                connection.sendMouse(x: vncX, y: vncY, buttonMask: 1)
+                try? await Task.sleep(nanoseconds: 30_000_000)
+                connection.sendMouse(x: vncX, y: vncY, buttonMask: 0)
+                try? await Task.sleep(nanoseconds: 30_000_000)
+            }
         }
     }
 }
 
-// MARK: - VNC Keyboard Input
+// MARK: - Tap Detector View
 
-struct VNCKeyboardInput: UIViewRepresentable {
+struct TapDetectorView: UIViewRepresentable {
+    let onTap: (CGPoint) -> Void
+    let onDoubleTap: (CGPoint) -> Void
+    
+    func makeUIView(context: Context) -> UIView {
+        let view = UIView()
+        view.backgroundColor = .clear
+        
+        let singleTap = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleSingleTap(_:)))
+        singleTap.numberOfTapsRequired = 1
+        
+        let doubleTap = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleDoubleTap(_:)))
+        doubleTap.numberOfTapsRequired = 2
+        
+        // Single tap should wait for double tap to fail
+        singleTap.require(toFail: doubleTap)
+        
+        view.addGestureRecognizer(singleTap)
+        view.addGestureRecognizer(doubleTap)
+        
+        return view
+    }
+    
+    func updateUIView(_ uiView: UIView, context: Context) {}
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onTap: onTap, onDoubleTap: onDoubleTap)
+    }
+    
+    class Coordinator: NSObject {
+        let onTap: (CGPoint) -> Void
+        let onDoubleTap: (CGPoint) -> Void
+        
+        init(onTap: @escaping (CGPoint) -> Void, onDoubleTap: @escaping (CGPoint) -> Void) {
+            self.onTap = onTap
+            self.onDoubleTap = onDoubleTap
+        }
+        
+        @objc func handleSingleTap(_ gesture: UITapGestureRecognizer) {
+            let location = gesture.location(in: gesture.view)
+            onTap(location)
+        }
+        
+        @objc func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
+            let location = gesture.location(in: gesture.view)
+            onDoubleTap(location)
+        }
+    }
+}
+
+// MARK: - Keyboard Controller
+
+@Observable
+class KeyboardController {
+    var isKeyboardVisible: Bool = false
+    private weak var textField: UITextField?
+    
+    func register(_ textField: UITextField) {
+        self.textField = textField
+    }
+    
+    func showKeyboard() {
+        print("⌨️ showKeyboard called")
+        isKeyboardVisible = true
+        DispatchQueue.main.async { [weak self] in
+            self?.textField?.becomeFirstResponder()
+        }
+    }
+    
+    func hideKeyboard() {
+        print("⌨️ hideKeyboard called")
+        isKeyboardVisible = false
+        DispatchQueue.main.async { [weak self] in
+            self?.textField?.resignFirstResponder()
+        }
+    }
+    
+    func toggleKeyboard() {
+        if isKeyboardVisible {
+            hideKeyboard()
+        } else {
+            showKeyboard()
+        }
+    }
+}
+
+// MARK: - VNC Keyboard Input View
+
+struct VNCKeyboardInputView: UIViewRepresentable {
     let connection: VNCConnection
-    @Binding var isActive: Bool
+    let controller: KeyboardController
     
     func makeUIView(context: Context) -> VNCKeyboardTextField {
         let textField = VNCKeyboardTextField()
@@ -236,51 +365,51 @@ struct VNCKeyboardInput: UIViewRepresentable {
         textField.backgroundColor = .clear
         textField.textColor = .clear
         textField.tintColor = .clear
+        
+        // Register with controller
+        controller.register(textField)
+        
         return textField
     }
     
     func updateUIView(_ uiView: VNCKeyboardTextField, context: Context) {
         uiView.connection = connection
-        if isActive && !uiView.isFirstResponder {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                uiView.becomeFirstResponder()
-            }
-        }
     }
     
     func makeCoordinator() -> Coordinator {
-        Coordinator(self)
+        Coordinator(connection: connection, controller: controller)
     }
     
     class Coordinator: NSObject, UITextFieldDelegate {
-        var parent: VNCKeyboardInput
+        let connection: VNCConnection
+        let controller: KeyboardController
         
-        init(_ parent: VNCKeyboardInput) {
-            self.parent = parent
+        init(connection: VNCConnection, controller: KeyboardController) {
+            self.connection = connection
+            self.controller = controller
         }
         
         func textFieldDidEndEditing(_ textField: UITextField) {
-            parent.isActive = false
+            controller.isKeyboardVisible = false
+        }
+        
+        func textFieldDidBeginEditing(_ textField: UITextField) {
+            controller.isKeyboardVisible = true
         }
         
         func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-            // Handle key presses
-            if let vncTextField = textField as? VNCKeyboardTextField,
-               let connection = vncTextField.connection {
-                
-                if string.isEmpty {
-                    // Backspace pressed
-                    print("⌨️ Backspace pressed")
-                    connection.sendKey(key: 0xFF08, pressed: true)  // XK_BackSpace
-                    connection.sendKey(key: 0xFF08, pressed: false)
-                } else {
-                    // Regular characters
-                    for char in string {
-                        if let keysym = charToKeysym(char) {
-                            print("⌨️ Key pressed: '\(char)' -> keysym: \(keysym)")
-                            connection.sendKey(key: keysym, pressed: true)
-                            connection.sendKey(key: keysym, pressed: false)
-                        }
+            if string.isEmpty {
+                // Backspace pressed
+                print("⌨️ Backspace pressed")
+                connection.sendKey(key: 0xFF08, pressed: true)  // XK_BackSpace
+                connection.sendKey(key: 0xFF08, pressed: false)
+            } else {
+                // Regular characters
+                for char in string {
+                    if let keysym = charToKeysym(char) {
+                        print("⌨️ Key pressed: '\(char)' -> keysym: \(keysym)")
+                        connection.sendKey(key: keysym, pressed: true)
+                        connection.sendKey(key: keysym, pressed: false)
                     }
                 }
             }
@@ -291,12 +420,9 @@ struct VNCKeyboardInput: UIViewRepresentable {
         
         func textFieldShouldReturn(_ textField: UITextField) -> Bool {
             // Send Enter key
-            if let vncTextField = textField as? VNCKeyboardTextField,
-               let connection = vncTextField.connection {
-                print("⌨️ Enter pressed")
-                connection.sendKey(key: 0xFF0D, pressed: true)  // XK_Return
-                connection.sendKey(key: 0xFF0D, pressed: false)
-            }
+            print("⌨️ Enter pressed")
+            connection.sendKey(key: 0xFF0D, pressed: true)  // XK_Return
+            connection.sendKey(key: 0xFF0D, pressed: false)
             return false
         }
         
