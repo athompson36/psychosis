@@ -144,12 +144,14 @@ struct NativeVNCView: View {
                 }
                 
                 // Keyboard input - use UIViewController wrapper for proper keyboard handling
+                // Make it small but not zero-sized so it's in the view hierarchy
                 KeyboardInputViewControllerWrapper(
                     connection: connection,
                     controller: keyboardController
                 )
-                .frame(width: 0, height: 0)
-                .allowsHitTesting(false)
+                .frame(width: 44, height: 44)
+                .opacity(0.01)
+                .allowsHitTesting(true) // Allow hit testing so text field can receive focus
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -333,27 +335,52 @@ struct TapDetectorView: UIViewRepresentable {
 class KeyboardController: ObservableObject {
     @Published var isKeyboardVisible: Bool = false
     @Published var shouldShowKeyboard: Bool = false
-    private var textField: UITextField?
+    private weak var textField: UITextField?
     
     func register(_ textField: UITextField) {
-        print("⌨️ KeyboardController: registered text field")
+        print("⌨️ KeyboardController: registered text field, window: \(textField.window != nil)")
         self.textField = textField
     }
     
     func showKeyboard() {
-        print("⌨️ showKeyboard called, textField exists: \(textField != nil)")
+        print("⌨️ showKeyboard called, textField exists: \(textField != nil), window: \(textField?.window != nil ?? false)")
         shouldShowKeyboard = true
-        if let tf = textField {
+        
+        // Try multiple times with delays to ensure it works
+        func attemptBecomeFirstResponder(attempt: Int) {
+            guard let tf = textField else {
+                print("⚠️ No text field registered!")
+                return
+            }
+            
             DispatchQueue.main.async {
+                if tf.window == nil {
+                    print("⚠️ Text field not in window yet, attempt \(attempt)")
+                    if attempt < 5 {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            attemptBecomeFirstResponder(attempt: attempt + 1)
+                        }
+                    }
+                    return
+                }
+                
                 let success = tf.becomeFirstResponder()
-                print("⌨️ becomeFirstResponder result: \(success)")
+                print("⌨️ becomeFirstResponder attempt \(attempt) result: \(success)")
+                
                 if success {
                     self.isKeyboardVisible = true
+                } else if attempt < 3 {
+                    // Try again after a short delay
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        attemptBecomeFirstResponder(attempt: attempt + 1)
+                    }
+                } else {
+                    print("⚠️ Failed to become first responder after \(attempt) attempts")
                 }
             }
-        } else {
-            print("⚠️ No text field registered!")
         }
+        
+        attemptBecomeFirstResponder(attempt: 1)
     }
     
     func hideKeyboard() {
@@ -616,6 +643,7 @@ struct KeyboardInputViewControllerWrapper: UIViewControllerRepresentable {
     @ObservedObject var controller: KeyboardController
     
     func makeUIViewController(context: Context) -> KeyboardInputViewController {
+        print("⌨️ KeyboardInputViewControllerWrapper makeUIViewController")
         let vc = KeyboardInputViewController()
         vc.connection = connection
         vc.controller = controller
@@ -626,12 +654,23 @@ struct KeyboardInputViewControllerWrapper: UIViewControllerRepresentable {
         uiViewController.connection = connection
         uiViewController.controller = controller
         
+        // Re-register text field
+        controller.register(uiViewController.textField)
+        
         // Respond to shouldShowKeyboard
         if controller.shouldShowKeyboard && !uiViewController.textField.isFirstResponder {
-            DispatchQueue.main.async {
-                let success = uiViewController.textField.becomeFirstResponder()
-                print("⌨️ KeyboardInputViewController becomeFirstResponder: \(success)")
+            print("⌨️ updateUIViewController: attempting to show keyboard")
+            // Wait a bit to ensure view is in hierarchy
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                if uiViewController.textField.window != nil {
+                    let success = uiViewController.textField.becomeFirstResponder()
+                    print("⌨️ updateUIViewController becomeFirstResponder: \(success), window: \(uiViewController.textField.window != nil)")
+                } else {
+                    print("⚠️ updateUIViewController: text field not in window yet")
+                }
             }
+        } else if !controller.shouldShowKeyboard && uiViewController.textField.isFirstResponder {
+            uiViewController.textField.resignFirstResponder()
         }
     }
 }
@@ -645,7 +684,8 @@ class KeyboardInputViewController: UIViewController {
         super.viewDidLoad()
         
         view.backgroundColor = .clear
-        view.isUserInteractionEnabled = false // Don't block touches
+        // Allow user interaction so text field can receive focus
+        view.isUserInteractionEnabled = true
         
         // Configure text field
         textField.delegate = self
@@ -662,18 +702,20 @@ class KeyboardInputViewController: UIViewController {
         textField.backgroundColor = .clear
         textField.textColor = .clear
         textField.tintColor = .clear
-        textField.alpha = 0.01
+        textField.alpha = 0.02 // Slightly more visible for input system
         textField.placeholder = " "
         textField.text = " "
+        textField.isUserInteractionEnabled = true
+        textField.isEnabled = true
         
-        // Add to view (but make it tiny and invisible)
+        // Make text field larger (but still invisible) - iOS needs minimum size
         textField.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(textField)
         NSLayoutConstraint.activate([
-            textField.widthAnchor.constraint(equalToConstant: 1),
-            textField.heightAnchor.constraint(equalToConstant: 1),
+            textField.widthAnchor.constraint(equalToConstant: 44), // Minimum touch target
+            textField.heightAnchor.constraint(equalToConstant: 44),
             textField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            textField.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            textField.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -10)
         ])
         
         // Register with controller
@@ -683,12 +725,25 @@ class KeyboardInputViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        print("⌨️ KeyboardInputViewController viewDidAppear")
+        print("⌨️ KeyboardInputViewController viewDidAppear, window: \(view.window != nil)")
         
         // Update references
         textField.connection = connection
         textField.keyboardController = controller
         controller?.register(textField)
+        
+        // Try to become first responder if requested
+        if controller?.shouldShowKeyboard == true {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                let success = self.textField.becomeFirstResponder()
+                print("⌨️ viewDidAppear becomeFirstResponder: \(success)")
+            }
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        print("⌨️ KeyboardInputViewController viewWillAppear")
     }
 }
 
