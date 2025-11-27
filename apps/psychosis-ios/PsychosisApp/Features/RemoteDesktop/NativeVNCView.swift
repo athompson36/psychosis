@@ -20,7 +20,6 @@ struct NativeVNCView: View {
     @StateObject private var keyboardController = KeyboardController()
     @State private var lastTapTime: Date = .distantPast
     @State private var isDragging: Bool = false
-    @State private var keyboardHeight: CGFloat = 0
     
     var body: some View {
         GeometryReader { geometry in
@@ -133,7 +132,6 @@ struct NativeVNCView: View {
                                 set: { keyboardController.setKeyboardVisible($0) }
                             )
                         )
-                        .padding(.bottom, keyboardHeight > 0 ? keyboardHeight : 0)
                         
                         // Keyboard toggle button
                         HStack {
@@ -160,8 +158,6 @@ struct NativeVNCView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.black)
-        .animation(.easeOut(duration: 0.25), value: keyboardHeight)
-        // No longer need iOS keyboard notifications - using custom keyboard
         .onChange(of: connection.frameBufferImage) { oldImage, newImage in
             if let newImage = newImage {
                 image = newImage
