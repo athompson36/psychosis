@@ -17,7 +17,7 @@ struct NativeVNCView: View {
     @State private var image: UIImage?
     @State private var initialScaleCalculated: Bool = false
     @State private var imageSize: CGSize = .zero
-    @State private var keyboardController = KeyboardController()
+    @StateObject private var keyboardController = KeyboardController()
     @State private var lastTapTime: Date = .distantPast
     @State private var isDragging: Bool = false
     
@@ -83,34 +83,6 @@ struct NativeVNCView: View {
                             )
                         )
                     
-                    // Keyboard toggle button
-                    VStack {
-                        Spacer()
-                        HStack {
-                            Spacer()
-                            Button(action: {
-                                print("⌨️ Keyboard button tapped")
-                                keyboardController.toggleKeyboard()
-                            }) {
-                                Image(systemName: keyboardController.isKeyboardVisible ? "keyboard.chevron.compact.down" : "keyboard")
-                                    .font(.title2)
-                                    .foregroundColor(.white)
-                                    .padding(12)
-                                    .background(Color.black.opacity(0.6))
-                                    .clipShape(Circle())
-                            }
-                            .padding(.trailing, 16)
-                            .padding(.bottom, 100) // Above home indicator
-                        }
-                    }
-                    
-                    // Hidden keyboard input - always present
-                    VNCKeyboardInputView(
-                        connection: connection,
-                        controller: keyboardController
-                    )
-                    .frame(width: 1, height: 1)
-                    .opacity(0.01)
                 } else {
                     // Loading or disconnected state
                     if connection.isConnecting {
@@ -146,6 +118,37 @@ struct NativeVNCView: View {
                         }
                     }
                 }
+                
+                // Keyboard toggle button - always visible when connected
+                if connection.isConnected {
+                    VStack {
+                        Spacer()
+                        HStack {
+                            Spacer()
+                            Button(action: {
+                                print("⌨️ Keyboard button tapped")
+                                keyboardController.toggleKeyboard()
+                            }) {
+                                Image(systemName: keyboardController.isKeyboardVisible ? "keyboard.chevron.compact.down" : "keyboard")
+                                    .font(.title2)
+                                    .foregroundColor(.white)
+                                    .padding(12)
+                                    .background(Color.black.opacity(0.6))
+                                    .clipShape(Circle())
+                            }
+                            .padding(.trailing, 16)
+                            .padding(.bottom, 100) // Above home indicator
+                        }
+                    }
+                }
+                
+                // Hidden keyboard input - ALWAYS present so it can receive focus
+                VNCKeyboardInputView(
+                    connection: connection,
+                    controller: keyboardController
+                )
+                .frame(width: 1, height: 1)
+                .opacity(0.01)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -310,32 +313,41 @@ struct TapDetectorView: UIViewRepresentable {
 
 // MARK: - Keyboard Controller
 
-@Observable
-class KeyboardController {
-    var isKeyboardVisible: Bool = false
-    private weak var textField: UITextField?
+class KeyboardController: ObservableObject {
+    @Published var isKeyboardVisible: Bool = false
+    @Published var shouldShowKeyboard: Bool = false
+    private var textField: UITextField?
     
     func register(_ textField: UITextField) {
+        print("⌨️ KeyboardController: registered text field")
         self.textField = textField
     }
     
     func showKeyboard() {
-        print("⌨️ showKeyboard called")
-        isKeyboardVisible = true
-        DispatchQueue.main.async { [weak self] in
-            self?.textField?.becomeFirstResponder()
+        print("⌨️ showKeyboard called, textField exists: \(textField != nil)")
+        shouldShowKeyboard = true
+        if let tf = textField {
+            DispatchQueue.main.async {
+                let success = tf.becomeFirstResponder()
+                print("⌨️ becomeFirstResponder result: \(success)")
+                if success {
+                    self.isKeyboardVisible = true
+                }
+            }
+        } else {
+            print("⚠️ No text field registered!")
         }
     }
     
     func hideKeyboard() {
         print("⌨️ hideKeyboard called")
+        shouldShowKeyboard = false
         isKeyboardVisible = false
-        DispatchQueue.main.async { [weak self] in
-            self?.textField?.resignFirstResponder()
-        }
+        textField?.resignFirstResponder()
     }
     
     func toggleKeyboard() {
+        print("⌨️ toggleKeyboard called, current state: \(isKeyboardVisible)")
         if isKeyboardVisible {
             hideKeyboard()
         } else {
@@ -348,7 +360,7 @@ class KeyboardController {
 
 struct VNCKeyboardInputView: UIViewRepresentable {
     let connection: VNCConnection
-    let controller: KeyboardController
+    @ObservedObject var controller: KeyboardController
     
     func makeUIView(context: Context) -> VNCKeyboardTextField {
         let textField = VNCKeyboardTextField()
@@ -366,14 +378,27 @@ struct VNCKeyboardInputView: UIViewRepresentable {
         textField.textColor = .clear
         textField.tintColor = .clear
         
-        // Register with controller
-        controller.register(textField)
+        // Register with controller immediately
+        DispatchQueue.main.async {
+            controller.register(textField)
+        }
         
         return textField
     }
     
     func updateUIView(_ uiView: VNCKeyboardTextField, context: Context) {
         uiView.connection = connection
+        
+        // Re-register in case view was recreated
+        controller.register(uiView)
+        
+        // Respond to shouldShowKeyboard
+        if controller.shouldShowKeyboard && !uiView.isFirstResponder {
+            DispatchQueue.main.async {
+                let success = uiView.becomeFirstResponder()
+                print("⌨️ updateUIView becomeFirstResponder: \(success)")
+            }
+        }
     }
     
     func makeCoordinator() -> Coordinator {
@@ -390,11 +415,16 @@ struct VNCKeyboardInputView: UIViewRepresentable {
         }
         
         func textFieldDidEndEditing(_ textField: UITextField) {
-            controller.isKeyboardVisible = false
+            DispatchQueue.main.async {
+                self.controller.isKeyboardVisible = false
+                self.controller.shouldShowKeyboard = false
+            }
         }
         
         func textFieldDidBeginEditing(_ textField: UITextField) {
-            controller.isKeyboardVisible = true
+            DispatchQueue.main.async {
+                self.controller.isKeyboardVisible = true
+            }
         }
         
         func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
