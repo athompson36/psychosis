@@ -23,17 +23,17 @@ This project provides a phone-optimized UI to:
 ```
 psychosis/
 ├── apps/
-│   ├── hub-backend/          # Node/Express server
+│   ├── psychosis-backend/          # Node/Express server
 │   │   ├── /api/tools       # List registered tools (Dev Remote, VS Code, Xcode)
 │   │   ├── /api/files/*     # File tree & content for configured repo
 │   │   └── /api/chat        # Coding assistant endpoint (OpenAI)
 │   │
-│   ├── hub-frontend/        # React + Vite PWA (Web App)
+│   ├── psychosis-frontend/        # React + Vite PWA (Web App)
 │   │   ├── Top editor bar   # Xcode / VS Code / Dev Remote
 │   │   ├── MainPane         # Portrait top/bottom, landscape side-by-side
 │   │   └── Tabs             # Chat / Editor / Files + Split toggle
 │   │
-│   └── hub-ios/             # Native iOS/iPadOS App
+│   └── psychosis-ios/             # Native iOS/iPadOS App
 │       ├── App/             # App entry point
 │       ├── Features/        # Feature modules (same as web)
 │       ├── Core/            # Shared infrastructure
@@ -67,7 +67,7 @@ psychosis/
 
 ### Primary Mode
 1. Connect iPhone to WireGuard VPN
-2. Open hub in Safari
+2. Open Psychosis in Safari
 3. "Add to Home Screen" for PWA experience
 
 ### Optional: External Access
@@ -86,23 +86,23 @@ psychosis/
 
 #### Backend
 ```bash
-cd apps/hub-backend
+cd apps/psychosis-backend
 npm install
 npm start
 ```
 
 #### Web Frontend
 ```bash
-cd apps/hub-frontend
+cd apps/psychosis-frontend
 npm install
 npm run dev
 ```
 
 #### iOS App
 1. Open Xcode
-2. Create new iOS App project in `apps/hub-ios/`
-3. Add files from `apps/hub-ios/HubApp/` to Xcode project
-4. See `apps/hub-ios/PROJECT_SETUP.md` for detailed instructions
+2. Create new iOS App project in `apps/psychosis-ios/`
+3. Add files from `apps/psychosis-ios/PsychosisApp/` to Xcode project
+4. See `apps/psychosis-ios/PROJECT_SETUP.md` for detailed instructions
 5. Build and run (⌘R)
 
 ## Architecture

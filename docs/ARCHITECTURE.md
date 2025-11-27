@@ -61,7 +61,7 @@ This document describes the architecture decisions, patterns, and structure for 
 ```
 psychosis/
 ├── apps/
-│   ├── hub-backend/              # Node.js + Express backend
+│   ├── psychosis-backend/              # Node.js + Express backend
 │   │   ├── src/
 │   │   │   ├── routes/
 │   │   │   │   ├── tools.js       # /api/tools
@@ -77,7 +77,7 @@ psychosis/
 │   │   ├── package.json
 │   │   └── .env
 │   │
-│   └── hub-frontend/              # React + Vite PWA
+│   └── psychosis-frontend/              # React + Vite PWA
 │       ├── src/
 │       │   ├── components/
 │       │   │   ├── EditorBar/     # Top editor bar

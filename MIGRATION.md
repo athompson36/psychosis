@@ -21,12 +21,12 @@ The iOS SwiftUI code in `XcodeProject/` can be:
 ### 2. Create Correct Project Structure
 ```bash
 # Create backend
-mkdir -p apps/hub-backend/src/{routes,services,middleware}
-cd apps/hub-backend && npm init -y
+mkdir -p apps/psychosis-backend/src/{routes,services,middleware}
+cd apps/psychosis-backend && npm init -y
 
 # Create frontend
-mkdir -p apps/hub-frontend/src/{components,hooks,services,styles}
-cd apps/hub-frontend && npm create vite@latest . -- --template react
+mkdir -p apps/psychosis-frontend/src/{components,hooks,services,styles}
+cd apps/psychosis-frontend && npm create vite@latest . -- --template react
 ```
 
 ### 3. Remove/Archive iOS Code
@@ -44,8 +44,8 @@ rm -rf XcodeProject
 ```
 psychosis/
 ├── apps/
-│   ├── hub-backend/      # Node.js + Express
-│   └── hub-frontend/     # React + Vite PWA
+│   ├── psychosis-backend/      # Node.js + Express
+│   └── psychosis-frontend/     # React + Vite PWA
 ├── docs/                 # Documentation
 └── README.md
 ```

@@ -28,12 +28,12 @@
 ```
 psychosis/
 ├── apps/
-│   ├── hub-backend/          # Node.js + Express server
+│   ├── psychosis-backend/          # Node.js + Express server
 │   │   ├── /api/tools        # List registered tools
 │   │   ├── /api/files/*      # File tree & content
 │   │   └── /api/chat         # AI coding assistant
 │   │
-│   └── hub-frontend/         # React + Vite PWA
+│   └── psychosis-frontend/         # React + Vite PWA
 │       ├── EditorBar         # Tool selector
 │       ├── MainPane          # Split view container
 │       └── Tabs              # Chat / Editor / Files
@@ -142,16 +142,16 @@ psychosis/
 ### 🔴 Critical (Do First)
 1. **Set up backend project**
    ```bash
-   mkdir -p apps/hub-backend
-   cd apps/hub-backend
+   mkdir -p apps/psychosis-backend
+   cd apps/psychosis-backend
    npm init -y
    npm install express
    ```
 
 2. **Set up frontend project**
    ```bash
-   mkdir -p apps/hub-frontend
-   cd apps/hub-frontend
+   mkdir -p apps/psychosis-frontend
+   cd apps/psychosis-frontend
    npm create vite@latest . -- --template react
    ```
 

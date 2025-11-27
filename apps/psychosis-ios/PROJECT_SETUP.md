@@ -1,0 +1,114 @@
+# iOS Project Setup
+
+## Creating the Xcode Project
+
+1. **Open Xcode**
+2. **File → New → Project...**
+3. Select **iOS → App**
+4. Configure:
+   - **Product Name**: `Psychosis`
+   - **Team**: Your development team
+   - **Organization Identifier**: `com.fstech` (or your choice)
+   - **Interface**: SwiftUI
+   - **Language**: Swift
+   - **Storage**: None (we'll use UserDefaults/API)
+5. **Save location**: `apps/psychosis-ios/`
+6. Click **Create**
+
+## Adding Files to Xcode
+
+After creating the project, add the files we've created:
+
+1. **Right-click** on the project in Navigator
+2. **Add Files to "Psychosis"...**
+3. Navigate to `apps/psychosis-ios/PsychosisApp/`
+4. Select all folders:
+   - `App/`
+   - `Features/`
+   - `Core/`
+   - `Resources/`
+5. **IMPORTANT**:
+   - ✅ **"Create groups"** (not folder references)
+   - ❌ **"Copy items if needed"** - UNCHECKED
+   - ✅ **"Add to targets: Psychosis"** - CHECKED
+6. Click **Add**
+
+## Project Structure in Xcode
+
+After adding files, your project should look like:
+
+```
+Psychosis
+├── App
+│   ├── PsychosisApp.swift
+│   └── ContentView.swift
+├── Features
+│   ├── EditorBar
+│   │   └── EditorBarView.swift
+│   ├── MainPane
+│   │   └── MainPaneView.swift
+│   ├── Chat
+│   │   └── ChatView.swift
+│   ├── Editor
+│   │   └── EditorView.swift
+│   └── FileBrowser
+│       └── FileBrowserView.swift
+├── Core
+│   ├── Models
+│   │   └── FileItem.swift
+│   ├── Networking
+│   │   └── APIClient.swift
+│   └── Extensions
+│       └── Color+Hex.swift
+└── Resources
+```
+
+## Configuration
+
+### Info.plist Settings
+
+If using `GENERATE_INFOPLIST_FILE = YES` (default in modern Xcode):
+- No manual Info.plist needed
+- Settings are in Build Settings
+
+If you need to add App Transport Security:
+1. Select project → Target → Info tab
+2. Add key: **App Transport Security Settings** (Dictionary)
+3. Add sub-key: **Allow Arbitrary Loads** (Boolean = YES)
+   - Or add specific domain exceptions
+
+### Build Settings
+
+- **iOS Deployment Target**: 17.0
+- **Swift Language Version**: Swift 5.9
+- **Generate Info.plist File**: YES (default)
+
+### Fix Duplicate File Errors
+
+If you see "Multiple commands produce" errors:
+1. Check Project Navigator for duplicate file references
+2. Remove duplicates (Delete → Remove Reference)
+3. Clean build folder (⇧⌘K)
+4. Rebuild (⌘B)
+5. See `FIX_DUPLICATE_FILES.md` for detailed instructions
+
+## Running the App
+
+1. Select a simulator or device
+2. Press **⌘R** to build and run
+3. The app should launch with the Liquid Glass UI
+
+## Testing
+
+- Test on **iPhone** (portrait/landscape)
+- Test on **iPad** (better split view experience)
+- Test API connectivity (backend must be running)
+
+## Next Steps
+
+1. Connect to backend API
+2. Add Monaco Editor for better code editing
+3. Implement file saving
+4. Add error handling
+5. Polish UI animations
+

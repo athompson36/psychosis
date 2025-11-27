@@ -56,7 +56,7 @@
 
 ### Phase 1 Features (MVP)
 
-#### Backend API (`apps/hub-backend`)
+#### Backend API (`apps/psychosis-backend`)
 
 - [ ] **`/api/tools`** - List registered tools
   - Dev Remote
@@ -73,7 +73,7 @@
   - Repository context awareness
   - Code suggestions and explanations
 
-#### Frontend UI (`apps/hub-frontend`)
+#### Frontend UI (`apps/psychosis-frontend`)
 
 - [ ] **Top Editor Bar**
   - Tool selector (Xcode / VS Code / Dev Remote)

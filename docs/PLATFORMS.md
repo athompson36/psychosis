@@ -11,7 +11,7 @@ Both platforms share the same backend API and provide identical functionality.
 
 ---
 
-## Web App (`apps/hub-frontend`)
+## Web App (`apps/psychosis-frontend`)
 
 ### Technology
 - **React** 18+ with **Vite**
@@ -32,14 +32,14 @@ Both platforms share the same backend API and provide identical functionality.
 
 ### Setup
 ```bash
-cd apps/hub-frontend
+cd apps/psychosis-frontend
 npm install
 npm run dev
 ```
 
 ---
 
-## iOS/iPadOS App (`apps/hub-ios`)
+## iOS/iPadOS App (`apps/psychosis-ios`)
 
 ### Technology
 - **SwiftUI** for UI
@@ -61,8 +61,8 @@ npm run dev
 - Xcode 15.0+
 
 ### Setup
-1. Create Xcode project in `apps/hub-ios/`
-2. Add files from `HubApp/` folder
+1. Create Xcode project in `apps/psychosis-ios/`
+2. Add files from `PsychosisApp/` folder
 3. See `PROJECT_SETUP.md` for details
 4. Build and run
 
@@ -96,7 +96,7 @@ Both platforms provide:
 
 ### Web App Development
 ```bash
-cd apps/hub-frontend
+cd apps/psychosis-frontend
 npm run dev
 # Test at http://localhost:5173
 ```
@@ -109,7 +109,7 @@ npm run dev
 
 ### Backend Development
 ```bash
-cd apps/hub-backend
+cd apps/psychosis-backend
 npm start
 # API at http://localhost:3000/api
 ```

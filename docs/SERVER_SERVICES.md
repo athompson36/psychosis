@@ -9,8 +9,8 @@
 
 | Service | Container Name | Port(s) | Status | Description |
 |---------|---------------|---------|--------|-------------|
-| Hub Frontend | `rydell-maint-hub` | **80** (HTTP) | ⚠️ Unhealthy | Main hub frontend application |
-| Hub Backend | `rydell-backend` | **4000** | ✅ Healthy | Backend API service (Node.js) |
+| Psychosis Frontend | `rydell-maint-hub` | **3001** (HTTP) | ⚠️ Unhealthy | Main frontend application |
+| Psychosis Backend | `rydell-backend` | **5000** | ✅ Healthy | Backend API service (Node.js) |
 | noVNC | `novnc` | **6080** | ✅ Running | VNC web client (for remote desktop) |
 | Portainer | `portainer` | **9000** | ✅ Running | Docker container management UI |
 | Astryx API | `astryx_api_prod` | **8080** (bound to 192.168.4.100) | ✅ Healthy | Astryx production API |
@@ -55,14 +55,14 @@
 | Node.js (MCP Server) | - | MCP server process running in `astryx_api_prod` |
 | Python (app.py) | - | Python application process |
 | Java (Minecraft) | **25565, 25566** | Multiple Minecraft server instances |
-| Nginx | **80** | Web server (likely reverse proxy) |
+| Nginx | **3001** | Web server (likely reverse proxy) |
 | Supervisord | - | Process manager for noVNC |
 | Websockify | **8080** | WebSocket proxy for VNC (internal) |
 
 ## Service Health Summary
 
 ### ✅ Healthy Services
-- Hub Backend (port 4000)
+- Psychosis Backend (port 5000)
 - noVNC (port 6080)
 - Portainer (port 9000)
 - Astryx API (port 8080)
@@ -71,19 +71,19 @@
 - Main Minecraft servers (ports 25565, 25566)
 
 ### ⚠️ Issues Detected
-- **rydell-maint-hub** (port 80): Container status shows "unhealthy"
+- **rydell-maint-hub** (port 3001): Container status shows "unhealthy"
 - **mc-cobblemon**: Container is in restart loop
 
-## Key Ports for Hub Application
+## Key Ports for Psychosis Application
 
-For the Psychosis Hub application, the following services are relevant:
+For the Psychosis application, the following services are relevant:
 
-1. **Hub Backend API**: Port **4000** ✅
-   - Backend service for the hub application
+1. **Psychosis Backend API**: Port **5000** ✅
+   - Backend service for the application
    - Node.js/Express server
    - Database: SQLite (file:/app/prisma/dev.db)
 
-2. **Hub Frontend**: Port **80** ⚠️
+2. **Psychosis Frontend**: Port **3001** ⚠️
    - Frontend web application
    - Currently showing as unhealthy in Docker
 
@@ -94,7 +94,7 @@ For the Psychosis Hub application, the following services are relevant:
 
 ## Notes
 
-- The hub backend is running and accessible on port 4000
+- The Psychosis backend is running and accessible on port 5000
 - The frontend container shows as unhealthy - may need investigation
 - All Minecraft servers are operational except for the Cobblemon server
 - Portainer is available for container management on port 9000
