@@ -20,6 +20,7 @@ struct NativeVNCView: View {
     @StateObject private var keyboardController = KeyboardController()
     @State private var lastTapTime: Date = .distantPast
     @State private var isDragging: Bool = false
+    @State private var keyboardHeight: CGFloat = 0
     
     var body: some View {
         GeometryReader { geometry in
@@ -32,6 +33,7 @@ struct NativeVNCView: View {
                         .offset(offset)
                         .clipped()
                         .contentShape(Rectangle())
+                        .padding(.bottom, keyboardHeight) // Push content up when keyboard appears
                         .highPriorityGesture(
                             // Pinch to zoom
                             MagnificationGesture()
@@ -119,19 +121,18 @@ struct NativeVNCView: View {
                     }
                 }
                 
-                // Keyboard input bar - visible at bottom when keyboard is active
+                // Keyboard input - invisible text field for iOS keyboard
                 if connection.isConnected {
                     VStack {
                         Spacer()
                         
-                        // Custom keyboard view
-                        CustomKeyboardView(
+                        // Invisible text field that triggers iOS keyboard
+                        VNCKeyboardInputView(
                             connection: connection,
-                            isVisible: Binding(
-                                get: { keyboardController.isKeyboardVisible },
-                                set: { keyboardController.setKeyboardVisible($0) }
-                            )
+                            controller: keyboardController
                         )
+                        .frame(width: 0, height: 0)
+                        .opacity(0)
                         
                         // Keyboard toggle button
                         HStack {
@@ -150,7 +151,7 @@ struct NativeVNCView: View {
                                     .clipShape(Circle())
                             }
                             .padding(.trailing, 16)
-                            .padding(.bottom, keyboardController.isKeyboardVisible ? 280 : 16) // Adjust when keyboard is visible
+                            .padding(.bottom, keyboardHeight > 0 ? keyboardHeight + 8 : 16) // Position above keyboard
                         }
                     }
                 }
@@ -158,6 +159,20 @@ struct NativeVNCView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.black)
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { notification in
+            if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                withAnimation(.easeOut(duration: 0.25)) {
+                    keyboardHeight = keyboardFrame.height
+                }
+                print("⌨️ Keyboard showing, height: \(keyboardHeight)")
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            withAnimation(.easeOut(duration: 0.25)) {
+                keyboardHeight = 0
+            }
+            print("⌨️ Keyboard hiding")
+        }
         .onChange(of: connection.frameBufferImage) { oldImage, newImage in
             if let newImage = newImage {
                 image = newImage
@@ -231,12 +246,6 @@ struct NativeVNCView: View {
             // Release after short delay
             try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
             connection.sendMouse(x: clampedX, y: clampedY, buttonMask: 0)
-            
-            // Always show keyboard after any tap on VNC screen
-            print("🖱️ Showing keyboard after tap")
-            await MainActor.run {
-                keyboardController.showKeyboard()
-            }
         }
     }
     
